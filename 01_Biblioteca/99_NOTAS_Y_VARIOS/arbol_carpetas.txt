@@ -1,0 +1,39 @@
+cd C:\SGOF\04_Backend
+
+
+Estoy armando el backend de un sistema de gestión de taxis (SGOF).
+
+Ya tengo:
+- Base de datos PostgreSQL funcionando (Render)
+- Tablas creadas (empresas, usuarios, clientes, pedidos, viajes, etc.)
+- Datos de prueba cargados
+- Backend Node.js con Express funcionando (localhost:3000)
+
+Quiero continuar desde:
+👉 conectar correctamente el backend con PostgreSQL y empezar a crear endpoints reales (ej: /viajes, /clientes, /choferes)
+
+Trabajamos paso a paso, sin saltear nada.
+Soy principiante, necesito instrucciones claras y directas.
+
+🎯 Mañana arrancamos con:
+
+conexión real a DB (pg)
+
+endpoint /test-db validado
+
+endpoint real /viajes
+
+endpoint /clientes
+
+estructura backend ordenada (services / routes)
+
+🧠 IMPORTANTE
+
+Ya hiciste lo más difícil:
+👉 entender flujo completo del sistema
+
+Ahora solo queda:
+👉 convertirlo en API
+
+Descansá tranquilo 😄
+Mañana entramos en modo backend serio

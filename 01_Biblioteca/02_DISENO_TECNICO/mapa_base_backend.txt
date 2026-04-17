@@ -1,0 +1,424 @@
+Mapa base del backend SGOF
+1. Módulo autenticación
+
+Se encarga de entrar al sistema y validar usuarios.
+
+Endpoints base
+
+POST /auth/login
+
+POST /auth/logout
+
+GET /auth/me
+
+Qué hace
+
+valida usuario y contraseña
+
+devuelve sesión o token
+
+identifica rol y empresa
+
+2. Módulo empresas
+
+Administra la empresa y su configuración.
+
+Endpoints base
+
+GET /empresas/:id
+
+POST /empresas
+
+PATCH /empresas/:id
+
+GET /empresas/:id/configuracion
+
+PATCH /empresas/:id/configuracion
+
+Qué hace
+
+crea empresa
+
+consulta datos
+
+actualiza configuración general
+
+3. Módulo usuarios
+
+Administra accesos al sistema.
+
+Endpoints base
+
+GET /usuarios
+
+GET /usuarios/:id
+
+POST /usuarios
+
+PATCH /usuarios/:id
+
+PATCH /usuarios/:id/activar
+
+PATCH /usuarios/:id/desactivar
+
+Qué hace
+
+alta de usuarios
+
+cambio de rol
+
+activación/desactivación
+
+4. Módulo operadoras
+
+Administra personal de cabina.
+
+Endpoints base
+
+GET /operadoras
+
+GET /operadoras/:id
+
+POST /operadoras
+
+PATCH /operadoras/:id
+
+PATCH /operadoras/:id/activar
+
+PATCH /operadoras/:id/desactivar
+
+5. Módulo choferes
+
+Administra choferes.
+
+Endpoints base
+
+GET /choferes
+
+GET /choferes/:id
+
+POST /choferes
+
+PATCH /choferes/:id
+
+PATCH /choferes/:id/estado
+
+PATCH /choferes/:id/activar
+
+PATCH /choferes/:id/desactivar
+
+Qué hace
+
+alta de chofer
+
+cambio de estado
+
+control básico operativo
+
+6. Módulo taxis
+
+Administra unidades.
+
+Endpoints base
+
+GET /taxis
+
+GET /taxis/:id
+
+POST /taxis
+
+PATCH /taxis/:id
+
+PATCH /taxis/:id/estado
+
+PATCH /taxis/:id/activar
+
+PATCH /taxis/:id/desactivar
+
+7. Módulo tablets
+
+Administra dispositivos.
+
+Endpoints base
+
+GET /tablets
+
+GET /tablets/:id
+
+POST /tablets
+
+PATCH /tablets/:id
+
+PATCH /tablets/:id/estado
+
+8. Módulo turnos
+
+Configura turnos de empresa.
+
+Endpoints base
+
+GET /turnos
+
+GET /turnos/:id
+
+POST /turnos
+
+PATCH /turnos/:id
+
+DELETE /turnos/:id o desactivar lógico
+
+9. Módulo clientes
+
+Administra clientes.
+
+Endpoints base
+
+GET /clientes
+
+GET /clientes/:id
+
+POST /clientes
+
+PATCH /clientes/:id
+
+PATCH /clientes/:id/activar
+
+PATCH /clientes/:id/desactivar
+
+10. Módulo pedidos
+
+Es la entrada operativa principal.
+
+Endpoints base
+
+GET /pedidos
+
+GET /pedidos/:id
+
+POST /pedidos
+
+PATCH /pedidos/:id
+
+PATCH /pedidos/:id/estado
+
+POST /pedidos/:id/cancelar
+
+Qué hace
+
+crear pedido
+
+editar datos
+
+cancelar
+
+cambiar estado
+
+11. Módulo asignaciones
+
+Resuelve el despacho.
+
+Endpoints base
+
+GET /asignaciones
+
+GET /asignaciones/:id
+
+POST /asignaciones
+
+PATCH /asignaciones/:id/estado
+
+POST /asignaciones/:id/rechazar
+
+POST /asignaciones/:id/cancelar
+
+Qué hace
+
+asignar chofer/taxi
+
+registrar intentos
+
+marcar principal
+
+gestionar rechazo
+
+12. Módulo viajes
+
+Gestiona el viaje real.
+
+Endpoints base
+
+GET /viajes
+
+GET /viajes/:id
+
+POST /viajes
+
+PATCH /viajes/:id/estado
+
+POST /viajes/:id/iniciar
+
+POST /viajes/:id/finalizar
+
+POST /viajes/:id/cancelar
+
+Qué hace
+
+crea viaje a partir de asignación
+
+cambia estados
+
+finaliza viaje
+
+guarda importe final
+
+13. Módulo pagos
+
+Registra cobro.
+
+Endpoints base
+
+GET /pagos
+
+GET /pagos/:id
+
+POST /pagos
+
+PATCH /pagos/:id
+
+POST /pagos/:id/anular
+
+14. Módulo crédito
+
+Para clientes con cuenta corriente.
+
+Endpoints base
+
+GET /clientes-credito
+
+POST /clientes-credito
+
+PATCH /clientes-credito/:id
+
+GET /movimientos-credito
+
+POST /movimientos-credito
+
+15. Módulo eventos
+
+Bitácora y auditoría.
+
+Endpoints base
+
+GET /eventos
+
+GET /eventos/:id
+
+Normalmente no se crea manualmente desde frontend; lo genera el backend.
+
+16. Módulo GPS
+
+Ubicación y trazabilidad.
+
+Endpoints base
+
+GET /gps-logs
+
+POST /gps-logs
+
+GET /gps-logs/taxi/:id
+
+GET /gps-logs/viaje/:id
+
+Flujo operativo mínimo del backend
+Flujo 1 — Pedido manual
+
+POST /pedidos
+
+buscar chofer/taxi disponible
+
+POST /asignaciones
+
+PATCH /pedidos/:id/estado
+
+POST /viajes
+
+Flujo 2 — Inicio de viaje
+
+POST /viajes/:id/iniciar
+
+PATCH /choferes/:id/estado
+
+PATCH /taxis/:id/estado
+
+Flujo 3 — Finalizar viaje
+
+POST /viajes/:id/finalizar
+
+PATCH /choferes/:id/estado
+
+PATCH /taxis/:id/estado
+
+POST /pagos
+
+Orden recomendado de construcción del backend
+Etapa 1
+
+auth
+
+empresas
+
+usuarios
+
+Etapa 2
+
+clientes
+
+choferes
+
+taxis
+
+Etapa 3
+
+pedidos
+
+asignaciones
+
+viajes
+
+Etapa 4
+
+pagos
+
+eventos
+
+gps_logs
+
+Etapa 5
+
+crédito
+
+reportes
+
+automatizaciones
+
+Lo mínimo para que “funcione”
+
+Si querés un MVP backend de verdad, lo mínimo mínimo es:
+
+POST /auth/login
+
+POST /pedidos
+
+POST /asignaciones
+
+POST /viajes
+
+POST /viajes/:id/finalizar
+
+POST /pagos
+
+GET /viajes
+
+GET /pedidos
+
+Con eso ya tenés operación básica.

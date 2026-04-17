@@ -1,0 +1,257 @@
+1. Crear pedido
+
+Entrada:
+
+empresa_id
+
+cliente_id
+
+origen
+
+destino
+
+cantidad_pasajeros
+
+Acción SQL:
+
+insertar en pedidos
+
+estado inicial = pendiente
+
+Resultado esperado:
+
+pedido creado con su id
+
+2. Buscar chofer y taxi disponibles
+
+Entrada:
+
+empresa_id
+
+Acción SQL:
+
+buscar en choferes un registro con estado = 'disponible'
+
+buscar en taxis un registro con estado = 'disponible'
+
+Resultado esperado:
+
+devolver chofer_id y taxi_id
+
+si no hay, el pedido queda sin_unidad
+
+3. Crear asignación
+
+Entrada:
+
+empresa_id
+
+pedido_id
+
+chofer_id
+
+taxi_id
+
+Acción SQL:
+
+insertar en asignaciones
+
+orden_intento = 1
+
+estado = 'asignada'
+
+es_asignacion_principal = TRUE
+
+Resultado esperado:
+
+asignación creada con su id
+
+4. Actualizar pedido a asignado
+
+Entrada:
+
+pedido_id
+
+Acción SQL:
+
+UPDATE pedidos
+SET estado = 'asignado'
+WHERE id = ?;
+
+Resultado esperado:
+
+pedido ya no está pendiente
+
+5. Crear viaje
+
+Entrada:
+
+empresa_id
+
+pedido_id
+
+asignacion_id
+
+cliente_id
+
+chofer_id
+
+taxi_id
+
+código de viaje
+
+origen
+
+Acción SQL:
+
+insertar en viajes
+
+estado = 'en_viaje'
+
+Resultado esperado:
+
+viaje creado con su id
+
+6. Marcar chofer y taxi como ocupados
+
+Entrada:
+
+chofer_id
+
+taxi_id
+
+Acción SQL:
+
+UPDATE choferes
+SET estado = 'ocupado'
+WHERE id = ?;
+
+UPDATE taxis
+SET estado = 'ocupado'
+WHERE id = ?;
+
+Resultado esperado:
+
+no pueden recibir otro viaje
+
+7. Finalizar viaje
+
+Entrada:
+
+viaje_id
+
+importe_final
+
+Acción SQL:
+
+UPDATE viajes
+SET estado = 'finalizado',
+    fecha_hora_fin = CURRENT_TIMESTAMP,
+    importe_final = ?
+WHERE id = ?;
+
+Resultado esperado:
+
+viaje cerrado
+
+8. Liberar chofer y taxi
+
+Entrada:
+
+chofer_id
+
+taxi_id
+
+Acción SQL:
+
+UPDATE choferes
+SET estado = 'disponible'
+WHERE id = ?;
+
+UPDATE taxis
+SET estado = 'disponible'
+WHERE id = ?;
+
+Resultado esperado:
+
+vuelven a estar disponibles
+
+9. Registrar pago
+
+Entrada:
+
+empresa_id
+
+viaje_id
+
+código de pago
+
+método
+
+monto
+
+Acción SQL:
+
+insertar en pagos
+
+estado = 'pagado'
+
+Resultado esperado:
+
+pago asociado al viaje
+
+10. Registrar evento
+
+Entrada:
+
+empresa_id
+
+tipo_entidad
+
+entidad_id
+
+tipo_evento
+
+descripción
+
+Acción SQL:
+
+insertar en eventos
+
+Resultado esperado:
+
+trazabilidad del sistema
+
+Flujo completo convertido
+1. crear_pedido()
+2. buscar_unidad_disponible()
+3. crear_asignacion()
+4. actualizar_pedido_asignado()
+5. crear_viaje()
+6. marcar_recursos_ocupados()
+7. finalizar_viaje()
+8. liberar_recursos()
+9. registrar_pago()
+10. registrar_evento()
+Lo importante
+
+Esto ya se puede transformar casi directo en backend.
+
+El siguiente paso correcto es:
+
+convertir esto en endpoints o funciones
+
+Ejemplo:
+
+POST /pedidos
+
+POST /asignaciones
+
+POST /viajes
+
+PATCH /viajes/:id/finalizar
+
+POST /pagos
+
+Si querés, ahora vamos con eso y 
+armamos el mapa base del backend.

@@ -1,0 +1,122 @@
+MINI MANUAL — CONEXIÓN + CONSULTA (SGOF)
+🔹 1. Abrir base en DBeaver
+Abrir DBeaver
+En la izquierda:
+👉 Click derecho en sgof_db
+👉 Connect
+
+Si no conecta:
+👉 Edit Connection y verificar:
+
+Host: dpg-xxxx.oregon-postgres.render.com
+Port: 5432
+Database: sgof_db
+User: sgof_db_user
+Password: (tu password)
+
+
+
+ node src/server.cjs
+
+VER ERROR EXACTO:
+
+node --check src/server.cjs
+
+node src/server.cjs   
+
+Acordate esta regla
+node --check
+👉 solo valida sintaxis
+👉 si no dice nada = ✔️ correcto
+node src/server.cjs
+👉 levanta el servidor
+👉 ahí sí aparece:
+
+
+
+
+Proyecto: SGOF (Sistema de Gestión Operativa de Flota)
+
+Estado actual:
+- Backend Node.js + PostgreSQL funcionando
+- CRUD completo de pedidos
+- Asignaciones manuales y automáticas
+- Reasignación con cola (rechazo → siguiente taxi)
+- Viajes automáticos
+- Finalización de viajes
+- Pagos funcionando
+- Tracking GPS (POST /gps)
+- Última posición por taxi (GET /gps/taxi/:id/ultimo)
+- Despacho automático por cercanía usando GPS
+- Endpoint de estado del sistema operativo
+
+Objetivo siguiente:
+Implementar “Mapa lógico”:
+- endpoint que devuelva TODOS los taxis activos
+- con su ÚLTIMA posición GPS
+- incluyendo estado del taxi
+- listo para usar en frontend (mapa o dashboard)
+
+
+
+
+Quiero que sigamos paso a paso, directo a código como veníamos.
+
+
+
+
+
+
+
+ }
+
+      contenedor.innerHTML = '';
+
+      data.taxis.forEach(taxi => {
+        const div = document.createElement('div');
+       div.className = 'taxi-card'; 
+       div.innerHTML = `
+      data.taxis.forEach(taxi => {
+  const div = document.createElement('div');
+  div.className = 'taxi-card';
+
+  div.innerHTML = `
+    <strong>🚕 ${taxi.codigo_movil}</strong><br>
+    Matrícula: ${taxi.matricula}<br>
+    Estado: ${taxi.estado}<br>
+    Operativo: ${taxi.estado_operativo}<br>
+    Velocidad: ${taxi.velocidad_kmh ?? 'sin dato'} km/h<br>
+    Última actualización: ${taxi.ultima_actualizacion}<br>
+    Coordenadas: ${taxi.latitud}, ${taxi.longitud}
+  `;
+
+  contenedor.appendChild(div);
+
+  // 👇 ACÁ VA EL MARCADOR
+  if (taxi.latitud && taxi.longitud) {
+    L.marker([taxi.latitud, taxi.longitud])
+      .addTo(mapa)
+      .bindPopup(`
+        🚕 ${taxi.codigo_movil}<br>
+        ${taxi.estado_operativo}<br>
+        ${taxi.velocidad_kmh ?? 'sin dato'} km/h
+      `);
+  }
+
+}); 
+  <strong>🚕 ${taxi.codigo_movil}</strong><br>
+  Matrícula: ${taxi.matricula}<br>
+  Estado: ${taxi.estado}<br>
+  Operativo: ${taxi.estado_operativo}<br>
+  Velocidad: ${taxi.velocidad_kmh ?? 'sin dato'} km/h<br>
+  Última actualización: ${taxi.ultima_actualizacion}<br>
+  Coordenadas: ${taxi.latitud}, ${taxi.longitud}
+`;
+        contenedor.appendChild(div);
+      });
+
+    } catch (error) {
+      console.error(error);
+      document.getElementById('taxis').innerHTML = 'Error cargando taxis';
+    }
+  }

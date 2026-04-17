@@ -1,0 +1,37 @@
+SISTEMA SGOF — ÍNDICE GENERAL
+
+01_FUNDAMENTOS
+Base conceptual del sistema:
+- Arquitectura general (01_Arquitectura_general_SGOF.pdf)
+- Arquitectura técnica (02_Arquitectura_tecnica_SGOF.pdf)
+- Modelo de datos (03_Base_de_datos_SGOF.pdf)
+- Estados del sistema (04_Modelo_estados_SGOF.pdf)
+- Eventos del sistema (05_Modelo_eventos_SGOF.pdf)
+- Algoritmo base de despacho (06_Algoritmo_despacho_SGOF.pdf)
+- SQL inicial (07_SQL_inicial_SGOF.pdf)
+
+02_DISENO_TECNICO
+Definición técnica del sistema:
+- Arquitectura base (SGOF_arquitectura_base.pdf)
+- Árbol técnico y módulos (SGOF_arbol_tecnico_y_modulos.pdf)
+- Modelo técnico completo (sistema_digital_taxis_modelo_tecnico.pdf)
+- Base de datos y relaciones (SGOF_base_de_datos_tablas_relaciones.pdf)
+
+03_OPERACION_Y_UI
+Interacción del usuario:
+- Pantalla de despacho operadora (SGOF_diseño_pantalla_despacho_operadora.pdf)
+
+04_ALGORITMOS
+Lógica avanzada:
+- Algoritmo optimizado de despacho (SGOF_algoritmo_avanzado_digital.pdf)
+
+05_DESARROLLO_Y_ESTADO
+Evolución del sistema:
+- Avance backend viajes (SGOF_avance_backend_viajes.pdf)
+- Estado intermedio del sistema (SGOF_estado_actual_control_intermedio.pdf)
+
+06_PROYECTO_ACTUAL
+Implementación práctica:
+- Resumen del proyecto actual (proyecto_taxis_resumen.pdf)
+- Resumen sistema taxis digital (resumen_sistema_taxis_digital.pdf)
+- Plan de digitalización (plan_pasos_digitalizacion_taxis.pdf)

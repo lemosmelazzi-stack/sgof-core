@@ -1,0 +1,162 @@
+Perfecto. Acá van las 10 reglas operativas base de SGOF, claras y listas para usar después en backend.
+
+Reglas operativas SGOF
+1. Todo pedido nace en estado pendiente
+
+Cuando entra una solicitud de viaje, se crea un registro en pedidos con:
+
+empresa
+
+cliente
+
+origen
+
+destino si existe
+
+cantidad de pasajeros
+
+fecha/hora
+
+estado = pendiente
+
+Ese es el punto de entrada del sistema.
+
+2. No se asigna un pedido si no hay chofer y taxi disponibles
+
+Antes de asignar, el sistema debe verificar:
+
+chofer en estado disponible
+
+taxi en estado disponible
+
+Si falta uno de los dos, el pedido no se asigna.
+
+3. Cada intento de despacho queda registrado
+
+Cada intento se guarda en asignaciones con:
+
+pedido
+
+chofer
+
+taxi
+
+orden de intento
+
+fecha/hora
+
+estado del intento
+
+Esto permite trazabilidad completa.
+
+4. Solo una asignación puede ser principal por pedido
+
+Un pedido puede tener varios intentos, pero solo uno puede quedar como:
+
+es_asignacion_principal = TRUE
+
+Esa es la asignación válida.
+
+5. Cuando un pedido se asigna, cambia de estado
+
+Si la asignación es válida:
+
+pedidos.estado = 'asignado'
+
+Y la asignación queda:
+
+asignaciones.estado = 'asignada'
+
+6. Cuando se crea el viaje, chofer y taxi quedan ocupados
+
+Al crear un registro en viajes:
+
+choferes.estado = 'ocupado'
+
+taxis.estado = 'ocupado'
+
+Así el sistema evita doble asignación.
+
+7. El viaje recorre estados operativos
+
+El viaje puede pasar por:
+
+pendiente
+
+en_camino_origen
+
+en_origen
+
+en_viaje
+
+finalizado
+
+cancelado
+
+no_show
+
+Esto permite seguimiento real de la operación.
+
+8. Al finalizar un viaje se libera la unidad
+
+Cuando el viaje termina:
+
+viajes.estado = 'finalizado'
+
+se completa fecha_hora_fin
+
+se completa importe_final
+
+choferes.estado = 'disponible'
+
+taxis.estado = 'disponible'
+
+9. Todo cobro debe vincularse a un viaje
+
+Un pago no existe solo.
+Siempre debe apuntar a:
+
+viaje_id
+
+Y registrar:
+
+método de pago
+
+estado
+
+monto
+
+fecha/hora
+
+10. Todo cambio importante debe poder auditarse
+
+Los eventos relevantes del sistema deben registrarse en eventos, por ejemplo:
+
+pedido creado
+
+asignación realizada
+
+viaje iniciado
+
+viaje finalizado
+
+pago registrado
+
+cancelación
+
+Eso deja historial completo para control y soporte.
+
+Resumen del flujo oficial
+cliente
+→ pedido pendiente
+→ búsqueda de chofer/taxi disponible
+→ asignación
+→ pedido asignado
+→ viaje creado
+→ chofer/taxi ocupados
+→ viaje finalizado
+→ chofer/taxi disponibles
+→ pago
+→ evento auditado
+
+

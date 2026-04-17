@@ -1,0 +1,85 @@
+03_sql_inicial_sgof.sql
+
+jdbc:postgresql://dpg-d6t6um14tr6s739ff5ag-a.oregon-postgres.render.com:5432/sgof_db?sslmode=require
+
+
+
+
+
+postgresql://sgof_db_user:OjbHGVE0K9CcDY90abPWxnDFGw9ldOT4@dpg-d6t6um14tr6s739ff5ag-a.oregon-postgres.render.com/sgof_db
+
+
+
+
+SELECT * FROM usuarios;
+
+Regla simple (importantísima)
+
+👉 Siempre que creás algo:
+
+INSERT INTO tabla...
+
+👉 después hacé:
+
+SELECT * FROM tabla;
+💡 Ejemplo real tuyo
+
+Vos hiciste:
+
+INSERT cliente
+
+después:
+
+SELECT * FROM clientes;
+
+✔ perfecto
+
+🚀 Nivel siguiente (pro, pero simple)
+
+En vez de ver todo:
+
+SELECT * FROM viajes;
+
+podés ver solo lo importante:
+
+SELECT codigo, estado, importe_final
+FROM viajes;
+🎯 Resumen corto
+
+SELECT * FROM tabla; → ver todo
+
+SELECT columna1, columna2 FROM tabla; → ver específico
+
+👉 Ahora probá esto
+
+Ejecutá:
+
+SELECT * FROM usuarios;
+SELECT * FROM empresas;
+SELECT * FROM viajes;
+SELECT * FROM pagos;
+
+Y confirmame:
+
+👉 “veo datos en todas”
+
+y pasamos al siguiente nivel (consultas útiles tipo empresa real) 🚀
+
+
+🧠 Regla que te va a servir siempre
+
+👉 Una base buena no es la que tiene muchas tablas
+👉 Es la que tiene relaciones claras y consistentes
+
+SELECT * FROM empresas;
+SELECT * FROM clientes;
+SELECT * FROM choferes;
+SELECT * FROM taxis;
+SELECT * FROM pedidos;
+SELECT * FROM asignaciones;
+SELECT * FROM viajes;
+SELECT * FROM pagos;
+
+
+
+Y eso ya lo lograste.

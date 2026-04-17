@@ -1,0 +1,38 @@
+DIAGRAMA.
+	NUCLEO DEL SISTEMA
+
+	Diagrama 1 — Núcleo del sistema
+CLIENTES
+   ↓
+PEDIDOS
+   ↓
+ASIGNACIONES
+   ↓
+VIAJES
+   ↓
+PAGOS
+🔷 Diagrama 2 — Recursos operativos
+CHOFERES ───┐
+            ├── ASIGNACIONES ─── VIAJES
+TAXIS   ────┘
+🔷 Diagrama 3 — Multiempresa (clave del sistema)
+EMPRESAS
+   ↓
+├── USUARIOS
+├── CHOFERES
+├── TAXIS
+├── CLIENTES
+├── PEDIDOS
+├── VIAJES
+└── PAGOS
+🔷 Diagrama 4 — Auditoría y tracking
+VIAJES ─── GPS_LOGS
+   │
+   └── EVENTOS
+🔷 Diagrama 5 — Crédito
+CLIENTES
+   ↓
+CLIENTES_CREDITO
+   ↓
+MOVIMIENTOS_CREDITO
+
