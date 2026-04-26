@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalle de Viaje</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f7fa;
+      color: #222;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 700px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .item {
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #555;
+      display: inline-block;
+      width: 140px;
+    }
+
+    .estado-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .estado-pendiente { background: #6c757d; }
+    .estado-en_origen { background: #fd7e14; }
+    .estado-en_viaje { background: #0d6efd; }
+    .estado-finalizado { background: #198754; }
+    .estado-cancelado { background: #dc3545; }
+
+    .acciones {
+      margin-top: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+    }
+#mapaViaje {
+  width: 100%;
+  height: 400px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+  </style>
+</head>
+<body>
+
+  <h1>Detalle de Viaje</h1>
+
+  <div class="card" id="detalle">Cargando...</div>
+
+<div class="card" style="margin-top: 20px;">
+  <h2>Mapa del viaje</h2>
+  <div id="mapaViaje"></div>
+</div>
+
+ <div class="acciones">
+  <a href="/viajes.html" class="btn">Volver al listado</a>
+  <a id="btnMapa" href="#" class="btn" style="margin-left: 10px;">Ver en mapa operativo</a>
+</div>
+  <script>
+    function getId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    async function cargarDetalle() {
+      try {
+        const id = getId();
+
+        if (!id) {
+          document.getElementById('detalle').innerHTML = 'No se recibió un ID de viaje.';
+          return;
+        }
+
+        const res = await fetch('/viajes/' + id);
+const json = await res.json();
+
+if (!json.ok) {
+  document.getElementById('detalle').innerHTML = 'Viaje no encontrado.';
+  return;
+}
+
+const viaje = json.data;
+document.getElementById('btnMapa').href = `/mapa.html?viajeId=${viaje.id}`;
+
+        if (!viaje) {
+          document.getElementById('detalle').innerHTML = 'Viaje no encontrado.';
+          return;
+        }
+
+document.getElementById('detalle').innerHTML = `
+  <div class="item"><span class="label">Código:</span> ${viaje.codigo ?? ''}</div>
+
+  <div class="item">
+    <span class="label">Estado:</span>
+    <span class="estado-badge estado-${viaje.estado}">
+      ${viaje.estado ?? ''}
+    </span>
+  </div>
+
+  <div class="item"><span class="label">Origen:</span> ${viaje.origen_direccion ?? ''}</div>
+  <div class="item"><span class="label">Destino:</span> ${viaje.destino_direccion ?? ''}</div>
+
+  <div class="item">
+    <span class="label">Inicio:</span>
+    ${viaje.fecha_hora_inicio ? new Date(viaje.fecha_hora_inicio).toLocaleString() : ''}
+  </div>
+
+  <div class="item">
+    <span class="label">Fin:</span>
+    ${viaje.fecha_hora_fin ? new Date(viaje.fecha_hora_fin).toLocaleString() : ''}
+  </div>
+
+  <div class="item">
+    <span class="label">Importe:</span>
+    ${
+      viaje.importe_final !== null && viaje.importe_final !== undefined
+        ? new Intl.NumberFormat('es-AR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }).format(viaje.importe_final)
+        : ''
+    }
+  </div>
+`;
+
+if (
+  viaje.origen_latitud &&
+  viaje.origen_longitud &&
+  viaje.destino_latitud &&
+  viaje.destino_longitud
+) {
+  const origen = [parseFloat(viaje.origen_latitud), parseFloat(viaje.origen_longitud)];
+  const destino = [parseFloat(viaje.destino_latitud), parseFloat(viaje.destino_longitud)];
+
+  const mapa = L.map('mapaViaje');
+  mapa.setView(origen, 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(mapa);
+
+  L.marker(origen).addTo(mapa).bindPopup('Origen').openPopup();
+  L.marker(destino).addTo(mapa).bindPopup('Destino');
+
+  const bounds = L.latLngBounds([origen, destino]);
+  mapa.fitBounds(bounds, { padding: [50, 50] });
+} else {
+  document.getElementById('mapaViaje').innerHTML =
+    'Este viaje no tiene coordenadas cargadas.';
+}
+
+      } catch (error) {
+        document.getElementById('detalle').innerHTML = 'Error cargando detalle del viaje.';
+        console.error(error);
+      }
+    }
+
+    cargarDetalle();
+  </script>
+
+</body>
+</html>

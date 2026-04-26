@@ -212,15 +212,27 @@
   <div id="app-layout">
     <!-- PANEL IZQUIERDO -->
     <aside id="panel-pendientes">
-      <h2>Viajes pendientes</h2>
+  <h2>Viajes pendientes</h2>
 
-      <div id="lista-pendientes">Cargando...</div>
+<div id="lista-pendientes">Cargando...</div>
 
-      <hr />
+  <hr />
 
-      <h3>Viaje seleccionado</h3>
-      <div id="detalle-viaje">Ningún viaje seleccionado</div>
-    </aside>
+  <h3>Viaje seleccionado</h3>
+  <div id="detalle-viaje"></div>
+
+  <button id="btn-asignar-taxi">Asignar taxi seleccionado</button>
+<button id="btn-en-origen">
+  Taxi llegó al origen
+</button>
+<button id="btn-iniciar-viaje">
+  Iniciar viaje
+</button>
+<button id="btn-finalizar-viaje">
+  Finalizar viaje
+</button>
+
+</aside>
 
     <!-- CONTENEDOR DERECHO -->
     <main id="contenido-principal">
@@ -241,13 +253,11 @@
 <script src="viajes.js"></script>
 
 <script>
-  cargarTaxis();
-  cargarPendientes();
-  animarTaxis();
+  // Actualiza periódicamente taxis cada 5 segundos
+cargarTaxis();
+cargarPendientes();
+setInterval(actualizarTaxisPeriodico, 5000);
 
- setInterval(() => {
-  actualizarTaxisPeriodico();
-}, FETCH_INTERVAL); 
 
 </script>
 

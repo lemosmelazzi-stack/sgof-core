@@ -1,3 +1,4 @@
+let filtroActivo = 'todos';
 function taxiDisponibleParaAsignar(taxi) {
   return (taxi.estado || '').toLowerCase() === 'disponible' &&
     taxi.estado_operativo !== 'disponible_en_movimiento';
@@ -79,13 +80,30 @@ function getTaxiCardHTML(taxi) {
 function renderTaxiCard(taxi) {
   const div = document.createElement('div');
   div.className = 'taxi-card';
+  div.tabIndex = -1;
 
-  const estadoVisible =
-    taxi.estado_operativo === 'disponible_en_movimiento'
-      ? 'Asignado / en movimiento'
-      : (taxi.estado ?? 'sin dato');
+  div.innerHTML = getTaxiCardHTML(taxi);
 
- // Actualiza una tarjeta existente sin recrearla completa
+  if (!taxiDisponibleParaAsignar(taxi)) {
+    div.style.opacity = '0.65';
+    div.style.cursor = 'not-allowed';
+  } else {
+    div.style.opacity = '1';
+    div.style.cursor = 'pointer';
+  }
+
+  div.onclick = () => {
+    if (!taxiDisponibleParaAsignar(taxi)) {
+      mostrarMensaje('Ese taxi no está disponible', 'error');
+      return;
+    }
+
+    seleccionarTaxi(taxi.taxi_id, true, true, false);
+  };
+
+  return div;
+}
+
 function actualizarTaxiCardExistente(taxi, div) {
   div.innerHTML = getTaxiCardHTML(taxi);
 
@@ -106,23 +124,6 @@ function actualizarTaxiCardExistente(taxi, div) {
     seleccionarTaxi(taxi.taxi_id, true, true, false);
   };
 }
-
-  if (!taxiDisponibleParaAsignar(taxi)) {
-    div.style.opacity = '0.65';
-    div.style.cursor = 'not-allowed';
-  }
-
-  div.onclick = () => {
-    if (!taxiDisponibleParaAsignar(taxi)) {
-      mostrarMensaje('Ese taxi no está disponible', 'error');
-      return;
-    }
-
-    seleccionarTaxi(taxi.taxi_id, true, true, false);
-  };
-
-  return div;
-}
 function renderResumen(total, disponibles, enMovimiento, ocupados) {
   document.getElementById('resumen').innerHTML = `
     <div class="resumen-item">Total: ${total}</div>
@@ -140,6 +141,7 @@ function renderLeyenda() {
     <div class="leyenda-item"><span class="leyenda-color" style="background: gray;"></span>Sin estado</div>
   `;
 }
+
 function renderFiltros() {
   document.getElementById('filtros').innerHTML = `
     <button class="filtro-btn ${filtroActivo === 'todos' ? 'activo' : ''}" onclick="filtroActivo='todos'; cargarTaxis()">Todos</button>
@@ -222,6 +224,18 @@ async function fetchTaxis() {
   return await res.json();
 }
 
+function reordenarCardsSegunTaxis(taxis) {
+  const contenedor = document.getElementById('taxis');
+  if (!contenedor) return;
+
+  taxis.forEach((taxi) => {
+    const card = cardsPorTaxi[taxi.taxi_id];
+    if (card) {
+      contenedor.appendChild(card);
+    }
+  });
+}
+
 // Actualiza solo resumen, cards y marcadores sin reconstruir toda la lista
 async function actualizarTaxisPeriodico() {
   try {
@@ -239,7 +253,7 @@ async function actualizarTaxisPeriodico() {
 
     data.taxis.forEach((taxi) => {
       if (taxi.estado === 'ocupado') ocupados++;
-      else if (taxi.estado_operativo === 'disponible_en_movimiento') enMovimiento++;
+     else if (taxi.estado === 'disponible_en_movimiento') enMovimiento++;
       else if (taxi.estado === 'disponible') disponibles++;
 
       taxisVistos.add(taxi.taxi_id);
@@ -311,7 +325,7 @@ async function cargarTaxis() {
 
     data.taxis.forEach((taxi) => {
       if (taxi.estado === 'ocupado') ocupados++;
-      else if (taxi.estado_operativo === 'disponible_en_movimiento') enMovimiento++;
+      else if (taxi.estado === 'disponible_en_movimiento') enMovimiento++;
       else if (taxi.estado === 'disponible') disponibles++;
     });
 
@@ -326,7 +340,7 @@ renderFiltros();
     data.taxis.forEach((taxi) => {
       if (filtroActivo !== 'todos') {
         if (filtroActivo === 'disponible' && taxi.estado !== 'disponible') return;
-        if (filtroActivo === 'movimiento' && taxi.estado_operativo !== 'disponible_en_movimiento') return;
+        if (filtroActivo === 'movimiento' && taxi.estado !== 'disponible_en_movimiento') return;
         if (filtroActivo === 'ocupado' && taxi.estado !== 'ocupado') return;
       }
 
@@ -340,16 +354,7 @@ renderFiltros();
     });
 
     // Reordena las tarjetas en el panel según el orden actual de los taxis
-function reordenarCardsSegunTaxis(taxisOrdenados) {
-  const contenedor = document.getElementById('taxis');
 
-  taxisOrdenados.forEach((taxi) => {
-    const card = cardsPorTaxi[taxi.taxi_id];
-    if (card) {
-      contenedor.appendChild(card);
-    }
-  });
-}
 
     Object.keys(marcadoresPorTaxi).forEach((taxiId) => {
       if (!taxisVistos.has(taxiId)) {
@@ -380,5 +385,22 @@ function reordenarCardsSegunTaxis(taxisOrdenados) {
       'Error cargando taxis: ' + error.message;
   }
 }
+function reordenarCardsSegunTaxis(taxisOrdenados) {
+  const contenedor = document.getElementById('taxis');
+  if (!contenedor) return;
 
-
+  taxisOrdenados.forEach((taxi) => {
+    const card = cardsPorTaxi[taxi.taxi_id];
+    if (card) {
+      contenedor.appendChild(card);
+    }
+  });
+}
+// Actualiza periódicamente taxis cada 5 segundos
+async function actualizarTaxisPeriodico() {
+  try {
+    await cargarTaxis();
+  } catch (error) {
+    console.error('Error actualizando taxis periódicamente:', error);
+  }
+}

@@ -114,11 +114,12 @@ actualizarTaxisPeriodico();
 }
 // Carga los viajes pendientes desde el backend y los muestra en pantalla
 async function cargarPendientes() {
+ console.log('ENTRANDO A cargarPendientes');  
   try {
-  const response = await fetch('/viajes?estado=pendiente');  
+     const response = await fetch('/viajes?estado=pendiente');  
     const result = await response.json();
-
-    const lista = document.getElementById('lista-pendientes');
+ console.log('RESULTADO VIAJES EN MAPA:', result);
+        const lista = document.getElementById('lista-pendientes');
 
     if (!result.ok) {
       lista.innerHTML = '<p>Error al cargar viajes</p>';

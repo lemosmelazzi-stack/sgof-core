@@ -43,11 +43,39 @@ app.get('/test-db', async (req, res) => {
 // ======================================================
 // ENDPOINTS DE TAXIS
 // ======================================================
+app.get('/mapa-taxis', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        t.id AS taxi_id,
+        t.codigo_movil,
+        t.estado,
+        g.latitud,
+        g.longitud
+      FROM taxis t
+      LEFT JOIN LATERAL (
+        SELECT latitud, longitud
+        FROM gps_logs
+        WHERE taxi_id = t.id
+        ORDER BY fecha_hora_gps DESC
+        LIMIT 1
+      ) g ON true
+      WHERE t.activo = true
+    `);
 
+    res.json({
+      ok: true,
+      taxis: result.rows
+    });
 
-// ======================================================
-// SERVIDOR
-// ======================================================
+  } catch (error) {
+    console.error('Error en /mapa-taxis:', error);
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
 
 app.listen(3000, () => {
   console.log('Servidor corriendo en http://localhost:3000');

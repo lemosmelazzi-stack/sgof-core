@@ -2,6 +2,108 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../config/db');
 
+router.get('/resumen', async (req, res) => {
+  try {
+    const { desde, hasta, estado } = req.query;
+
+    // 🔹 Construir filtros dinámicos
+    let filtros = [];
+    let valores = [];
+
+    if (estado) {
+      valores.push(estado);
+      filtros.push(`estado = $${valores.length}`);
+    }
+
+    if (desde) {
+      valores.push(desde);
+      filtros.push(`fecha_hora_inicio >= $${valores.length}`);
+    }
+
+    if (hasta) {
+      valores.push(hasta);
+      filtros.push(`fecha_hora_inicio <= $${valores.length}`);
+    }
+
+   const whereClause = filtros.length ? `WHERE ${filtros.join(' AND ')}` : 'WHERE TRUE';
+    // 🔹 Queries
+    const totalQuery = `
+      SELECT COUNT(*) AS total_viajes
+      FROM viajes
+      ${whereClause}
+    `;
+
+    const estadoQuery = `
+      SELECT estado, COUNT(*) AS cantidad
+      FROM viajes
+      ${whereClause}
+      GROUP BY estado
+      ORDER BY estado
+    `;
+
+    const porMesQuery = `
+      SELECT
+        TO_CHAR(fecha_hora_inicio, 'YYYY-MM') AS periodo,
+        COUNT(*) AS cantidad
+      FROM viajes
+      ${whereClause}
+      AND fecha_hora_inicio IS NOT NULL
+      GROUP BY periodo
+      ORDER BY periodo
+    `;
+
+    const metricasQuery = `
+      SELECT
+        COALESCE(SUM(distancia_km), 0) AS distancia_total_km,
+        COALESCE(SUM(importe_final), 0) AS importe_total,
+        COALESCE(SUM(duracion_minutos), 0) AS duracion_total_min,
+        COALESCE(AVG(importe_final), 0) AS promedio_importe
+      FROM viajes
+      ${whereClause}
+      AND estado = 'finalizado'
+    `;
+
+    // 🔹 Ejecutar queries
+    const totalResult = await pool.query(totalQuery, valores);
+    const estadoResult = await pool.query(estadoQuery, valores);
+    const porMesResult = await pool.query(porMesQuery, valores);
+    const metricasResult = await pool.query(metricasQuery, valores);
+
+    // 🔹 Respuesta
+    res.json({
+      ok: true,
+      data: {
+        total_viajes: parseInt(totalResult.rows[0].total_viajes, 10),
+
+        por_estado: estadoResult.rows.map(row => ({
+          estado: row.estado,
+          cantidad: parseInt(row.cantidad, 10)
+        })),
+
+        por_mes: porMesResult.rows.map(row => ({
+          periodo: row.periodo,
+          cantidad: parseInt(row.cantidad, 10)
+        })),
+
+        metricas: {
+          distancia_total_km: Number(metricasResult.rows[0].distancia_total_km),
+          importe_total: Number(metricasResult.rows[0].importe_total),
+          duracion_total_min: Number(metricasResult.rows[0].duracion_total_min),
+          promedio_importe: Number(metricasResult.rows[0].promedio_importe)
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en GET /viajes/resumen:', error);
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error al obtener resumen de viajes',
+      error: error.message
+    });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
    const { empresa_id, estado, desde, hasta, limit, offset, sort, order } = req.query;
@@ -110,6 +212,61 @@ res.json({
   }
 });
 
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        codigo,
+        estado,
+        empresa_id,
+        pedido_id,
+        cliente_id,
+        chofer_id,
+        taxi_id,
+        origen_direccion,
+        destino_direccion,
+        origen_latitud,
+        origen_longitud,
+        destino_latitud,
+        destino_longitud,
+        fecha_hora_inicio,
+        fecha_hora_fin,
+        distancia_km,
+        duracion_minutos,
+        importe_estimado,
+        importe_final,
+        fecha_creacion
+      FROM viajes
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Viaje no encontrado'
+      });
+    }
+
+    return res.json({
+      ok: true,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error en GET /viajes/:id:', error);
+    return res.status(500).json({
+      ok: false,
+      mensaje: 'Error al obtener viaje',
+      error: error.message
+    });
+  }
+});
+
 router.post('/:id/despachar', async (req, res) => {
   try {
     const { id } = req.params;
@@ -161,10 +318,10 @@ router.post('/:id/despachar', async (req, res) => {
     `, [taxiId, id]);
 
     await pool.query(`
-      UPDATE taxis
-      SET estado = 'ocupado'
-      WHERE id = $1
-    `, [taxiId]);
+  UPDATE taxis
+  SET estado = 'disponible_en_movimiento'
+  WHERE id = $1
+`, [taxiId]);
 
     res.json({
       ok: true,
@@ -257,9 +414,9 @@ router.post('/:id/finalizar', async (req, res) => {
     }
 
     const viajeExiste = await pool.query(
-  'SELECT id, estado FROM viajes WHERE id = $1',
-  [id]
-);
+      'SELECT id, estado FROM viajes WHERE id = $1',
+      [id]
+    );
 
     if (viajeExiste.rows.length === 0) {
       return res.status(404).json({
@@ -267,15 +424,16 @@ router.post('/:id/finalizar', async (req, res) => {
         mensaje: 'Viaje no encontrado'
       });
     }
+
     if (
-  viajeExiste.rows[0].estado === 'finalizado' ||
-  viajeExiste.rows[0].estado === 'cancelado'
-) {
-  return res.status(400).json({
-    ok: false,
-    mensaje: `No se puede asignar taxi a un viaje en estado ${viajeExiste.rows[0].estado}`
-  });
-}
+      viajeExiste.rows[0].estado === 'finalizado' ||
+      viajeExiste.rows[0].estado === 'cancelado'
+    ) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: `No se puede asignar taxi a un viaje en estado ${viajeExiste.rows[0].estado}`
+      });
+    }
 
     const taxiExiste = await pool.query(
       'SELECT id, codigo_movil, estado, activo FROM taxis WHERE id = $1 LIMIT 1',
@@ -300,7 +458,7 @@ router.post('/:id/finalizar', async (req, res) => {
 
     const resultTaxi = await pool.query(`
       UPDATE taxis
-      SET estado = 'ocupado'
+      SET estado = 'disponible_en_movimiento'
       WHERE id = $1
       RETURNING id, codigo_movil, estado
     `, [taxi_id]);
@@ -320,7 +478,110 @@ router.post('/:id/finalizar', async (req, res) => {
       error: error.message
     });
   }
-}); 
+});
+
+router.put('/:id/en-origen', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await pool.query(`
+      UPDATE viajes
+      SET estado = 'en_origen',
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+    `, [id]);
+
+    res.json({ ok: true });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false });
+  }
+});
+
+router.put('/:id/iniciar-viaje', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const viaje = await pool.query(
+      'SELECT taxi_id FROM viajes WHERE id = $1',
+      [id]
+    );
+
+    if (viaje.rows.length === 0) {
+      return res.status(404).json({ ok: false, mensaje: 'Viaje no encontrado' });
+    }
+
+    const taxi_id = viaje.rows[0].taxi_id;
+
+    // 1. actualizar viaje
+    await pool.query(`
+      UPDATE viajes
+      SET estado = 'en_viaje',
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+    `, [id]);
+
+    // 2. actualizar taxi
+    if (taxi_id) {
+      await pool.query(`
+        UPDATE taxis
+        SET estado = 'ocupado'
+        WHERE id = $1
+      `, [taxi_id]);
+    }
+
+    res.json({ ok: true });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false });
+  }
+});
+
+router.put('/:id/finalizar-viaje', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const viaje = await pool.query(
+      'SELECT taxi_id FROM viajes WHERE id = $1',
+      [id]
+    );
+
+    if (viaje.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Viaje no encontrado'
+      });
+    }
+
+    const taxi_id = viaje.rows[0].taxi_id;
+
+    // 1. cerrar viaje
+    await pool.query(`
+      UPDATE viajes
+      SET estado = 'finalizado',
+          fecha_hora_fin = NOW(),
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+    `, [id]);
+
+    // 2. liberar taxi
+    if (taxi_id) {
+      await pool.query(`
+        UPDATE taxis
+        SET estado = 'disponible'
+        WHERE id = $1
+      `, [taxi_id]);
+    }
+
+    res.json({ ok: true });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false });
+  }
+});
 
 router.put('/:id/desasignar-taxi', async (req, res) => {
   const { id } = req.params;
@@ -369,6 +630,7 @@ router.put('/:id/desasignar-taxi', async (req, res) => {
       mensaje: 'Taxi desasignado correctamente',
       viaje: result.rows[0]
     });
+
   } catch (error) {
     console.error('Error en PUT /viajes/:id/desasignar-taxi:', error);
     res.status(500).json({
@@ -378,6 +640,4 @@ router.put('/:id/desasignar-taxi', async (req, res) => {
     });
   }
 });
-
-
 module.exports = router;

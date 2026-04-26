@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Viajes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f7fa;
+      color: #222;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .filtros {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filtros select,
+    .filtros input,
+    .filtros button {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .filtros button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+tr:hover {
+  background-color: #e0edff;
+  cursor: pointer;
+  transform: scale(1.01);
+  transition: all 0.15s ease;
+}
+
+    th {
+      background: #f0f2f5;
+    }
+
+    .paginacion {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .paginacion button {
+      padding: 8px 12px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+<style>
+  .paginacion button {
+    padding: 8px 12px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* 👇 PEGALO ACÁ */
+
+  .estado-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+  }
+
+  .estado-pendiente { background: #6c757d; }
+  .estado-en_origen { background: #fd7e14; }
+  .estado-en_viaje { background: #0d6efd; }
+  .estado-finalizado { background: #198754; }
+  .estado-cancelado { background: #dc3545; }
+
+
+  </style>
+</head>
+<body>
+
+  <h1>Listado de Viajes</h1>
+
+  <div class="filtros">
+    <select id="estadoFiltro">
+      <option value="">Todos los estados</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="en_origen">En origen</option>
+      <option value="en_viaje">En viaje</option>
+      <option value="finalizado">Finalizado</option>
+      <option value="cancelado">Cancelado</option>
+    </select>
+
+    <input type="date" id="desdeFiltro">
+    <input type="date" id="hastaFiltro">
+
+    <button onclick="aplicarFiltros()">Aplicar</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Estado</th>
+        <th>Origen</th>
+        <th>Destino</th>
+        <th>Inicio</th>
+        <th>Importe</th>
+      </tr>
+    </thead>
+    <tbody id="tablaViajes"></tbody>
+  </table>
+
+  <div class="paginacion">
+    <button onclick="cambiarPagina(-1)">Anterior</button>
+    <span id="infoPagina">Página 1</span>
+    <button onclick="cambiarPagina(1)">Siguiente</button>
+  </div>
+
+  <script>
+    let paginaActual = 1;
+    const limite = 5;
+
+    async function cargarViajes() {
+      const estado = document.getElementById('estadoFiltro').value;
+      const desde = document.getElementById('desdeFiltro').value;
+      const hasta = document.getElementById('hastaFiltro').value;
+
+      let url = `/viajes?pagina=${paginaActual}&limite=${limite}`;
+
+      if (estado) url += `&estado=${estado}`;
+      if (desde) url += `&desde=${desde}`;
+      if (hasta) url += `&hasta=${hasta}`;
+
+      const res = await fetch(url);
+      const json = await res.json();
+
+      if (!json.ok) {
+        alert('Error al cargar viajes');
+        return;
+      }
+
+      const tbody = document.getElementById('tablaViajes');
+      tbody.innerHTML = '';
+
+      json.data.forEach(viaje => {
+  const fila = `
+    <tr onclick="verViaje('${viaje.id}')">
+      <td>${viaje.codigo ?? ''}</td>
+
+      <td>
+        <span class="estado-badge estado-${viaje.estado}">
+          ${viaje.estado ?? ''}
+        </span>
+      </td>
+
+      <td>${viaje.origen_direccion ?? ''}</td>
+      <td>${viaje.destino_direccion ?? ''}</td>
+
+      <td>
+        ${viaje.fecha_hora_inicio 
+          ? new Date(viaje.fecha_hora_inicio).toLocaleString() 
+          : ''}
+      </td>
+
+      <td>
+        ${viaje.importe_final !== null && viaje.importe_final !== undefined
+          ? new Intl.NumberFormat('es-AR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(viaje.importe_final)
+          : ''}
+      </td>
+    </tr>
+  `;
+
+  tbody.innerHTML += fila;
+});
+
+      document.getElementById('infoPagina').innerText =
+        `Página ${paginaActual} | Total: ${json.total ?? 0}`;
+    }
+
+    function aplicarFiltros() {
+      paginaActual = 1;
+      cargarViajes();
+    }
+
+    function cambiarPagina(direccion) {
+      const nuevaPagina = paginaActual + direccion;
+      if (nuevaPagina < 1) return;
+      paginaActual = nuevaPagina;
+      cargarViajes();
+    }
+
+   function verViaje(id) {
+  window.location.href = `/viaje.html?id=${id}`;
+}
+  cargarViajes();
+
+  </script>
+
+</body>
+</html>

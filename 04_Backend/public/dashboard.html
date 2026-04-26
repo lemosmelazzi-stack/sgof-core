@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>SGOF Dashboard</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f5f7fa;
+    color: #222;
+  }
+
+  h1 {
+    margin-bottom: 30px;
+  }
+
+  h2 {
+    margin-top: 30px;
+  }
+
+  #total,
+  #metricas {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    max-width: 500px;
+  }
+
+  .chart-box {
+    width: 100%;
+    max-width: 700px;
+    height: 320px;
+    background: white;
+    padding: 16px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+.filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filtros select,
+.filtros input,
+.filtros button {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.filtros button {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+</style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</head>
+<body>
+
+  <h1>Dashboard SGOF</h1>
+
+  <div class="filtros">
+
+  <select id="estadoFiltro">
+    <option value="">Todos los estados</option>
+    <option value="pendiente">Pendiente</option>
+    <option value="en_origen">En origen</option>
+    <option value="en_viaje">En viaje</option>
+    <option value="finalizado">Finalizado</option>
+    <option value="cancelado">Cancelado</option>
+  </select>
+
+  <input type="date" id="desdeFiltro">
+  <input type="date" id="hastaFiltro">
+
+  <button onclick="cargarDatos()">Aplicar</button>
+
+</div>
+
+  <h2>Total de Viajes</h2>
+  <div id="total"></div>
+
+  <h2>Métricas</h2>
+  <div id="metricas"></div>
+<h2>Por Estado</h2>
+<div class="chart-box">
+  <canvas id="estadoChart"></canvas>
+</div>
+ <h2>Por Mes</h2>
+<div class="chart-box">
+  <canvas id="mesChart"></canvas>
+</div>
+
+ 
+  <script>
+    async function cargarDatos() {
+      try {
+    const estado = document.getElementById('estadoFiltro').value;
+const desde = document.getElementById('desdeFiltro').value;
+const hasta = document.getElementById('hastaFiltro').value;
+
+let url = '/viajes/resumen?';
+
+if (estado) url += `estado=${estado}&`;
+if (desde) url += `desde=${desde}&`;
+if (hasta) url += `hasta=${hasta}&`;
+
+const res = await fetch(url);
+        const json = await res.json();
+
+        if (!json.ok) {
+          alert('Error en backend');
+          return;
+        }
+
+        const d = json.data;
+
+        document.getElementById('total').innerText = d.total_viajes;
+
+        document.getElementById('metricas').innerHTML = `
+          Distancia: ${d.metricas.distancia_total_km} km <br>
+          Importe: $${d.metricas.importe_total} <br>
+          Duración: ${d.metricas.duracion_total_min} min <br>
+          Promedio: $${d.metricas.promedio_importe}
+        `;
+
+        new Chart(document.getElementById('estadoChart'), {
+          type: 'pie',
+          data: {
+            labels: d.por_estado.map(e => e.estado),
+            datasets: [{
+              data: d.por_estado.map(e => e.cantidad)
+            }]
+          }
+        });
+
+        new Chart(document.getElementById('mesChart'), {
+          type: 'bar',
+          data: {
+            labels: d.por_mes.map(m => m.periodo),
+            datasets: [{
+              label: 'Viajes',
+              data: d.por_mes.map(m => m.cantidad)
+            }]
+          }
+        });
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    cargarDatos();
+  </script>
+
+</body>
+</html>
