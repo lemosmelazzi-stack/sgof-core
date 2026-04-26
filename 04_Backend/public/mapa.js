@@ -87,6 +87,35 @@ async function asignarTaxiSeleccionado() {
   }
 }
 
+async function asignarAutomatico() {
+  if (!viajeSeleccionadoId) {
+    alert('Seleccioná un viaje primero');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/viajes/${viajeSeleccionadoId}/asignar-automatico`, {
+      method: 'POST'
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert(data.mensaje || 'Error en asignación automática');
+      return;
+    }
+
+    alert('Asignado automáticamente');
+
+    await mostrarViajeEnMapa();
+    await cargarTaxis();
+
+  } catch (error) {
+    console.error(error);
+    alert('Error de conexión');
+  }
+}
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(mapa);
@@ -270,7 +299,11 @@ const btnAsignarTaxi = document.getElementById('btn-asignar-taxi');
 const btnEnOrigen = document.getElementById('btn-en-origen');
 const btnIniciarViaje = document.getElementById('btn-iniciar-viaje');
 const btnFinalizarViaje = document.getElementById('btn-finalizar-viaje');
+const btnAsignarAuto = document.getElementById('btn-asignar-auto');
 
+if (btnAsignarAuto) {
+  btnAsignarAuto.addEventListener('click', asignarAutomatico);
+}
 if (btnAsignarTaxi) {
   btnAsignarTaxi.addEventListener('click', asignarTaxiSeleccionado);
 }
