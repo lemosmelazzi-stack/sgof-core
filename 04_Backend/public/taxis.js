@@ -158,6 +158,34 @@ function getPrioridadTaxi(taxi) {
   if ((taxi.estado || '').toLowerCase() === 'ocupado') return 3;
   return 4;
 }
+
+function moverMarkerSuave(marker, nuevaLat, nuevaLng, duracion = 1000) {
+  const inicio = marker.getLatLng();
+
+  const latInicial = inicio.lat;
+  const lngInicial = inicio.lng;
+
+  const diferenciaLat = nuevaLat - latInicial;
+  const diferenciaLng = nuevaLng - lngInicial;
+
+  const inicioTiempo = performance.now();
+
+  function animar(tiempoActual) {
+    const progreso = Math.min((tiempoActual - inicioTiempo) / duracion, 1);
+
+    const latActual = latInicial + diferenciaLat * progreso;
+    const lngActual = lngInicial + diferenciaLng * progreso;
+
+    marker.setLatLng([latActual, lngActual]);
+
+    if (progreso < 1) {
+      requestAnimationFrame(animar);
+    }
+  }
+
+  requestAnimationFrame(animar);
+}
+
 // Crea o actualiza el marcador de un taxi en el mapa
 function actualizarMarkerTaxi(taxi, bounds) {
 
@@ -174,7 +202,8 @@ function actualizarMarkerTaxi(taxi, bounds) {
 
   let marker = marcadoresPorTaxi[taxiId];
 if (marker) {
-  marker.setLatLng([lat, lng]);
+moverMarkerSuave(marker, lat, lng, 1000);
+
   marker.setIcon(crearIconoTaxi(taxi.heading || taxi.rumbo_grados || 0, obtenerColor(taxi)));
   marker.bindPopup(`🚕 ${codigo}`);
 } else {
