@@ -201,6 +201,127 @@
   color: white;
   border-color: #1976d2;
 }
+.viaje-activo-card {
+  padding: 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.viaje-titulo {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.viaje-linea {
+  margin-bottom: 6px;
+}
+
+/* estado */
+.estado-pendiente {
+  color: orange;
+  font-weight: bold;
+}
+
+.estado-asignado {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.estado-en_viaje {
+  color: green;
+  font-weight: bold;
+}
+
+/* contador */
+.viaje-tiempo {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: bold;
+}
+.pendiente-codigo {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.pendiente-origen {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.pendiente-estado {
+  margin-top: 4px;
+  color: orange;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.card-viaje:hover {
+  background: #f5f5f5;
+}
+.pendiente-estado {
+  margin-top: 4px;
+  color: orange;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.tiempo-normal {
+  margin-top: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+.tiempo-urgente {
+  margin-top: 8px;
+  font-weight: bold;
+  color: red;
+  animation: parpadeo 1s infinite;
+}
+
+@keyframes parpadeo {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+.viaje-activo-card.urgente {
+  background-color: #ffe5e5;
+  border: 2px solid red;
+}
+
+.tiempo-normal {
+  color: #333;
+}
+
+.tiempo-urgente {
+  color: red;
+  font-weight: bold;
+  animation: parpadeo 1s infinite;
+}
+
+@keyframes parpadeo {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+.tiempo-urgente {
+  color: #d32f2f;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.viaje-activo-card.urgente {
+  border: 2px solid #d32f2f;
+  animation: alertaSuave 1s infinite;
+}
+
+@keyframes alertaSuave {
+  0% { background-color: #fff; }
+  50% { background-color: #ffeaea; }
+  100% { background-color: #fff; }
+}
 
   </style>
 </head>
@@ -208,32 +329,30 @@
   <!-- MENSAJE GLOBAL -->
   <div id="feedback"></div>
 
-  <!-- CONTENEDOR PRINCIPAL -->
-  <div id="app-layout">
-    <!-- PANEL IZQUIERDO -->
-    <aside id="panel-pendientes">
-  <h2>Viajes pendientes</h2>
+ <!-- CONTENEDOR PRINCIPAL -->
+<div id="app-layout">
 
-<div id="lista-pendientes">Cargando...</div>
+  <!-- PANEL IZQUIERDO -->
+  <aside id="panel-pendientes">
 
-  <hr />
+    <h2>Viajes pendientes</h2>
 
-  <h3>Viaje seleccionado</h3>
-  <div id="detalle-viaje"></div>
+    <button onclick="crearPedidoTest()" style="margin-bottom:10px;">
+      🚀 Nuevo pedido test
+    </button>
 
-  <button id="btn-asignar-taxi">Asignar taxi seleccionado</button>
-<button id="btn-en-origen">
-  <button id="btn-asignar-auto">Asignar automático</button>
-  Taxi llegó al origen
-</button>
-<button id="btn-iniciar-viaje">
-  Iniciar viaje
-</button>
-<button id="btn-finalizar-viaje">
-  Finalizar viaje
-</button>
+    <div id="lista-pendientes">Cargando...</div>
 
-</aside>
+    <hr />
+
+    <h3>Viaje seleccionado</h3>
+
+    <div id="detalle-viaje"></div>
+
+    <div id="acciones-viaje" class="oculto"></div>
+
+  </aside>
+
 
     <!-- CONTENEDOR DERECHO -->
     <main id="contenido-principal">
@@ -254,15 +373,45 @@
 <script src="viajes.js"></script>
 
 <script>
-  // Actualiza periódicamente taxis cada 5 segundos
-cargarTaxis();
+  // Inicio inicial
+  cargarTaxis();
+  cargarPendientes();
+
+  // Taxis cada 5 segundos
+ 
+  // Asignación automática desactivada para pruebas
+  // setInterval(asignarPendientesAutomaticamente, 10000);
+
+  // Control automático de estados desactivado para pruebas
+  /*
+  setInterval(async () => {
+    try {
+      await fetch('/viajes/controlar-estados', { method: 'POST' });
+    } catch (error) {
+      console.warn('Control de estados no disponible momentáneamente');
+    }
+  }, 10000);
+  */
+setInterval(async () => {
+  try {
+    await fetch('/viajes/controlar-timeout', { method: 'POST' });
+  } catch (error) {
+    console.warn('Error en timeout');
+  }
+}, 5000);
+
+// ejecución inmediata
 cargarPendientes();
-setInterval(actualizarTaxisPeriodico, 5000);
+cargarTaxis();
+cargarViajeActivo();
 
-
+// refrescos
+setInterval(cargarPendientes, 5000);
+setInterval(cargarTaxis, 3000);
+setInterval(cargarViajeActivo, 1000);
 </script>
-
-
+<audio id="alerta-sonido" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 </body>
+
 </html>
 

@@ -2,6 +2,97 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../config/db');
 
+// ✅ CREAR PEDIDO + VIAJE TEST
+router.post('/', async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const empresaId = 'e08cbddb-5d43-4df4-9a13-8e030fefd3ae';
+
+    const codigoPedido = `PED-TEST-${Date.now()}`;
+    const codigoViaje = `VIA-TEST-${Date.now()}`;
+
+    const pedidoResult = await client.query(`
+  
+      INSERT INTO pedidos (
+  id,
+  empresa_id,
+  codigo,
+  estado,
+  origen_direccion,
+  destino_direccion,
+  fecha_creacion,
+  fecha_actualizacion
+)
+VALUES (
+  gen_random_uuid(),
+  $1,
+  $2,
+  'pendiente',
+  'Origen prueba',
+  'Destino prueba',
+  NOW(),
+  NOW()
+)
+
+      RETURNING id
+    `, [empresaId, codigoPedido]);
+
+    const pedidoId = pedidoResult.rows[0].id;
+
+    const viajeResult = await client.query(`
+     INSERT INTO viajes (
+  id,
+  empresa_id,
+  pedido_id,
+  codigo,
+  estado,
+  origen_direccion,
+  destino_direccion,
+  fecha_creacion,
+  fecha_actualizacion
+)
+VALUES (
+  gen_random_uuid(),
+  $1,
+  $2,
+  $3,
+  'pendiente',
+  'Origen prueba',
+  'Destino prueba',
+  NOW(),
+  NOW()
+)
+      RETURNING *
+    `, [empresaId, pedidoId, codigoViaje]);
+
+    await client.query('COMMIT');
+
+    res.json({
+      ok: true,
+      mensaje: 'Pedido y viaje test creados',
+      pedido_id: pedidoId,
+      data: viajeResult.rows[0]
+    });
+
+  } catch (error) {
+    await client.query('ROLLBACK');
+
+    console.error('Error creando pedido/viaje test:', error);
+
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error al crear pedido/viaje test',
+      error: error.message
+    });
+
+  } finally {
+    client.release();
+  }
+});
+
 router.get('/resumen', async (req, res) => {
   try {
     const { desde, hasta, estado } = req.query;
@@ -117,6 +208,7 @@ router.get('/', async (req, res) => {
     v.pedido_id,
     v.cliente_id,
     v.chofer_id,
+    v.fecha_hora_asignacion,
     v.taxi_id,
     v.origen_direccion,
     v.destino_direccion,
@@ -233,6 +325,7 @@ router.get('/:id', async (req, res) => {
         origen_longitud,
         destino_latitud,
         destino_longitud,
+        fecha_hora_asignacion,
         fecha_hora_inicio,
         fecha_hora_fin,
         distancia_km,
@@ -273,10 +366,10 @@ router.post('/:id/despachar', async (req, res) => {
 
     console.log('Despachando viaje:', id);
 
-    const viaje = await pool.query(
-      'SELECT id, estado FROM viajes WHERE id = $1 LIMIT 1',
-      [id]
-    );
+   const viaje = await pool.query(
+  'SELECT id, estado, origen_latitud, origen_longitud FROM viajes WHERE id = $1',
+  [id]
+); 
 
     if (viaje.rows.length === 0) {
       return res.status(404).json({
@@ -292,12 +385,37 @@ router.post('/:id/despachar', async (req, res) => {
       });
     }
 
-    const taxi = await pool.query(`
-      SELECT id, codigo_movil
-      FROM taxis
-      WHERE estado = 'disponible'
-      LIMIT 1
-    `);
+   const taxi = await pool.query(`
+  SELECT
+    t.id,
+    t.codigo_movil,
+    g.latitud,
+    g.longitud,
+    (
+      6371 * acos(
+        cos(radians($1)) *
+        cos(radians(g.latitud)) *
+        cos(radians(g.longitud) - radians($2)) +
+        sin(radians($1)) *
+        sin(radians(g.latitud))
+      )
+    ) AS distancia_km
+  FROM taxis t
+  JOIN LATERAL (
+    SELECT latitud, longitud
+    FROM gps_logs
+    WHERE taxi_id = t.id
+    ORDER BY fecha_hora_gps DESC
+    LIMIT 1
+  ) g ON true
+  WHERE t.estado IN ('disponible', 'disponible_en_movimiento')
+  AND t.activo = true
+  ORDER BY distancia_km ASC
+  LIMIT 1
+`, [
+  viaje.rows[0].origen_latitud,
+  viaje.rows[0].origen_longitud
+]);
 
     if (taxi.rows.length === 0) {
       return res.status(400).json({
@@ -308,21 +426,25 @@ router.post('/:id/despachar', async (req, res) => {
 
     const taxiId = taxi.rows[0].id;
 
-    const result = await pool.query(`
-      UPDATE viajes
-      SET taxi_id = $1,
-          estado = 'en_camino_origen',
-          fecha_actualizacion = NOW()
-      WHERE id = $2
-      RETURNING *
-    `, [taxiId, id]);
+const result = await pool.query(`
+  UPDATE viajes
+  SET taxi_id = $1,
+      estado = 'en_camino_origen',
+      fecha_hora_asignacion = NOW(),
+      fecha_actualizacion = NOW()
+  WHERE id = $2
+`, [taxiId, id]);
 
-    await pool.query(`
+ // 👈 cierre correcto
+
+// segundo query separado
+await pool.query(`
   UPDATE taxis
   SET estado = 'disponible_en_movimiento'
   WHERE id = $1
 `, [taxiId]);
 
+   
     res.json({
       ok: true,
       mensaje: 'Despacho automático realizado',
@@ -333,6 +455,162 @@ router.post('/:id/despachar', async (req, res) => {
     console.error('Error en despacho automático:', error);
     res.status(500).json({
       ok: false,
+      error: error.message
+    });
+  }
+});
+
+// 🔴 NUEVO: rechazar taxi
+router.post('/:id/rechazar-taxi', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const viaje = await pool.query(`
+      SELECT taxi_id
+      FROM viajes
+      WHERE id = $1
+      LIMIT 1
+    `, [id]);
+
+    if (viaje.rows.length === 0 || !viaje.rows[0].taxi_id) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El viaje no tiene taxi asignado'
+      });
+    }
+
+    const taxi_id = viaje.rows[0].taxi_id;
+
+    await pool.query(`
+      UPDATE viajes
+      SET taxi_id = NULL,
+          estado = 'pendiente',
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+    `, [id]);
+
+    await pool.query(`
+      UPDATE taxis
+      SET posicion_cola = (
+        SELECT COALESCE(MAX(posicion_cola), 0) + 1
+        FROM taxis
+      )
+      WHERE id = $1
+    `, [taxi_id]);
+
+    await pool.query(`
+      UPDATE taxis
+      SET estado = 'disponible'
+      WHERE id = $1
+    `, [taxi_id]);
+
+    res.json({
+      ok: true,
+      mensaje: 'Taxi rechazado correctamente'
+    });
+
+  } catch (error) {
+    console.error('Error en rechazar taxi:', error);
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error al rechazar taxi'
+    });
+  }
+});
+
+router.post('/:id/rechazar-y-reasignar', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. Rechazar taxi actual
+    const viajeActual = await pool.query(`
+      SELECT taxi_id
+      FROM viajes
+      WHERE id = $1
+      fecha_hora_asignacion = NOW()
+      LIMIT 1
+    `, [id]);
+
+    if (viajeActual.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Viaje no encontrado'
+      });
+    }
+
+    const taxiActualId = viajeActual.rows[0].taxi_id;
+
+    if (taxiActualId) {
+      await pool.query(`
+        UPDATE viajes
+        SET taxi_id = NULL,
+            estado = 'pendiente',
+            fecha_actualizacion = NOW()
+        WHERE id = $1
+      `, [id]);
+
+      await pool.query(`
+        UPDATE taxis
+        SET posicion_cola = (
+          SELECT COALESCE(MAX(posicion_cola), 0) + 1
+          FROM taxis
+        ),
+        estado = 'disponible'
+        WHERE id = $1
+      `, [taxiActualId]);
+    }
+
+    // 2. Buscar siguiente taxi disponible por cola
+    const siguienteTaxi = await pool.query(`
+      SELECT id, codigo_movil
+      FROM taxis
+      WHERE estado = 'disponible'
+        AND activo = true
+      ORDER BY posicion_cola ASC
+      LIMIT 1
+    `);
+
+    if (siguienteTaxi.rows.length === 0) {
+      return res.json({
+        ok: true,
+        mensaje: 'Taxi rechazado, pero no hay otro taxi disponible'
+      });
+    }
+
+    const nuevoTaxiId = siguienteTaxi.rows[0].id;
+
+    // 3. Asignar siguiente taxi
+    const resultViaje = await pool.query(`
+      UPDATE viajes
+      SET taxi_id = $1,
+          estado = 'en_camino_origen',
+          fecha_actualizacion = NOW()
+      WHERE id = $2
+      RETURNING id, codigo, estado, taxi_id
+    `, [nuevoTaxiId, id]);
+
+    await pool.query(`
+      UPDATE taxis
+      SET estado = 'disponible_en_movimiento',
+          posicion_cola = (
+            SELECT COALESCE(MAX(posicion_cola), 0) + 1
+            FROM taxis
+          )
+      WHERE id = $1
+    `, [nuevoTaxiId]);
+
+    res.json({
+      ok: true,
+      mensaje: 'Taxi rechazado y viaje reasignado',
+      viaje: resultViaje.rows[0],
+      taxi_reasignado: siguienteTaxi.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error en rechazar-y-reasignar:', error);
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error al rechazar y reasignar',
       error: error.message
     });
   }
@@ -401,6 +679,164 @@ router.post('/:id/finalizar', async (req, res) => {
     });
   }
 });
+
+router.post('/test', async (req, res) => {
+  try {
+    const empresaId = 'e08cbddb-5d43-4df4-9a13-8e030fefd3ae';
+
+    const result = await pool.query(`
+      WITH nuevo_pedido AS (
+        INSERT INTO pedidos (
+          id, empresa_id, codigo, estado, canal,
+          origen_latitud, origen_longitud, origen_direccion,
+          destino_latitud, destino_longitud, destino_direccion,
+          fecha_creacion, fecha_actualizacion
+        )
+        VALUES (
+          gen_random_uuid(),
+          $1,
+          'PED-TEST-' || EXTRACT(EPOCH FROM NOW())::BIGINT,
+          'pendiente',
+          'manual',
+          -34.90517,
+          -56.16689,
+          'Origen prueba',
+          -34.89110,
+          -56.15450,
+          'Destino prueba',
+          NOW(),
+          NOW()
+        )
+        RETURNING id
+      )
+      INSERT INTO viajes (
+        id, empresa_id, pedido_id, codigo, estado,
+        origen_latitud, origen_longitud, origen_direccion,
+        destino_latitud, destino_longitud, destino_direccion,
+        fecha_creacion, fecha_actualizacion
+      )
+      SELECT
+        gen_random_uuid(),
+        $1,
+        id,
+        'VIA-TEST-' || EXTRACT(EPOCH FROM NOW())::BIGINT,
+        'pendiente',
+        -34.90517,
+        -56.16689,
+        'Origen prueba',
+        -34.89110,
+        -56.15450,
+        'Destino prueba',
+        NOW(),
+        NOW()
+      FROM nuevo_pedido
+      RETURNING *;
+    `, [empresaId]);
+
+    res.json({ ok: true, data: result.rows[0] });
+
+  } catch (error) {
+    console.error('Error creando test:', error);
+    res.status(500).json({ ok: false });
+  }
+});
+
+router.post('/controlar-timeout', async (req, res) => {
+  try {
+    const viajesTimeout = await pool.query(`
+      SELECT id
+      FROM viajes
+      WHERE estado = 'en_camino_origen'
+        AND taxi_id IS NOT NULL
+        AND fecha_hora_asignacion IS NOT NULL
+        AND NOW() - fecha_hora_asignacion > INTERVAL '30 seconds'
+    `);
+
+    for (const viaje of viajesTimeout.rows) {
+      const id = viaje.id;
+
+      const viajeActual = await pool.query(`
+        SELECT taxi_id
+        FROM viajes
+        WHERE id = $1
+        LIMIT 1
+      `, [id]);
+
+      if (viajeActual.rows.length === 0 || !viajeActual.rows[0].taxi_id) {
+        continue;
+      }
+
+      const taxiActualId = viajeActual.rows[0].taxi_id;
+
+      await pool.query(`
+        UPDATE viajes
+        SET taxi_id = NULL,
+            estado = 'pendiente',
+            fecha_actualizacion = NOW()
+        WHERE id = $1
+      `, [id]);
+
+      await pool.query(`
+        UPDATE taxis
+        SET estado = 'disponible',
+            posicion_cola = (
+              SELECT COALESCE(MAX(posicion_cola), 0) + 1
+              FROM taxis
+            )
+        WHERE id = $1
+      `, [taxiActualId]);
+
+      const siguienteTaxi = await pool.query(`
+        SELECT id, codigo_movil
+        FROM taxis
+        WHERE estado = 'disponible'
+          AND activo = true
+        ORDER BY posicion_cola ASC
+        LIMIT 1
+      `);
+
+      if (siguienteTaxi.rows.length === 0) {
+        continue;
+      }
+
+      const nuevoTaxiId = siguienteTaxi.rows[0].id;
+
+     await pool.query(`
+  UPDATE viajes
+  SET taxi_id = NULL,
+      estado = 'pendiente',
+      fecha_hora_asignacion = NULL,
+      fecha_actualizacion = NOW()
+  WHERE id = $1
+`, [id]);
+
+      await pool.query(`
+        UPDATE taxis
+        SET estado = 'disponible_en_movimiento',
+            posicion_cola = (
+              SELECT COALESCE(MAX(posicion_cola), 0) + 1
+              FROM taxis
+            )
+        WHERE id = $1
+      `, [nuevoTaxiId]);
+    }
+
+    res.json({
+      ok: true,
+      mensaje: 'Control de timeout ejecutado',
+      total: viajesTimeout.rows.length
+    });
+
+  } catch (error) {
+    console.error('Error en controlar-timeout:', error);
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error en controlar-timeout',
+      error: error.message
+    });
+  }
+});
+
     router.put('/:id/asignar-taxi', async (req, res) => {
   try {
     const { id } = req.params;
@@ -446,16 +882,15 @@ router.post('/:id/finalizar', async (req, res) => {
         mensaje: 'Taxi no encontrado'
       });
     }
-
-    const resultViaje = await pool.query(`
-      UPDATE viajes
-      SET taxi_id = $1,
-          estado = 'en_camino_origen',
-          fecha_actualizacion = NOW()
-      WHERE id = $2
-      RETURNING id, codigo, estado, taxi_id, fecha_actualizacion
-    `, [taxi_id, id]);
-
+   const resultViaje = await pool.query(`
+  UPDATE viajes
+  SET taxi_id = $1,
+      estado = 'en_camino_origen',
+      fecha_hora_asignacion = NOW(),
+      fecha_actualizacion = NOW()
+  WHERE id = $2
+ RETURNING id, codigo, estado, taxi_id, fecha_hora_asignacion 
+`, [taxi_id, id]);
     const resultTaxi = await pool.query(`
       UPDATE taxis
       SET estado = 'disponible_en_movimiento'
@@ -463,6 +898,15 @@ router.post('/:id/finalizar', async (req, res) => {
       RETURNING id, codigo_movil, estado
     `, [taxi_id]);
 
+    // Mover taxi asignado al final de la cola
+    await pool.query(`
+      UPDATE taxis
+      SET posicion_cola = (
+        SELECT COALESCE(MAX(posicion_cola), 0) + 1
+        FROM taxis
+      )
+      WHERE id = $1
+    `, [taxi_id]);
     res.json({
       ok: true,
       mensaje: 'Taxi asignado correctamente',
@@ -477,6 +921,106 @@ router.post('/:id/finalizar', async (req, res) => {
       mensaje: 'Error al asignar taxi',
       error: error.message
     });
+  }
+});
+
+router.post('/:id/aceptar', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await pool.query(`
+      UPDATE viajes
+      SET estado = 'en_viaje'
+      WHERE id = $1
+    `, [id]);
+
+    return res.json({ ok: true });
+
+  } catch (error) {
+    console.error('Error aceptar viaje:', error);
+    res.status(500).json({ ok: false });
+  }
+});
+
+router.post('/:id/aceptar', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await pool.query(`
+      UPDATE viajes
+      SET estado = 'en_viaje'
+      WHERE id = $1
+    `, [id]);
+
+    return res.json({ ok: true });
+
+  } catch (error) {
+    console.error('Error aceptar viaje:', error);
+    res.status(500).json({ ok: false });
+  }
+});
+
+
+// 👇 PEGAR ACA
+router.post('/:id/iniciar-viaje', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(`
+      UPDATE viajes
+      SET estado = 'en_viaje',
+          fecha_hora_inicio = NOW(),
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+      RETURNING *
+    `, [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ ok: false });
+    }
+
+    return res.json({ ok: true, data: result.rows[0] });
+
+  } catch (error) {
+    console.error('Error iniciar viaje:', error);
+    res.status(500).json({ ok: false });
+  }
+});
+
+router.put('/:id/finalizar-viaje', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const viaje = await pool.query(
+      'SELECT taxi_id FROM viajes WHERE id = $1',
+      [id]
+    );
+
+    const taxiId = viaje.rows[0]?.taxi_id;
+
+    const result = await pool.query(`
+      UPDATE viajes
+      SET estado = 'finalizado',
+          fecha_hora_fin = NOW(),
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+      RETURNING *
+    `, [id]);
+
+    if (taxiId) {
+      await pool.query(`
+        UPDATE taxis
+        SET estado = 'disponible',
+            fecha_actualizacion = NOW()
+        WHERE id = $1
+      `, [taxiId]);
+    }
+
+    return res.json({ ok: true, data: result.rows[0] });
+
+  } catch (error) {
+    console.error('Error finalizar viaje:', error);
+    res.status(500).json({ ok: false });
   }
 });
 
@@ -534,10 +1078,15 @@ router.post('/:id/asignar-automatico', async (req, res) => {
       RETURNING *
     `, [taxi_id]);
 
+    const viajeConTaxi = {
+  ...resultViaje.rows[0],
+  taxi_codigo: resultTaxi.rows[0].codigo_movil
+};
+
     res.json({
       ok: true,
       mensaje: 'Asignación automática realizada',
-      viaje: resultViaje.rows[0],
+      viaje: viajeConTaxi,
       taxi: resultTaxi.rows[0]
     });
 
@@ -547,164 +1096,113 @@ router.post('/:id/asignar-automatico', async (req, res) => {
   }
 });
 
-router.put('/:id/en-origen', async (req, res) => {
-  const { id } = req.params;
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+  const R = 6371;
 
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+router.post('/controlar-estados', async (req, res) => {
   try {
-    await pool.query(`
-      UPDATE viajes
-      SET estado = 'en_origen',
-          fecha_actualizacion = NOW()
-      WHERE id = $1
-    `, [id]);
 
+    // =========================
+    // 1. en_camino_origen → en_origen
+    // =========================
+    const viajes = await pool.query(`
+      SELECT v.id, v.estado, v.origen_latitud, v.origen_longitud, v.taxi_id
+      FROM viajes v
+      WHERE v.estado = 'en_camino_origen'
+        AND v.taxi_id IS NOT NULL
+    `);
+
+    for (const viaje of viajes.rows) {
+      const gps = await pool.query(`
+        SELECT latitud, longitud
+        FROM gps_logs
+        WHERE taxi_id = $1
+        ORDER BY fecha_hora_gps DESC
+        LIMIT 1
+      `, [viaje.taxi_id]);
+
+      if (gps.rows.length === 0) continue;
+
+      const distancia = calcularDistancia(
+        parseFloat(gps.rows[0].latitud),
+        parseFloat(gps.rows[0].longitud),
+        parseFloat(viaje.origen_latitud),
+        parseFloat(viaje.origen_longitud)
+      );
+
+      if (distancia < 0.5) {
+        await pool.query(`
+          UPDATE viajes
+          SET estado = 'en_origen',
+              fecha_hora_llegada_origen = NOW()
+          WHERE id = $1
+        `, [viaje.id]);
+      }
+    }
+
+    // =========================
+    // 2. en_origen → en_viaje
+    // =========================
+    const viajesEnOrigen = await pool.query(`
+      SELECT v.id, v.estado, v.origen_latitud, v.origen_longitud, v.taxi_id
+      FROM viajes v
+      WHERE v.estado = 'en_origen'
+        AND v.taxi_id IS NOT NULL
+    `);
+
+    for (const viaje of viajesEnOrigen.rows) {
+      const gps = await pool.query(`
+        SELECT latitud, longitud
+        FROM gps_logs
+        WHERE taxi_id = $1
+        ORDER BY fecha_hora_gps DESC
+        LIMIT 1
+      `, [viaje.taxi_id]);
+
+      if (gps.rows.length === 0) continue;
+
+      const distancia = calcularDistancia(
+        parseFloat(gps.rows[0].latitud),
+        parseFloat(gps.rows[0].longitud),
+        parseFloat(viaje.origen_latitud),
+        parseFloat(viaje.origen_longitud)
+      );
+
+      if (distancia > 0.15) {
+        await pool.query(`
+          UPDATE viajes
+          SET estado = 'en_viaje',
+              fecha_hora_inicio_real = NOW()
+          WHERE id = $1
+        `, [viaje.id]);
+
+        await pool.query(`
+          UPDATE taxis
+          SET estado = 'ocupado'
+          WHERE id = $1
+        `, [viaje.taxi_id]);
+      }
+    }
+
+    // 👉 RECIÉN ACÁ RESPONDE
     res.json({ ok: true });
 
   } catch (error) {
     console.error(error);
     res.status(500).json({ ok: false });
-  }
-});
-
-router.put('/:id/iniciar-viaje', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const viaje = await pool.query(
-      'SELECT taxi_id FROM viajes WHERE id = $1',
-      [id]
-    );
-
-    if (viaje.rows.length === 0) {
-      return res.status(404).json({ ok: false, mensaje: 'Viaje no encontrado' });
-    }
-
-    const taxi_id = viaje.rows[0].taxi_id;
-
-    // 1. actualizar viaje
-    await pool.query(`
-      UPDATE viajes
-      SET estado = 'en_viaje',
-          fecha_actualizacion = NOW()
-      WHERE id = $1
-    `, [id]);
-
-    // 2. actualizar taxi
-    if (taxi_id) {
-      await pool.query(`
-        UPDATE taxis
-        SET estado = 'ocupado'
-        WHERE id = $1
-      `, [taxi_id]);
-    }
-
-    res.json({ ok: true });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ ok: false });
-  }
-});
-
-router.put('/:id/finalizar-viaje', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const viaje = await pool.query(
-      'SELECT taxi_id FROM viajes WHERE id = $1',
-      [id]
-    );
-
-    if (viaje.rows.length === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: 'Viaje no encontrado'
-      });
-    }
-
-    const taxi_id = viaje.rows[0].taxi_id;
-
-    // 1. cerrar viaje
-    await pool.query(`
-      UPDATE viajes
-      SET estado = 'finalizado',
-          fecha_hora_fin = NOW(),
-          fecha_actualizacion = NOW()
-      WHERE id = $1
-    `, [id]);
-
-    // 2. liberar taxi
-    if (taxi_id) {
-      await pool.query(`
-        UPDATE taxis
-        SET estado = 'disponible'
-        WHERE id = $1
-      `, [taxi_id]);
-    }
-
-    res.json({ ok: true });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ ok: false });
-  }
-});
-
-router.put('/:id/desasignar-taxi', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const viajeExiste = await pool.query(
-      'SELECT id, estado, taxi_id FROM viajes WHERE id = $1',
-      [id]
-    );
-
-    if (viajeExiste.rows.length === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: 'Viaje no encontrado'
-      });
-    }
-
-    if (!viajeExiste.rows[0].taxi_id) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: 'El viaje no tiene taxi asignado'
-      });
-    }
-
-    if (
-      viajeExiste.rows[0].estado === 'finalizado' ||
-      viajeExiste.rows[0].estado === 'cancelado'
-    ) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: `No se puede desasignar taxi de un viaje en estado ${viajeExiste.rows[0].estado}`
-      });
-    }
-
-    const result = await pool.query(
-      `UPDATE viajes
-       SET taxi_id = NULL,
-           fecha_actualizacion = NOW()
-       WHERE id = $1
-       RETURNING *`,
-      [id]
-    );
-
-    res.json({
-      ok: true,
-      mensaje: 'Taxi desasignado correctamente',
-      viaje: result.rows[0]
-    });
-
-  } catch (error) {
-    console.error('Error en PUT /viajes/:id/desasignar-taxi:', error);
-    res.status(500).json({
-      ok: false,
-      mensaje: 'Error al desasignar taxi',
-      error: error.message
-    });
   }
 });
 module.exports = router;
