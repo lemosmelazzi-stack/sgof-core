@@ -20,6 +20,7 @@ function seleccionarViaje(viaje, card) {
 
   // 👇 mantener comportamiento de mapa
   centrarMapa(viaje);
+  dibujarLineaTaxiPasajero();
 }
 
 // Envía al backend la asignación de un taxi a un viaje

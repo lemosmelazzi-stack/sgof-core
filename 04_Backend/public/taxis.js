@@ -24,6 +24,35 @@ function crearTaxiState(taxi, marker) {
   };
 }
 
+function dibujarLineaTaxiPasajero() {
+  console.log('DIBUJAR LINEA:', {
+    taxiSeleccionadoId,
+    viajeSeleccionadoId,
+    markerTaxi: marcadoresPorTaxi[taxiSeleccionadoId],
+    marcadorViaje
+  });
+
+  if (!taxiSeleccionadoId || !viajeSeleccionadoId) return;
+
+  const markerTaxi = marcadoresPorTaxi[taxiSeleccionadoId];
+
+  if (!markerTaxi || !marcadorViaje) return;
+
+  const posTaxi = markerTaxi.getLatLng();
+  const posViaje = marcadorViaje.getLatLng();
+
+  if (lineaTaxiPasajero) {
+    mapa.removeLayer(lineaTaxiPasajero);
+  }
+
+  lineaTaxiPasajero = L.polyline([posTaxi, posViaje], {
+    color: '#2563eb',
+    weight: 4,
+    opacity: 0.9,
+    dashArray: '8, 8'
+  }).addTo(mapa);
+}
+
 function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarCard = true) {
  seguirTaxiSeleccionado = true;
     taxiSeleccionadoId = taxiId;
@@ -57,6 +86,7 @@ function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarC
   if (marker && abrirPopup) {
     marker.openPopup();
   }
+  dibujarLineaTaxiPasajero();
 }
 // Genera el HTML interno de una tarjeta de taxi
 function getTaxiCardHTML(taxi) {
@@ -93,12 +123,17 @@ function renderTaxiCard(taxi) {
   }
 
   div.onclick = () => {
+    console.log('CLICK CARD TAXI:', taxi.taxi_id);
     if (!taxiDisponibleParaAsignar(taxi)) {
       mostrarMensaje('Ese taxi no está disponible', 'error');
       return;
     }
+seleccionarTaxi(taxi.taxi_id, true, true, false);
 
-    seleccionarTaxi(taxi.taxi_id, true, true, false);
+console.log('CARD TAXI CLICK, voy a dibujar línea:', taxi.taxi_id);
+
+dibujarLineaTaxiPasajero();
+   
   };
 
   return div;
@@ -116,13 +151,19 @@ function actualizarTaxiCardExistente(taxi, div) {
   }
 
   div.onclick = () => {
+    console.log('CLICK CARD TAXI:', taxi.taxi_id);
     if (!taxiDisponibleParaAsignar(taxi)) {
       mostrarMensaje('Ese taxi no está disponible', 'error');
       return;
     }
 
-    seleccionarTaxi(taxi.taxi_id, true, true, false);
-  };
+  seleccionarTaxi(taxi.taxi_id, true, true, false);
+
+  console.log('CARD TAXI CLICK, voy a dibujar línea:', taxi.taxi_id);
+
+  window.dibujarLineaTaxiPasajero();
+};
+
 }
 function renderResumen(total, disponibles, enMovimiento, ocupados) {
   document.getElementById('resumen').innerHTML = `
@@ -185,7 +226,6 @@ function moverMarkerSuave(marker, nuevaLat, nuevaLng, duracion = 1000) {
 
   requestAnimationFrame(animar);
 }
-
 // Crea o actualiza el marcador de un taxi en el mapa
 function actualizarMarkerTaxi(taxi, bounds) {
 
@@ -201,11 +241,18 @@ function actualizarMarkerTaxi(taxi, bounds) {
   const codigo = taxi.codigo_movil || taxi.codigo || taxiId;
 
   let marker = marcadoresPorTaxi[taxiId];
-if (marker) {
-moverMarkerSuave(marker, lat, lng, 1000);
 
+if (marker) {
+  moverMarkerSuave(marker, lat, lng, 1000);
   marker.setIcon(crearIconoTaxi(taxi.heading || taxi.rumbo_grados || 0, obtenerColor(taxi)));
   marker.bindPopup(`🚕 ${codigo}`);
+
+  marker.off('click');
+  marker.on('click', () => {
+    console.log('CLICK TAXI:', taxiId);
+    seleccionarTaxi(taxiId, false, false, true);
+  });
+
 } else {
 
     marker = L.marker([lat, lng], {
@@ -215,17 +262,12 @@ moverMarkerSuave(marker, lat, lng, 1000);
       .bindPopup(`🚕 ${codigo}`);
 
     marker.on('click', () => {
-      if (!taxiDisponibleParaAsignar(taxi)) {
-        mostrarMensaje('Ese taxi no está disponible', 'error');
-        return;
-      }
-
+      console.log('CLICK TAXI:', taxiId);
       seleccionarTaxi(taxiId, false, false, true);
     });
 
     marcadoresPorTaxi[taxiId] = marker;
   }
-
   bounds.push([lat, lng]);
 }
 async function fetchTaxis() {
@@ -239,12 +281,17 @@ async function fetchTaxis() {
   console.log('RESPUESTA /taxis/positions:', data);
 
   return (data.taxis || []).map(taxi => ({
-    ...taxi,
-    lat: parseFloat(taxi.latitud),
-    lng: parseFloat(taxi.longitud),
-    speed: taxi.velocidad_kmh || 0,
-    heading: taxi.rumbo_grados || 0
-  }));
+  ...taxi,
+
+  lat: parseFloat(taxi.latitud),
+  lng: parseFloat(taxi.longitud),
+
+  speed: taxi.velocidad_kmh || 0,
+  heading: taxi.rumbo_grados || 0,
+
+  estado: 'disponible',
+  estado_operativo: 'disponible'
+}));
 }
 function reordenarCardsSegunTaxis(taxis) {
   const contenedor = document.getElementById('taxis');
@@ -399,5 +446,3 @@ async function actualizarTaxisPeriodico() {
     console.error('Error actualizando taxis periódicamente:', error);
   }
 }
-
-   

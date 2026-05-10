@@ -5,7 +5,7 @@ let mapaAjustado = false;
 let taxiSeleccionadoId = null;
 let seguirTaxiSeleccionado = true;
 let viajeSeleccionadoId = null;
-
+let lineaTaxiPasajero = null;
 let marcadoresPorTaxi = {};
 let cardsPorTaxi = {};
 let taxisState = new Map();
@@ -80,6 +80,8 @@ async function mostrarViajeEnMapa() {
     mostrarViajeSeleccionadoEnPanel(viaje);
    // mostrarOrigenYDestinoEnMapa(viaje);
     centrarMapa(viaje);
+
+  
 
   } catch (error) {
     console.error('Error cargando viaje:', error);
@@ -428,9 +430,11 @@ function centrarMapa(viaje) {
     lat = parseFloat(viaje.origen_latitud);
     lng = parseFloat(viaje.origen_longitud);
   }
-
-  mapa.setView([lat, lng], 15);
-
+mapa.flyTo([lat, lng], 16, {
+  animate: true,
+  duration: 1
+});
+  
   if (marcadorViaje) {
     mapa.removeLayer(marcadorViaje);
   }
