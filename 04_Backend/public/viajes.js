@@ -20,9 +20,10 @@ function seleccionarViaje(viaje, card) {
 
   // 👇 mantener comportamiento de mapa
   centrarMapa(viaje);
+  if (typeof dibujarLineaTaxiPasajero === 'function') {
   dibujarLineaTaxiPasajero();
 }
-
+}
 // Envía al backend la asignación de un taxi a un viaje
 async function asignarTaxiSeleccionado(viajeId) {
   if (!viajeId || !taxiSeleccionadoId) {

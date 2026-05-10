@@ -24,6 +24,63 @@ function crearTaxiState(taxi, marker) {
   };
 }
 
+function mostrarResumenRuta(distanciaKm, etaMin) {
+  const resumen = document.getElementById('resumen');
+
+  if (!resumen) return;
+
+  resumen.innerHTML = `
+    <div style="
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+      font-weight: 600;
+    ">
+      🚕 Ruta taxi → pasajero: ${distanciaKm} km / ${etaMin} min
+    </div>
+  `;
+}
+
+async function dibujarRutaRealTaxiPasajero(posTaxi, posViaje) {
+
+  const url = `https://router.project-osrm.org/route/v1/driving/${posTaxi.lng},${posTaxi.lat};${posViaje.lng},${posViaje.lat}?overview=full&geometries=geojson`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (!data.routes || data.routes.length === 0) {
+    console.warn('No se encontró ruta real');
+    return;
+  }
+
+  const coords = data.routes[0].geometry.coordinates.map(coord => [
+    coord[1],
+    coord[0]
+  ]);
+
+  if (lineaTaxiPasajero) {
+    mapa.removeLayer(lineaTaxiPasajero);
+  }
+
+  lineaTaxiPasajero = L.polyline(coords, {
+    color: '#2563eb',
+    weight: 5,
+    opacity: 0.9
+  }).addTo(mapa);
+
+  const distanciaKm = (data.routes[0].distance / 1000).toFixed(2);
+  const etaMin = Math.round(data.routes[0].duration / 60);
+
+  console.log('RUTA REAL TAXI → PASAJERO:', {
+    distanciaKm,
+    etaMin
+  });
+
+mostrarResumenRuta(distanciaKm, etaMin);
+}
+
 function dibujarLineaTaxiPasajero() {
   console.log('DIBUJAR LINEA:', {
     taxiSeleccionadoId,
@@ -41,17 +98,9 @@ function dibujarLineaTaxiPasajero() {
   const posTaxi = markerTaxi.getLatLng();
   const posViaje = marcadorViaje.getLatLng();
 
-  if (lineaTaxiPasajero) {
-    mapa.removeLayer(lineaTaxiPasajero);
-  }
-
-  lineaTaxiPasajero = L.polyline([posTaxi, posViaje], {
-    color: '#2563eb',
-    weight: 4,
-    opacity: 0.9,
-    dashArray: '8, 8'
-  }).addTo(mapa);
+ dibujarRutaRealTaxiPasajero(posTaxi, posViaje);
 }
+  
 
 function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarCard = true) {
  seguirTaxiSeleccionado = true;
