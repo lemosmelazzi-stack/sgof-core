@@ -7,9 +7,8 @@ let seguirTaxiSeleccionado = true;
 let viajeSeleccionadoId = null;
 let lineaTaxiPasajero = null;
 let marcadoresPorTaxi = {};
-let cardsPorTaxi = {};
 let taxisState = new Map();
-
+let cardsPorTaxi = {};
 const FETCH_INTERVAL = 5000;
 const ANIMATION_DURATION = 4800;
 
@@ -62,6 +61,7 @@ function obtenerViajeIdDesdeURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get('viajeId');
 }
+
 async function mostrarViajeEnMapa() {
   try {
     const viajeId = obtenerViajeIdDesdeURL();
@@ -73,15 +73,20 @@ async function mostrarViajeEnMapa() {
 
     const res = await fetch(`/viajes/${viajeId}`);
     const data = await res.json();
-    const viaje = data.data || data;
+   const viaje = data.data || data;
 
-    viajeSeleccionado = viaje;
+if (!viaje || viaje.estado === 'finalizado' || viaje.estado === 'cancelado') {
+  viajeSeleccionado = null;
+  viajeSeleccionadoId = null;
+  mostrarViajeSeleccionadoEnPanel(null);
+  return;
+}
 
-    mostrarViajeSeleccionadoEnPanel(viaje);
-   // mostrarOrigenYDestinoEnMapa(viaje);
-    centrarMapa(viaje);
+viajeSeleccionado = viaje;
+viajeSeleccionadoId = viaje.id;
 
-  
+mostrarViajeSeleccionadoEnPanel(viaje);
+centrarMapa(viaje);
 
   } catch (error) {
     console.error('Error cargando viaje:', error);
@@ -100,17 +105,22 @@ async function asignarTaxiSeleccionado() {
   }
 
   try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/asignar-taxi`, {
+    const res = await fetch('/viajes/asignar', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        taxi_id: taxiSeleccionadoId
-      })
+
+body: JSON.stringify({
+  viaje_id: viajeSeleccionadoId,
+  taxi_id: taxiSeleccionadoId
+})
+
     });
 
     const data = await res.json();
+
+  console.log('RESPUESTA ASIGNAR MAPA.JS:', data);  
 
 if (!data.ok) {
   alert('Error al asignar taxi');
@@ -125,8 +135,8 @@ await cargarTaxis();
 
     alert('Taxi asignado correctamente.');
 
-    await mostrarViajeEnMapa();
-    await cargarTaxis();
+    //await mostrarViajeEnMapa();
+
 
   } catch (error) {
     console.error('Error asignando taxi:', error);
@@ -210,30 +220,33 @@ async function asignarAutomatico() {
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(mapa);
-
 function obtenerColor(taxi) {
 
-  const estado = (taxi.estado || '').toLowerCase();
+  const estado = (
+    taxi.estado_operativo ||
+    taxi.estado ||
+    ''
+  ).toLowerCase();
 
-  // EN VIAJE
+  // EN VIAJE / OCUPADO → rojo
   if (
-    estado === 'en_viaje' ||
-    taxi.en_viaje === true
+    estado === 'en_curso' ||
+    estado === 'ocupado'
   ) {
     return '#ef4444';
   }
 
-  // ASIGNADO
+  // ASIGNADO → naranja
   if (estado === 'asignado') {
-    return '#3b82f6';
+    return '#f59e0b';
   }
 
-  // MOVIMIENTO
+  // TAXI SELECCIONADO → naranja fuerte
   if (
-    (taxi.speed || 0) > 5 ||
-    estado === 'disponible_en_movimiento'
+    taxi.taxi_id === taxiSeleccionadoId ||
+    taxi.id === taxiSeleccionadoId
   ) {
-    return '#f59e0b';
+    return '#ff8800';
   }
 
   // DISPONIBLE
@@ -247,6 +260,7 @@ function obtenerColor(taxi) {
   // OFFLINE
   return '#6b7280';
 }
+
 
 function easeInOutCubic(t) {
   return t < 0.5
@@ -384,23 +398,31 @@ function seguirTaxiEnMapa(state) {
   }
 }
 
-
-
-mostrarViajeEnMapa();
+//mostrarViajeEnMapa();
 
 function mostrarViajeSeleccionadoEnPanel(viaje) {
  const panel = document.getElementById('detalle-viaje');
 
   if (!panel) return;
+if (
+  !viaje ||
+  viaje.estado === 'finalizado' ||
+  viaje.estado === 'cancelado'
+) {
+  panel.innerHTML = `
+    <div style="padding:10px; color:#888;">
+      Ningún viaje seleccionado
+    </div>
+  `;
 
-  if (!viaje) {
-    panel.innerHTML = `
-      <div style="padding:10px; color:#888;">
-        Ningún viaje seleccionado
-      </div>
-    `;
-    return;
-  }
+  viajeSeleccionado = null;
+  viajeSeleccionadoId = null;
+
+  document.getElementById('acciones-viaje')
+    .classList.add('oculto');
+
+  return;
+}
 
    viajeSeleccionadoId = viaje.id;
 
@@ -477,15 +499,17 @@ if (btnFinalizarViaje) {
 // INICIAR VIAJE
 // ==========================
 async function iniciarViaje() {
+  console.log('CLICK INICIAR VIAJE', viajeSeleccionadoId);
   if (!viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
     return;
   }
-
-  try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/iniciar-viaje`, {
-      method: 'POST'
-    });
+try {
+  console.log('FETCH INICIAR:', `/viajes/${viajeSeleccionadoId}/iniciar`);
+  const res = await fetch(`/viajes/${viajeSeleccionadoId}/iniciar`, {
+    method: 'POST'
+  });
+  console.log('STATUS INICIAR:', res.status);
 
     const data = await res.json();
 
@@ -498,7 +522,7 @@ async function iniciarViaje() {
 
    await cargarViajeActivo();
 await cargarTaxis();
-await mostrarViajeEnMapa();
+//await mostrarViajeEnMapa();
 
 activarBotonesOperativos();
 document.getElementById('acciones-viaje').classList.remove('oculto');
@@ -519,27 +543,31 @@ async function finalizarViaje() {
   }
 
   try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/finalizar-viaje`, {
-      method: 'PUT'
+    const res = await fetch(`/viajes/${viajeSeleccionadoId}/finalizar`, {
+      method: 'POST'
     });
 
     const data = await res.json();
 
     if (!data.ok) {
-      alert('Error al finalizar viaje');
+      alert(data.mensaje || 'Error al finalizar viaje');
       return;
     }
 
-    alert('Viaje finalizado');
+alert('Viaje finalizado');
 
-    viajeSeleccionadoId = null;
+viajeSeleccionadoId = null;
+viajeSeleccionado = null;
 
-  //'<p>Ningún viaje seleccionado</p>';
+window.history.replaceState({}, '', '/mapa');
+
+mostrarViajeSeleccionadoEnPanel(null);
+
+document.getElementById('acciones-viaje')
+  .classList.add('oculto');
 
 await cargarPendientes();
-await cargarViajeActivo();
 await cargarTaxis();
-
 
   } catch (error) {
     console.error(error);

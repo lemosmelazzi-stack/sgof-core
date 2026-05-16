@@ -2,9 +2,9 @@ console.log('VIAJES.JS CARGADO');
 const timersAsignacion = {};
 
 let ultimoTotalPendientes = 0;
-// Maneja la selección de un viaje pendiente y actualiza UI + mapa
 
 function seleccionarViaje(viaje, card) {
+  console.log('SELECCIONANDO VIAJE:', viaje);
   viajeSeleccionadoId = viaje.id;
 
   document.querySelectorAll('.card-viaje').forEach((el) => {
@@ -13,17 +13,40 @@ function seleccionarViaje(viaje, card) {
 
   card.classList.add('seleccionado');
 
-  activarBotonesOperativos();
+ activarBotonesOperativos();
 
-  // 👇 panel operativo
+const acciones = document.getElementById('acciones-viaje');
+
+if (acciones) {
+  acciones.classList.remove('oculto');
+  acciones.style.display = 'block';
+}
+
+mostrarViajeOperativo(viaje);
+
+
+
+document.getElementById('acciones-viaje')?.classList.remove('oculto'); 
+
   mostrarViajeOperativo(viaje);
 
-  // 👇 mantener comportamiento de mapa
   centrarMapa(viaje);
+
+  console.log('VOY A BUSCAR MEJOR TAXI');
+
   if (typeof dibujarLineaTaxiPasajero === 'function') {
-  dibujarLineaTaxiPasajero();
-}
-}
+    dibujarLineaTaxiPasajero();
+  }
+
+  console.log('VIAJE COMPLETO:', viaje);
+console.log('LAT VIAJE:', viaje.latitud);
+console.log('LNG VIAJE:', viaje.longitud);
+
+  if (typeof encontrarMejorTaxiParaViaje === 'function') {
+    encontrarMejorTaxiParaViaje(viaje);
+  }
+ }
+
 // Envía al backend la asignación de un taxi a un viaje
 async function asignarTaxiSeleccionado(viajeId) {
   if (!viajeId || !taxiSeleccionadoId) {
@@ -153,48 +176,64 @@ ultimoTotalPendientes = totalActual;
       return;
     }
 
-    const pendientes = (result.data || []).filter((v) => v.estado === 'pendiente');
+const pendientes = (result.data || []).filter(
+  (v) => v.estado === 'pendiente'
+);
 
-   if (pendientes.length === 0) {
+if (pendientes.length === 0) {
   lista.innerHTML = '<p>No hay pendientes</p>';
 
   desactivarBotonesOperativos();
-  document.getElementById('acciones-viaje').classList.add('oculto');
+
+  document.getElementById('acciones-viaje')
+    .classList.add('oculto');
 
   dibujarPendientesEnMapa([]);
+
   return;
 }
 
-    pendientes.forEach((v) => {
-      const card = document.createElement('div');
-      card.className = 'card-viaje';
-      card.style.border = '1px solid #ddd';
-      card.style.borderRadius = '8px';
-      card.style.padding = '10px';
-      card.style.marginBottom = '10px';
-      card.style.background = 'white';
-      card.style.cursor = 'pointer';
+pendientes.forEach((v) => {
 
-      card.innerHTML = `
-        <div class="pendiente-codigo">
-          ${v.codigo || 'Sin código'}
-        </div>
+  const card = document.createElement('div');
 
-        <div class="pendiente-origen">
-          📍 ${v.origen_direccion || 'Sin dirección'}
-        </div>
+  card.className = 'card-viaje';
 
-        <div class="pendiente-estado">
-          ${v.estado || ''}
-        </div>
-      `;
+  card.style.border = '1px solid #ddd';
+  card.style.borderRadius = '8px';
+  card.style.padding = '10px';
+  card.style.marginBottom = '10px';
+  card.style.background = 'white';
+  card.style.cursor = 'pointer';
 
-      card.addEventListener('click', () => seleccionarViaje(v, card));
-      lista.appendChild(card);
-    });
+  card.innerHTML = `
+    <div class="pendiente-codigo">
+      ${v.codigo || 'Sin código'}
+    </div>
 
-    activarBotonesOperativos();
-    dibujarPendientesEnMapa(pendientes);
+    <div class="pendiente-origen">
+      📍 ${v.origen_direccion || 'Sin dirección'}
+    </div>
+
+    <div class="pendiente-estado">
+      ${v.estado || ''}
+    </div>
+  `;
+
+  card.onclick = (event) => {
+  event.stopPropagation();
+
+  console.log('CLICK CARD VIAJE:', v);
+
+  seleccionarViaje(v, card);
+};
+   
+  lista.appendChild(card);
+});
+
+activarBotonesOperativos();
+
+dibujarPendientesEnMapa(pendientes);
 
   } catch (error) {
     console.error('Error cargando pendientes:', error);
@@ -271,8 +310,8 @@ if (
     `;
   }
 
-  if (estado === 'en_camino_origen') {
-  titulo = 'Taxi en camino al origen';
+  if (estado === 'asignado') {
+ titulo = 'Taxi asignado';
 
   bloqueTimer = '';
 
@@ -289,7 +328,7 @@ if (
     `;
   }
 
-  if (estado === 'en_viaje') {
+  if (estado === 'en_curso') {
     titulo = 'Viaje en curso';
 
     bloqueTimer = '';
@@ -465,17 +504,27 @@ async function cargarViajeActivo() {
     const acciones = document.getElementById('acciones-viaje');
 
     const viaje = data.data.find(v =>
-      v.estado === 'en_camino_origen' ||
+      v.estado === 'asignado' ||
       v.estado === 'en_origen' ||
-      v.estado === 'en_viaje'
+      v.estado === 'en_curso'
     );
 
     if (!viaje) {
+      viajeSeleccionado = null;
+      viajeSeleccionadoId = null;
+
       acciones.classList.add('oculto');
+
+      document.getElementById('detalle-viaje').innerHTML = '';
+
       return;
     }
 
+    viajeSeleccionado = viaje;
+    viajeSeleccionadoId = viaje.id;
+
     acciones.classList.remove('oculto');
+
     mostrarViajeOperativo(viaje);
 
   } catch (error) {
@@ -562,8 +611,8 @@ function mostrarViajeOperativo(viaje) {
     `;
   }
 
-  if (estado === 'en_camino_origen') {
-    titulo = 'Taxi en camino al origen';
+  if (estado === 'asignado') {
+    titulo = 'Taxi asignado';
     bloqueAcciones = `
       <button onclick="iniciarViaje()">Iniciar viaje</button>
     `;
@@ -576,7 +625,7 @@ function mostrarViajeOperativo(viaje) {
     `;
   }
 
-  if (estado === 'en_viaje') {
+  if (estado === 'en_curso') {
     titulo = 'Viaje en curso';
     bloqueTimer = '';
     bloqueAcciones = `
@@ -693,12 +742,76 @@ function activarBotonesOperativos() {
     btn.style.cursor = 'pointer';
   });
 }
-console.log('GLOBAL cargarPendientes:', typeof window.cargarPendientes);
+
+function activarBotonesOperativos() {
+  document.querySelectorAll('#acciones-viaje .btn-operativo').forEach((btn) => {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  });
+}
+
+document
+  .getElementById('btn-asignar-taxi')
+  ?.addEventListener('click', async () => {
+
+    if (!viajeSeleccionadoId) {
+      alert('Seleccioná un viaje');
+      return;
+    }
+
+    if (!taxiSeleccionadoId) {
+      alert('Seleccioná un taxi');
+      return;
+    }
+
+    console.log('ASIGNANDO TAXI:', {
+      viajeSeleccionadoId,
+      taxiSeleccionadoId
+    });
+
+    try {
+
+      const response = await fetch('/viajes/asignar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          viaje_id: viajeSeleccionadoId,
+          taxi_id: taxiSeleccionadoId
+        })
+      });
+
+      const result = await response.json();
+
+      console.log('RESPUESTA ASIGNACION:', result);
+
+      if (result.ok) {
+        alert('Taxi asignado correctamente');
+ await cargarPendientes();
+  await cargarViajeActivo();
+
+      } else {
+        alert('Error asignando taxi');
+      }
+
+    } catch (error) {
+
+      console.error('ERROR ASIGNANDO:', error);
+
+      alert('Error de conexión');
+    }
+});
 
 window.cargarPendientes = cargarPendientes;
 window.cargarTaxis = cargarTaxis;
 window.cargarViajeActivo = cargarViajeActivo;
-
+ window.finalizarViaje = finalizarViaje;
+ 
+ window.iniciarViaje = iniciarViaje;
+window.asignarTaxiSeleccionado = asignarTaxiSeleccionado;
+ 
 console.log('GLOBAL cargarPendientes:', typeof window.cargarPendientes);
 //cargarPendientes();
 //cargarTaxis();

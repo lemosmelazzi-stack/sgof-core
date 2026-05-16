@@ -13,6 +13,10 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/viajes', viajesRoutes);
 app.use('/taxis', taxisRoutes(pool));
+
+app.get('/mapa', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/mapa.html'));
+});
 // ======================================================
 // ENDPOINTS DE VIAJES
 // ======================================================

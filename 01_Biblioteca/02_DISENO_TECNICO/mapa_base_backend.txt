@@ -413,7 +413,7 @@ POST /asignaciones
 
 POST /viajes
 
-POST /viajes/:id/finalizar
+
 
 POST /pagos
 

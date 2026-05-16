@@ -102,7 +102,7 @@ tr:hover {
 
   .estado-pendiente { background: #6c757d; }
   .estado-en_origen { background: #fd7e14; }
-  .estado-en_viaje { background: #0d6efd; }
+  .estado-en_curso { background: #0d6efd; }
   .estado-finalizado { background: #198754; }
   .estado-cancelado { background: #dc3545; }
 
@@ -118,7 +118,7 @@ tr:hover {
       <option value="">Todos los estados</option>
       <option value="pendiente">Pendiente</option>
       <option value="en_origen">En origen</option>
-      <option value="en_viaje">En viaje</option>
+      <option value="en_curso">En viaje</option>
       <option value="finalizado">Finalizado</option>
       <option value="cancelado">Cancelado</option>
     </select>
@@ -158,7 +158,9 @@ tr:hover {
       const desde = document.getElementById('desdeFiltro').value;
       const hasta = document.getElementById('hastaFiltro').value;
 
-      let url = `/viajes?pagina=${paginaActual}&limite=${limite}`;
+     const offset = (paginaActual - 1) * limite;
+
+let url = `/viajes?estado=pendiente&limit=${limite}&offset=${offset}`;
 
       if (estado) url += `&estado=${estado}`;
       if (desde) url += `&desde=${desde}`;

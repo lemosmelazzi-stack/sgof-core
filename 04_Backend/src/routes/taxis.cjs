@@ -7,16 +7,19 @@ module.exports = (pool) => {
   router.get('/', async (req, res) => {
 
     try {
-
-     const result = await pool.query(`
+const result = await pool.query(`
   SELECT
-    t.*,
+    t.id AS taxi_id,
+    t.codigo_movil,
+    t.estado,
     -34.9011 AS latitud,
-    -56.1645 AS longitud
+    -56.1645 AS longitud,
+    0 AS velocidad_kmh,
+    0 AS rumbo_grados
   FROM taxis t
   ORDER BY t.id
-`); 
-
+`);
+console.log('POSITIONS RAW DB:', result.rows);
       res.json(result.rows);
 
     } catch (error) {
@@ -35,20 +38,25 @@ module.exports = (pool) => {
 router.get('/positions', async (req, res) => {
 
   try {
-
-    const result = await pool.query(`
-      SELECT DISTINCT ON (taxi_id)
-        taxi_id,
-        latitud,
-        longitud,
-        velocidad_kmh,
-        rumbo_grados,
-        fecha_hora_gps
-      FROM gps_logs
-      WHERE latitud IS NOT NULL
-        AND longitud IS NOT NULL
-      ORDER BY taxi_id, fecha_hora_gps DESC
-    `);
+const result = await pool.query(`
+  SELECT DISTINCT ON (g.taxi_id)
+  g.taxi_id,
+  g.latitud,
+  g.longitud,
+  g.velocidad_kmh,
+  g.rumbo_grados,
+  g.fecha_hora_gps,
+  t.estado,
+  t.estado AS estado_operativo,
+  t.codigo_movil
+FROM gps_logs g
+LEFT JOIN taxis t
+  ON t.id = g.taxi_id
+WHERE g.latitud IS NOT NULL
+  AND g.longitud IS NOT NULL
+ORDER BY g.taxi_id, g.fecha_hora_gps DESC
+`);
+console.log('POSITIONS BACKEND:', result.rows);
 
     res.json({
       ok: true,

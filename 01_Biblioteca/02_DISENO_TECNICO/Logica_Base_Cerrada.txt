@@ -87,7 +87,7 @@ en_camino_origen
 
 en_origen
 
-en_viaje
+en_curso
 
 finalizado
 

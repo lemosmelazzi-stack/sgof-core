@@ -606,7 +606,7 @@ CREATE TABLE viajes (
             'pendiente',
             'en_camino_origen',
             'en_origen',
-            'en_viaje',
+            'en_curso',
             'finalizado',
             'cancelado',
             'no_show'
@@ -997,15 +997,17 @@ CREATE TABLE gps_logs (
     rumbo_grados NUMERIC(6,2),
     altitud_metros NUMERIC(8,2),
 
-    fuente VARCHAR(20) NOT NULL DEFAULT 'tablet',
-    estado_senal VARCHAR(20),
-    motor_encendido BOOLEAN,
-    en_viaje BOOLEAN,
-    datos_extra JSONB,
+  fuente VARCHAR(20) NOT NULL DEFAULT 'tablet',
+estado_senal VARCHAR(20),
+motor_encendido BOOLEAN,
 
-    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+estado VARCHAR(20) NOT NULL DEFAULT 'disponible',
 
-    CONSTRAINT fk_gps_empresa
+datos_extra JSONB,
+
+fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+CONSTRAINT fk_gps_empresa
         FOREIGN KEY (empresa_id) REFERENCES empresas(id),
 
     CONSTRAINT fk_gps_taxi

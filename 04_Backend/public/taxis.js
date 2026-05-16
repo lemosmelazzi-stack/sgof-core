@@ -1,7 +1,7 @@
 let filtroActivo = 'todos';
 function taxiDisponibleParaAsignar(taxi) {
   return (taxi.estado || '').toLowerCase() === 'disponible' &&
-    taxi.estado_operativo !== 'disponible_en_movimiento';
+    taxi.estado_operativo !== 'asignado';
 }
 
 function crearTaxiState(taxi, marker) {
@@ -80,6 +80,72 @@ async function dibujarRutaRealTaxiPasajero(posTaxi, posViaje) {
 
 mostrarResumenRuta(distanciaKm, etaMin);
 }
+async function calcularETAEntrePuntos(posTaxi, posViaje) {
+
+  const url = `https://router.project-osrm.org/route/v1/driving/${posTaxi.lng},${posTaxi.lat};${posViaje.lng},${posViaje.lat}?overview=false`;
+
+  try {
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.routes || !data.routes.length) {
+      return null;
+    }
+
+    return {
+      distanciaKm: data.routes[0].distance / 1000,
+      etaMin: data.routes[0].duration / 60
+    };
+
+  } catch (error) {
+
+    console.error('Error calculando ETA:', error);
+
+    return null;
+  }
+}
+async function encontrarMejorTaxiParaViaje() {
+
+  if (!marcadorViaje) return;
+
+  const posViaje = marcadorViaje.getLatLng();
+
+  let mejorTaxiId = null;
+  let mejorETA = Infinity;
+
+  for (const taxiId in marcadoresPorTaxi) {
+
+    const markerTaxi = marcadoresPorTaxi[taxiId];
+
+    if (!markerTaxi) continue;
+
+    const posTaxi = markerTaxi.getLatLng();
+
+    const resultado = await calcularETAEntrePuntos(posTaxi, posViaje);
+
+    if (!resultado) continue;
+
+    console.log('ETA TAXI:', taxiId, resultado);
+
+    if (resultado.etaMin < mejorETA) {
+      mejorETA = resultado.etaMin;
+      mejorTaxiId = taxiId;
+    }
+  }
+
+  console.log('MEJOR TAXI:', mejorTaxiId, mejorETA);
+
+  if (mejorTaxiId) {
+
+    seleccionarTaxi(mejorTaxiId, true, true, true);
+
+    mostrarMensaje(
+      `🚕 Mejor taxi encontrado (${Math.round(mejorETA)} min)`,
+      'success'
+    );
+  }
+}
 
 function dibujarLineaTaxiPasajero() {
   console.log('DIBUJAR LINEA:', {
@@ -109,7 +175,15 @@ function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarC
   Object.values(cardsPorTaxi).forEach(card => {
     card.classList.remove('seleccionado');
   });
-
+if (cardsPorTaxi[taxiId]) {
+  cardsPorTaxi[taxiId].classList.add('seleccionado');
+}
+if (cardsPorTaxi[taxiId]) {
+  cardsPorTaxi[taxiId].scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  });
+}
   const card = cardsPorTaxi[taxiId];
   if (card) {
     card.classList.add('seleccionado');
@@ -140,7 +214,7 @@ function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarC
 // Genera el HTML interno de una tarjeta de taxi
 function getTaxiCardHTML(taxi) {
   const estadoVisible =
-    taxi.estado_operativo === 'disponible_en_movimiento'
+    taxi.estado_operativo === 'asignado'
       ? 'Asignado / en movimiento'
       : (taxi.estado ?? 'sin dato');
 
@@ -243,10 +317,14 @@ function renderFiltros() {
 
 // Devuelve prioridad visual para ordenar taxis en el panel
 function getPrioridadTaxi(taxi) {
-  if (taxi.estado_operativo === 'disponible_en_movimiento') return 2;
-  if ((taxi.estado || '').toLowerCase() === 'disponible') return 1;
-  if ((taxi.estado || '').toLowerCase() === 'ocupado') return 3;
-  return 4;
+  const estado = (taxi.estado_operativo || taxi.estado || '').toLowerCase();
+
+  if (estado === 'disponible') return 1;
+  if (estado === 'asignado') return 2;
+  if (estado === 'ocupado') return 3;
+  if (estado === 'offline') return 4;
+
+  return 5;
 }
 
 function moverMarkerSuave(marker, nuevaLat, nuevaLng, duracion = 1000) {
@@ -353,85 +431,7 @@ function reordenarCardsSegunTaxis(taxis) {
     }
   });
 }
-
-// Actualiza solo resumen, cards y marcadores sin reconstruir toda la lista
-async function actualizarTaxisPeriodico() {
-  try {
-    const data = await fetchTaxis();
-console.log('DATA EN cargarTaxis:', data);
-    data.taxis.sort((a, b) => {
-      return getPrioridadTaxi(a) - getPrioridadTaxi(b);
-    });
-    let disponibles = 0;
-    let enMovimiento = 0;
-    let ocupados = 0;
-
-    const taxisVistos = new Set();
-    const bounds = [];
-   const listaTaxis = Array.isArray(data)
-  ? data
-  : (data.taxis || data.data || []);
-
-console.log('LISTA TAXIS FINAL:', listaTaxis); 
-
-  data.taxis.forEach((taxi) => {
-  if (taxi.estado === 'ocupado') {
-    ocupados++;
-  } else if (taxi.estado === 'disponible_en_movimiento') {
-    disponibles++;
-    enMovimiento++;
-  } else if (taxi.estado === 'disponible') {
-    disponibles++;
-  }
-
-  taxisVistos.add(taxi.taxi_id);
-
-  const cardExistente = cardsPorTaxi[taxi.taxi_id];
-
-  if (cardExistente) {
-    actualizarTaxiCardExistente(taxi, cardExistente);
-  } else {
-    const contenedor = document.getElementById('taxis');
-    const nuevaCard = renderTaxiCard(taxi);
-    cardsPorTaxi[taxi.taxi_id] = nuevaCard;
-    contenedor.appendChild(nuevaCard);
-  }
-
-  actualizarMarkerTaxi(taxi, bounds);
-});
-    reordenarCardsSegunTaxis(data.taxis);
-
-    Object.keys(marcadoresPorTaxi).forEach((taxiId) => {
-      if (!taxisVistos.has(taxiId)) {
-        mapa.removeLayer(marcadoresPorTaxi[taxiId]);
-        delete marcadoresPorTaxi[taxiId];
-        taxisState.delete(taxiId);
-
-        if (cardsPorTaxi[taxiId]) {
-          cardsPorTaxi[taxiId].remove();
-          delete cardsPorTaxi[taxiId];
-        }
-      }
-    });
-
-    renderResumen(data.taxis.length, disponibles, enMovimiento, ocupados);
-
-    if (taxiSeleccionadoId && cardsPorTaxi[taxiSeleccionadoId]) {
-      cardsPorTaxi[taxiSeleccionadoId].classList.add('seleccionado');
-
-      const markerSeleccionado = marcadoresPorTaxi[taxiSeleccionadoId];
-      if (markerSeleccionado) {
-        markerSeleccionado.openPopup();
-      }
-    } else {
-      taxiSeleccionadoId = null;
-    }
-  } catch (error) {
-    console.error('Error actualizando taxis periódicamente:', error);
-  }
-}
-let cargandoTaxis = false;
-
+  
 
 async function cargarTaxis() {
 
@@ -455,16 +455,21 @@ async function cargarTaxis() {
     contenedor.innerHTML = '';
 
     const bounds = [];
+listaTaxis.forEach((taxi) => {
+  const div = renderTaxiCard(taxi);
 
-       listaTaxis.forEach((taxi) => {
-      const div = renderTaxiCard(taxi);
-      cardsPorTaxi[taxi.taxi_id] = div;
-      contenedor.appendChild(div);
+  cardsPorTaxi[taxi.taxi_id] = div;
 
-      console.log('DIBUJANDO TAXI:', taxi);
+  contenedor.appendChild(div);
 
-      actualizarMarkerTaxi(taxi, bounds);
-    });
+  if (taxi.taxi_id === taxiSeleccionadoId) {
+    div.classList.add('seleccionado');
+  }
+
+  console.log('DIBUJANDO TAXI:', taxi);
+
+  actualizarMarkerTaxi(taxi, bounds);
+});
 
   } catch (error) {
     console.error('Error en cargarTaxis:', error);

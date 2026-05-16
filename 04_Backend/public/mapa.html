@@ -8,12 +8,16 @@
   <link rel="icon" href="data:," />
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 
   <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
   <style>
+
+.oculto {
+  display: none !important;
+}
     html,
     body {
       height: 100%;
@@ -230,7 +234,7 @@
   font-weight: bold;
 }
 
-.estado-en_viaje {
+.estado-en_curso {
   color: green;
   font-weight: bold;
 }
@@ -349,7 +353,13 @@
 
     <div id="detalle-viaje"></div>
 
-    <div id="acciones-viaje" class="oculto"></div>
+    <div id="acciones-viaje" class="oculto">
+
+  <button id="btn-asignar-taxi">
+    🚖 Asignar taxi seleccionado
+  </button>
+
+</div>
 
   </aside>
 
@@ -392,14 +402,14 @@
     }
   }, 10000);
   */
-setInterval(async () => {
+/*setInterval(async () => {
   try {
     await fetch('/viajes/controlar-timeout', { method: 'POST' });
   } catch (error) {
     console.warn('Error en timeout');
   }
 }, 5000);
-
+*/
 // ejecución inmediata
 cargarPendientes();
 cargarTaxis();

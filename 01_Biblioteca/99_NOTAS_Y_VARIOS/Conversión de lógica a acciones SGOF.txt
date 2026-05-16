@@ -106,7 +106,7 @@ Acción SQL:
 
 insertar en viajes
 
-estado = 'en_viaje'
+estado = 'en_curso'
 
 Resultado esperado:
 
