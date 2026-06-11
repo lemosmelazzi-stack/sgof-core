@@ -126,9 +126,10 @@ document.getElementById('detalle').innerHTML = `
 
   <div class="item">
     <span class="label">Estado:</span>
-    <span class="estado-badge estado-${viaje.estado}">
-      ${viaje.estado ?? ''}
-    </span>
+    <span class="estado-badge estado-${estadoViajeTexto(viaje.estado)}">
+  ${estadoViajeTexto(viaje.estado) || ''}
+</span>
+
   </div>
 
   <div class="item"><span class="label">Origen:</span> ${viaje.origen_direccion ?? ''}</div>

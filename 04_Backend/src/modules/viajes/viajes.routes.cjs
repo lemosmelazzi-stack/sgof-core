@@ -154,7 +154,7 @@ router.post('/:id/despachar', async (req, res) => {
     const result = await pool.query(`
       UPDATE viajes
       SET taxi_id = $1,
-        estado = '${ESTADOS.VIAJE.ASIGNADO}', 
+        estado = '${en_camino_origen}', 
           fecha_actualizacion = NOW()
       WHERE id = $2
       RETURNING *
@@ -162,7 +162,7 @@ router.post('/:id/despachar', async (req, res) => {
 
     await pool.query(`
       UPDATE taxis
-      SET estado = '${ESTADOS.TAXI.ASIGNADO}'
+   SET estado = 'en_camino_origen'
       WHERE id = $1
     `, [taxiId]);
 
@@ -203,10 +203,10 @@ router.post('/:id/iniciar', async (req, res) => {
 
     const viaje = viajeResult.rows[0];
 
-    if (viaje.estado !== ESTADOS.VIAJE.ASIGNADO) {
+    if (viaje.estado !== en_camino_origen) {
       return res.status(400).json({
         ok: false,
-        mensaje: `No se puede iniciar un viaje en estado ${viaje.estado}`
+        mensaje: `No se puede iniciar un viaje en estado ${estadoViajeTexto(viaje.estado)} `
       });
     }
 
@@ -216,6 +216,37 @@ router.post('/:id/iniciar', async (req, res) => {
         mensaje: 'El viaje no tiene taxi asignado'
       });
     }
+
+const result = await pool.query(`
+  UPDATE viajes
+  SET estado = 'en_curso',
+      fecha_hora_inicio = NOW(),
+      fecha_actualizacion = NOW()
+  WHERE id = $1
+  RETURNING *
+`, [id]);
+
+const taxiUpdate = await pool.query(`
+  UPDATE taxis
+  SET estado = 'ocupado',
+      fecha_actualizacion = NOW()
+  WHERE id = $1
+  RETURNING id, codigo_movil, estado
+`, [viaje.taxi_id]);
+
+const io = req.app.get('io');
+
+if (io) {
+  io.emit('viaje-actualizado', result.rows[0]);
+  io.emit('taxi-actualizado', taxiUpdate.rows[0]);
+}
+
+return res.json({
+  ok: true,
+  mensaje: 'Viaje iniciado correctamente',
+  viaje: result.rows[0],
+  taxi: taxiUpdate.rows[0]
+});
 
     /*const result = await pool.query(`
       UPDATE viajes
@@ -301,7 +332,7 @@ router.post('/:id/iniciar', async (req, res) => {
    const resultViaje = await pool.query(`
   UPDATE viajes
   SET taxi_id = $1,
-      estado = '${ESTADOS.VIAJE.ASIGNADO}',
+      estado = 'en_camino_origen',
       fecha_actualizacion = NOW()
   WHERE id = $2
   RETURNING id, codigo, estado, taxi_id, fecha_actualizacion
@@ -309,7 +340,7 @@ router.post('/:id/iniciar', async (req, res) => {
 
 const resultTaxi = await pool.query(`
   UPDATE taxis
-  SET estado = '${ESTADOS.TAXI.ASIGNADO}'
+  SET estado = '${ESTADOS.TAXI.EN_CAMINO_ORIGEN}'
   WHERE id = $1
   RETURNING id, codigo_movil, estado
 `, [taxi_id]);
@@ -389,4 +420,4 @@ router.put('/:id/desasignar-taxi', async (req, res) => {
 });
 
 
-module.exports = router;
+module.exports = router; 

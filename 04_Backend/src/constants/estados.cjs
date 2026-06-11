@@ -1,16 +1,21 @@
 module.exports = {
+ 
   TAXI: {
     DISPONIBLE: 'disponible',
-    ASIGNADO: 'asignado',
+    EN_CAMINO_ORIGEN: 'en_camino_origen',
+    EN_ORIGEN: 'en_origen',
     OCUPADO: 'ocupado',
-    OFFLINE: 'offline'
+    FUERA_SERVICIO: 'fuera_servicio'
   },
 
   VIAJE: {
     PENDIENTE: 'pendiente',
-    ASIGNADO: 'asignado',
+    EN_CAMINO_ORIGEN: 'en_camino_origen',
+    EN_ORIGEN: 'en_origen',
     EN_CURSO: 'en_curso',
     FINALIZADO: 'finalizado',
-    CANCELADO: 'cancelado'
+    CANCELADO: 'cancelado',
+    NO_SHOW: 'no_show'
   }
-};
+
+}; 

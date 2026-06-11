@@ -38,7 +38,7 @@ console.log('POSITIONS RAW DB:', result.rows);
 router.get('/positions', async (req, res) => {
 
   try {
-const result = await pool.query(`
+  const result = await pool.query(`
   SELECT DISTINCT ON (g.taxi_id)
   g.taxi_id,
   g.latitud,
@@ -46,6 +46,7 @@ const result = await pool.query(`
   g.velocidad_kmh,
   g.rumbo_grados,
   g.fecha_hora_gps,
+  g.fuente,
   t.estado,
   t.estado AS estado_operativo,
   t.codigo_movil
@@ -56,7 +57,8 @@ WHERE g.latitud IS NOT NULL
   AND g.longitud IS NOT NULL
 ORDER BY g.taxi_id, g.fecha_hora_gps DESC
 `);
-console.log('POSITIONS BACKEND:', result.rows);
+
+//console.log('POSITIONS BACKEND:', result.rows);
 
     res.json({
       ok: true,

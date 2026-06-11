@@ -1,19 +1,50 @@
 // ======================================================
 // CONFIGURACION GENERAL
 // ======================================================
+const http = require('http');
+const { Server } = require('socket.io');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const pool = require('../config/db');
 const viajesRoutes = require('./routes/viajes.cjs');
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: '*'
+  }
+});
+
+app.set('io', io);
+io.on('connection', (socket) => {
+  console.log('Cliente conectado a Socket.IO:', socket.id);
+
+  socket.emit('mensaje-test', {
+    mensaje: 'Socket.IO funcionando correctamente'
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Cliente desconectado de Socket.IO:', socket.id);
+  });
+  
+});
+
 const taxisRoutes = require('./routes/taxis.cjs');
+
+const gpsPath = require.resolve('./routes/gps.cjs');
+console.log('GPS ROUTES CARGADO DESDE:', gpsPath);
+const gpsRoutes = require('./routes/gps.cjs');
+
+app.use(express.json());
+
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/viajes', viajesRoutes);
 app.use('/taxis', taxisRoutes(pool));
-
+app.use('/gps', gpsRoutes);
 app.get('/mapa', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/mapa.html'));
 });
@@ -80,8 +111,10 @@ app.get('/mapa-taxis', async (req, res) => {
     });
   }
 });
-
-app.listen(3000, () => {
+server.listen(3000, () => {
   console.log('Servidor corriendo en http://localhost:3000');
 });
+
+
+
 

@@ -183,8 +183,12 @@ let url = `/viajes?estado=pendiente&limit=${limite}&offset=${offset}`;
       <td>${viaje.codigo ?? ''}</td>
 
       <td>
-        <span class="estado-badge estado-${viaje.estado}">
-          ${viaje.estado ?? ''}
+        <span class="estado-badge estado- <span class="estado-badge estado-${estadoViajeTexto(viaje.estado)}">
+      ${estadoViajeTexto(viaje.estado)} ?? ''}
+    </span>">
+           <span class="estado-badge estado-${estadoViajeTexto(viaje.estado)}">
+      ${estadoViajeTexto(viaje.estado)} ?? ''}
+    </span> ''}
         </span>
       </td>
 

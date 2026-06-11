@@ -228,9 +228,8 @@
   color: orange;
   font-weight: bold;
 }
-
-.estado-asignado {
-  color: #007bff;
+.estado-en-camino-origen {
+  color: #f59e0b;
   font-weight: bold;
 }
 
@@ -327,6 +326,22 @@
   100% { background-color: #fff; }
 }
 
+.taxi-card.taxi-disponible {
+  border-left: 5px solid #22c55e;
+}
+
+.taxi-card.taxi-en-camino {
+  border-left: 5px solid #f59e0b;
+}
+
+.taxi-card.taxi-ocupado {
+  border-left: 5px solid #ef4444;
+}
+
+.taxi-card.taxi-desconocido {
+  border-left: 5px solid #6b7280;
+}
+
   </style>
 </head>
 <body>
@@ -341,24 +356,41 @@
 
     <h2>Viajes pendientes</h2>
 
-    <button onclick="crearPedidoTest()" style="margin-bottom:10px;">
-      🚀 Nuevo pedido test
-    </button>
-
+   <button id="btn-nuevo-pedido-test" style="margin-bottom:10px;">
+  🚀 Nuevo pedido test
+</button>
     <div id="lista-pendientes">Cargando...</div>
+<div id="bloque-viaje-seleccionado" style="display:none;">
+  <hr />
 
-    <hr />
+  <h3>Viaje seleccionado</h3>
 
-    <h3>Viaje seleccionado</h3>
+  <div id="detalle-viaje"></div>
 
-    <div id="detalle-viaje"></div>
+  <div id="acciones-viaje" class="oculto">
+<button id="btn-asignar-taxi">
+  🚖 Asignar taxi seleccionado
+</button>
 
-    <div id="acciones-viaje" class="oculto">
+<button id="btn-aceptar-viaje">
+  ✅ Aceptar viaje
+</button>
 
-  <button id="btn-asignar-taxi">
-    🚖 Asignar taxi seleccionado
-  </button>
+<button id="btn-rechazar-viaje">
+  ❌ Rechazar viaje
+</button>
 
+<button id="btn-en-origen">
+  📍 En origen
+</button>
+
+<button id="btn-iniciar-viaje">
+  ▶️ Iniciar viaje
+</button>
+
+<button id="btn-finalizar-viaje">
+  ✅ Finalizar viaje
+</button>
 </div>
 
   </aside>
@@ -377,51 +409,30 @@
       <div id="taxis">Cargando taxis...</div>
     </main>
   </div>
-
+<script src="/socket.io/socket.io.js"></script>
 <script src="mapa.js"></script>
 <script src="taxis.js"></script>
 <script src="viajes.js"></script>
 
 <script>
+  
   // Inicio inicial
-  cargarTaxis();
   cargarPendientes();
+  cargarTaxis();
+  cargarViajeActivo();
 
-  // Taxis cada 5 segundos
- 
-  // Asignación automática desactivada para pruebas
-  // setInterval(asignarPendientesAutomaticamente, 10000);
-
-  // Control automático de estados desactivado para pruebas
-  /*
-  setInterval(async () => {
-    try {
-      await fetch('/viajes/controlar-estados', { method: 'POST' });
-    } catch (error) {
-      console.warn('Control de estados no disponible momentáneamente');
-    }
-  }, 10000);
-  */
-/*setInterval(async () => {
-  try {
-    await fetch('/viajes/controlar-timeout', { method: 'POST' });
-  } catch (error) {
-    console.warn('Error en timeout');
-  }
-}, 5000);
-*/
-// ejecución inmediata
-cargarPendientes();
-cargarTaxis();
-cargarViajeActivo();
-
-// refrescos
-setInterval(cargarPendientes, 5000);
-setInterval(cargarTaxis, 3000);
-setInterval(cargarViajeActivo, 1000);
+  // refrescos
+  setInterval(cargarPendientes, 5000);
+  setInterval(cargarTaxis, 3000);
+  setInterval(cargarViajeActivo, 3000);
 </script>
-<audio id="alerta-sonido" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
-</body>
+
+<audio id="alerta-sonido"
+src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
+</audio>
+  
+  
+  </body>
 
 </html>
 
