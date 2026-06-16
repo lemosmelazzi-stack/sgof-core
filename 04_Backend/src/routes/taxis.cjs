@@ -19,7 +19,7 @@ const result = await pool.query(`
   FROM taxis t
   ORDER BY t.id
 `);
-console.log('POSITIONS RAW DB:', result.rows);
+
       res.json(result.rows);
 
     } catch (error) {
@@ -57,8 +57,6 @@ WHERE g.latitud IS NOT NULL
   AND g.longitud IS NOT NULL
 ORDER BY g.taxi_id, g.fecha_hora_gps DESC
 `);
-
-//console.log('POSITIONS BACKEND:', result.rows);
 
     res.json({
       ok: true,

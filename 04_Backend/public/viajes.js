@@ -1,11 +1,10 @@
-console.log('VIAJES.JS CARGADO');
+
 const timersAsignacion = {};
 
 let ultimoTotalPendientes = 0;
 
 function seleccionarViaje(viaje, card) {
-  console.log('SELECCIONANDO VIAJE:', viaje);
-
+  
 window.viajeSeleccionado = viaje;
 window.viajeSeleccionadoId = viaje.id;
 viajeSeleccionadoId = viaje.id;
@@ -46,18 +45,11 @@ if (accionesViaje) {
 }
 centrarMapa(viaje);
 
-console.log('VOY A BUSCAR MEJOR TAXI');
+
 
 if (typeof window.encontrarMejorTaxiParaViaje === 'function') {
   window.encontrarMejorTaxiParaViaje();
 }
-
-console.log('COORD VIAJE:', {
-  latitud: viaje.latitud,
-  longitud: viaje.longitud,
-  origen_latitud: viaje.origen_latitud,
-  origen_longitud: viaje.origen_longitud
-});
 
    if (typeof encontrarMejorTaxiParaViaje === 'function') {
     encontrarMejorTaxiParaViaje(viaje);
@@ -74,14 +66,7 @@ console.log('COORD VIAJE:', {
 
 async function asignarTaxiSeleccionado() {
 
-  console.log('ANTES DE VALIDAR ASIGNAR:', {
-    windowViajeId: window.viajeSeleccionadoId,
-    windowViaje: window.viajeSeleccionado,
-    windowTaxiId: window.taxiSeleccionadoId
-  });
-
-  console.log('CLICK asignarTaxiSeleccionado');
-
+  
   if (!window.viajeSeleccionadoId && window.viajeSeleccionado?.id) {
     window.viajeSeleccionadoId = window.viajeSeleccionado.id;
   }
@@ -96,11 +81,7 @@ async function asignarTaxiSeleccionado() {
     return;
   }
 
-  console.log('DATOS ASIGNAR:', {
-    viaje: window.viajeSeleccionadoId,
-    taxi: window.taxiSeleccionadoId
-  });
-
+  
   try {
 
     const res = await fetch('/viajes/asignar', {
@@ -117,8 +98,7 @@ async function asignarTaxiSeleccionado() {
 
     const data = await res.json();
 
-    console.log('RESPUESTA ASIGNAR:', data);
-
+    
     if (!data.ok) {
       alert(data.mensaje || 'Error al asignar taxi');
       return;
@@ -216,7 +196,7 @@ window.actualizarBotonesPorEstado = function actualizarBotonesPorEstado(viaje) {
 
 // Carga los viajes pendientes desde el backend y los muestra en pantalla
 async function cargarPendientes() {
- // console.log('ENTRANDO A cargarPendientes');
+ 
 
   try {
     const response = await fetch('/viajes?estado=pendiente');
@@ -234,8 +214,7 @@ async function cargarPendientes() {
 
     ultimoTotalPendientes = totalActual;
 
-   // console.log('RESULTADO VIAJES EN MAPA:', result);
-
+   
     const lista = document.getElementById('lista-pendientes');
     if (!lista) return;
 
@@ -361,13 +340,7 @@ function estadoViajeTexto(estado) {
  // ← cierre de cargarPendientes
 
  function mostrarViajeOperativo(viaje) {
-  console.log('ENTRE mostrarViajeOperativo', viaje);
-  console.log('ETA PANEL:', {
-    distancia: window.distanciaActualOSRM,
-    eta: window.etaActualOSRM
-  });
-
-  
+    
   const contenedor = document.getElementById('detalle-viaje');
   if (!contenedor) return;
 
@@ -517,12 +490,6 @@ function dibujarPendientesEnMapa(viajes) {
       esAproximado = true;
     }
 
-    console.log('LAT/LNG FINAL:', {
-  lat,
-  lng,
-  esAproximado
-});
-
     if (lat == null || lng == null || Number.isNaN(lat) || Number.isNaN(lng)) {
       return;
     }
@@ -563,34 +530,27 @@ async function asignarPendientesAutomaticamente() {
 
     for (const viaje of pendientes) {
       const res = await fetch(`/viajes/${viajeSeleccionadoId}/asignar-taxi`, {
-  method: 'PUT',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    taxi_id: taxiSeleccionadoId
-  })
-});
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          taxi_id: taxiSeleccionadoId
+        })
+      });
 
       const data = await res.json();
-
-      if (data.ok) {
-        console.log('Viaje asignado automáticamente:', viaje.codigo);
-      } else {
-        console.log('No se pudo asignar automáticamente:', viaje.codigo, data.mensaje);
-      }
     }
 
     if (typeof marcadoresPendientes !== 'undefined') {
+      marcadoresPendientes.forEach((m) => {
+        if (mapa.hasLayer(m)) {
+          mapa.removeLayer(m);
+        }
+      });
 
-  marcadoresPendientes.forEach((m) => {
-    if (mapa.hasLayer(m)) {
-      mapa.removeLayer(m);
+      marcadoresPendientes = [];
     }
-  });
-
-  marcadoresPendientes = [];
-}
 
     await cargarPendientes();
     await cargarTaxis();
@@ -599,6 +559,7 @@ async function asignarPendientesAutomaticamente() {
     console.error('Error en asignación automática total:', error);
   }
 }
+
 function parseFechaLocal(fecha) {
   if (!fecha) return null;
 
@@ -699,9 +660,7 @@ async function cargarViajePorId(id) {
   try {
     const res = await fetch(`/viajes/${id}`);
     const data = await res.json();
-
-    console.log('RECARGA VIAJE POR ID:', data);
-
+    
     const viaje = data.viaje || data.data;
 
     if (!viaje) {
@@ -779,8 +738,7 @@ function mostrarViajeOperativo(viaje) {
 window.mostrarViajeOperativo = mostrarViajeOperativo;
 
 async function aceptarViaje() {
-  console.log('CLICK ACEPTAR VIAJE', viajeSeleccionadoId);
-
+  
   if (!viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
     return;
@@ -792,9 +750,7 @@ async function aceptarViaje() {
     });
 
     const data = await res.json();
-
-    console.log('RESPUESTA ACEPTAR:', data);
-
+    
     if (!data.ok) {
       alert(data.mensaje || 'Error al aceptar viaje');
       return;
@@ -824,8 +780,7 @@ async function aceptarViaje() {
 }
 
 async function crearPedidoTest() {
-  console.log('CLICK crearPedidoTest');
-
+  
   try {
     const res = await fetch('/viajes/test', {
       method: 'POST'
@@ -850,10 +805,7 @@ async function crearPedidoTest() {
 }
 
 window.crearPedidoTest = crearPedidoTest;
-
-console.log('GLOBAL crearPedidoTest:', typeof window.crearPedidoTest);
-
-   
+  
 async function rechazarViaje(viajeId) {
   try {
     const res = await fetch(`/viajes/${viajeId}/rechazar-y-reasignar`, {
@@ -917,10 +869,6 @@ if (!window.taxiSeleccionadoId) {
 
    
 
-    console.log('ASIGNANDO TAXI:', {
-      viajeSeleccionadoId,
-      taxiSeleccionadoId
-    });
 
     try {
 
@@ -936,8 +884,6 @@ if (!window.taxiSeleccionadoId) {
       });
 
       const result = await response.json();
-
-      console.log('RESPUESTA ASIGNACION:', result);
 
       if (result.ok) {
         alert('Taxi asignado correctamente');
@@ -964,11 +910,3 @@ window.cargarViajeActivo = cargarViajeActivo;
  window.iniciarViaje = iniciarViaje;
 window.asignarTaxiSeleccionado = asignarTaxiSeleccionado;
  
-console.log('GLOBAL cargarPendientes:', typeof window.cargarPendientes);
-//cargarPendientes();
-//cargarTaxis();
-//cargarViajeActivo();
-
-//setInterval(cargarPendientes, 5000);
-//setInterval(cargarTaxis, 3000);
-//setInterval(cargarViajeActivo, 1000);

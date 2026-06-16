@@ -113,9 +113,7 @@ res.json({
 router.post('/:id/despachar', async (req, res) => {
   try {
     const { id } = req.params;
-
-    console.log('Despachando viaje:', id);
-
+    
     const viaje = await pool.query(
       'SELECT id, estado FROM viajes WHERE id = $1 LIMIT 1',
       [id]
@@ -185,8 +183,7 @@ router.post('/:id/iniciar', async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log('Iniciando viaje:', id);
-
+    
     const viajeResult = await pool.query(`
       SELECT id, estado, taxi_id
       FROM viajes
@@ -265,7 +262,7 @@ return res.json({
       RETURNING id, codigo_movil, estado
     `, [viaje.taxi_id]);
 
-    console.log('TAXI PASADO A OCUPADO:', taxiUpdate.rows);
+    'TAXI PASADO A OCUPADO:', taxiUpdate.rows);
 
     res.json({
       ok: true,

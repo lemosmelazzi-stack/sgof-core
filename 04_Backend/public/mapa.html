@@ -120,6 +120,18 @@
       cursor: pointer;
     }
 
+    .gps-online {
+  border-left: 6px solid #22c55e !important;
+}
+
+.gps-demora {
+  border-left: 6px solid #f59e0b !important;
+}
+
+.gps-viejo {
+  border-left: 6px solid #ef4444 !important;
+}
+
     .taxi-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -360,6 +372,14 @@
   🚀 Nuevo pedido test
 </button>
     <div id="lista-pendientes">Cargando...</div>
+
+<div id="panelGpsTaxi" style="display:none;">
+  <h3>GPS del taxi</h3>
+  <div id="contenidoGpsTaxi">
+    Ningún taxi seleccionado
+  </div>
+</div>
+
 <div id="bloque-viaje-seleccionado" style="display:none;">
   <hr />
 

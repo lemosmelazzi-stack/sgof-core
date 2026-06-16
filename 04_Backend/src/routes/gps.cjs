@@ -10,6 +10,108 @@ router.post('/simular-test', (req, res) => {
   res.json({ ok: true, mensaje: 'POST simular-test funciona' });
 });
 
+router.post('/posicion', async (req, res) => {
+  try {
+    const {
+      taxi_id,
+      latitud,
+      longitud,
+      velocidad_kmh = 0,
+      rumbo_grados = 0,
+      fuente = 'gps'
+    } = req.body;
+
+    const lat = Number(latitud);
+    const lng = Number(longitud);
+
+    if (!taxi_id || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'Datos GPS inválidos'
+      });
+    }
+
+    const empresaId = '4b593c63-8fdd-4c9d-bd48-54cb6ae89623';
+
+    const result = await req.app.get('pool').query(
+      `
+      INSERT INTO gps_logs (
+        id,
+        empresa_id,
+        taxi_id,
+        fecha_hora_gps,
+        latitud,
+        longitud,
+        velocidad_kmh,
+        rumbo_grados,
+        fuente,
+        estado_senal,
+        estado,
+        fecha_creacion
+      )
+      VALUES (
+        gen_random_uuid(),
+        $1,
+        $2,
+        NOW(),
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        'ok',
+        'activo',
+        NOW()
+      )
+      RETURNING *
+      `,
+      [
+        empresaId,
+        taxi_id,
+        lat,
+        lng,
+        Number(velocidad_kmh) || 0,
+        Number(rumbo_grados) || 0,
+        fuente
+      ]
+    );
+
+    const gps = result.rows[0];
+
+    const io = req.app.get('io');
+
+    if (io) {
+      io.emit('taxi_posicion', {
+        taxiId: gps.taxi_id,
+        taxi_id: gps.taxi_id,
+        lat: Number(gps.latitud),
+        lng: Number(gps.longitud),
+        latitud: Number(gps.latitud),
+        longitud: Number(gps.longitud),
+        velocidad_kmh: Number(gps.velocidad_kmh) || 0,
+        rumbo_grados: Number(gps.rumbo_grados) || 0,
+        fuente: gps.fuente,
+        fecha_hora_gps: gps.fecha_hora_gps
+      });
+    }
+
+    res.json({
+      ok: true,
+      mensaje: 'Posición GPS registrada',
+      gps
+    });
+
+  } catch (error) {
+    console.error('Error en POST /gps/posicion:', error);
+
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error al registrar posición GPS',
+      error: error.message
+    });
+  }
+});
+
 router.post('/simular-taxi/:taxiId', (req, res) => {
   const { taxiId } = req.params;
 
@@ -42,9 +144,7 @@ router.post('/simular-taxi/:taxiId', (req, res) => {
       velocidad_kmh: 35,
       fuente: 'simulacion'
     });
-
-    console.log('SIMULANDO GPS:', taxiId, lat, lng);
-
+    
     i++;
   }, 1500);
 
@@ -111,6 +211,40 @@ router.get('/historial/:taxiId', async (req, res) => {
     res.status(500).json({
       ok: false,
       mensaje: 'Error consultando historial GPS',
+      error: error.message
+    });
+  }
+});
+
+router.get('/resumen-hoy/:taxiId', async (req, res) => {
+  try {
+    const { taxiId } = req.params;
+
+    const result = await pool.query(`
+      SELECT
+        COUNT(*)::int AS puntos_hoy,
+        MIN(fecha_hora_gps) AS primer_gps,
+        MAX(fecha_hora_gps) AS ultimo_gps,
+        MAX(velocidad_kmh) AS velocidad_maxima
+      FROM gps_logs
+      WHERE taxi_id = $1
+       AND fecha_hora_gps >= COALESCE($2::date, CURRENT_DATE)
+       AND fecha_hora_gps < COALESCE($2::date, CURRENT_DATE) + INTERVAL '1 day'
+
+    `, [taxiId, req.query.fecha || null]);
+    
+    res.json({
+      ok: true,
+      taxi_id: taxiId,
+      resumen: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error consultando resumen GPS de hoy:', error);
+
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error consultando resumen GPS de hoy',
       error: error.message
     });
   }

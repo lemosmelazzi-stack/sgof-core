@@ -381,9 +381,7 @@ router.get('/:id', async (req, res) => {
 router.post('/:id/despachar', async (req, res) => {
   try {
     const { id } = req.params;
-
-    console.log('Despachando viaje:', id);
-
+   
    const viaje = await pool.query(
   'SELECT id, estado, origen_latitud, origen_longitud FROM viajes WHERE id = $1',
   [id]
@@ -452,7 +450,6 @@ await pool.query(`
   WHERE id = $1
 `, [taxi_id]);
 
-console.log('TAXI ACTUALIZADO A OCUPADO:', taxi_id);
 
 res.json({
   ok: true,
@@ -615,8 +612,6 @@ router.post('/:id/iniciar', async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log('INICIANDO VIAJE ID:', id);
-
     const viajeResult = await pool.query(`
       SELECT id, estado, taxi_id
       FROM viajes
@@ -662,10 +657,7 @@ if (viaje.estado !== 'en_origen') {
       WHERE id = $1
       RETURNING id, codigo_movil, estado
     `, [viaje.taxi_id]);
-
-    console.log('VIAJE INICIADO:', resultViaje.rows[0]);
-    console.log('TAXI OCUPADO:', resultTaxi.rows[0]);
-
+    
     res.json({
       ok: true,
       mensaje: 'Viaje iniciado correctamente',
@@ -687,9 +679,7 @@ if (viaje.estado !== 'en_origen') {
 router.post('/:id/finalizar', async (req, res) => {
   try {
     const { id } = req.params;
-
-    console.log('Finalizando viaje:', id);
-
+    
     const viajeResult = await pool.query(`
       SELECT id, estado, taxi_id
       FROM viajes
@@ -769,7 +759,7 @@ router.post('/:id/finalizar', async (req, res) => {
 });
 
 router.post('/test', async (req, res) => {
-  console.log('ENTRO A /viajes/test');
+  
 
   try {
    const empresaId = '4b593c63-8fdd-4c9d-bd48-54cb6ae89623'; 
@@ -825,8 +815,7 @@ router.post('/test', async (req, res) => {
    const io = req.app.get('io');
 
 if (io) {
-  console.log('EMITIENDO viaje-creado:', result.rows[0].codigo);
-
+  
   io.emit('viaje-creado', result.rows[0]);
 }
 
@@ -1041,8 +1030,7 @@ router.post('/:id/aceptar', async (req, res) => {
 
     const taxi_id = viajeResult.rows[0].taxi_id;
 
-    console.log('ACEPTAR VIAJE:', {
-      viaje_id: id,
+   
       taxi_id
     });
 
@@ -1070,7 +1058,7 @@ router.post('/:id/aceptar', async (req, res) => {
 `, [taxi_id]);
 
 
-    console.log('TAXI UPDATE:', taxiUpdate.rows);
+    
 
     return res.json({
       ok: true,
@@ -1088,7 +1076,7 @@ router.post('/:id/aceptar', async (req, res) => {
 });
  */
 router.post('/asignar', async (req, res) => {
-  console.log('ENTRÓ A /viajes/asignar', req.body);
+
   try {
 
     const { viaje_id, taxi_id } = req.body;
@@ -1122,13 +1110,11 @@ router.post('/asignar', async (req, res) => {
 
     if (io) {
 
-      console.log('EMITIENDO taxi-actualizado:', taxiUpdate.rows[0]);
-      io.emit('taxi-actualizado', taxiUpdate.rows[0]);
+        io.emit('taxi-actualizado', taxiUpdate.rows[0]);
 
      io.emit('taxi-actualizado', taxiUpdate.rows[0]);
 
 const taxiAsignado = taxiUpdate.rows[0];
-
 
 const posicionTaxi = await pool.query(`
     SELECT latitud, longitud
@@ -1144,15 +1130,6 @@ const lngInicio = Number(posicionTaxi.rows[0]?.longitud);
 const latDestino = Number(result.rows[0].origen_latitud);
 const lngDestino = Number(result.rows[0].origen_longitud);
 
-
-console.log('SIM TAXI:', {
-    latInicio,
-    lngInicio,
-    latDestino,
-    lngDestino,
-    origen_latitud: result.rows[0].origen_latitud,
-    origen_longitud: result.rows[0].origen_longitud
-});
 
 io.emit('taxi_posicion', {
     taxiId: taxiAsignado.id,
@@ -1179,7 +1156,7 @@ const pasos = 20;
     }, i * 500);
 }
 */
-      console.log('EMITIENDO viaje-actualizado:', result.rows[0]);
+   
       io.emit('viaje-actualizado', result.rows[0]);
     }
 
@@ -1333,9 +1310,7 @@ router.post('/:id/aceptar', async (req, res) => {
 router.put('/:id/en-origen', async (req, res) => {
   try {
     const { id } = req.params;
-
-    console.log('Marcando en origen:', id);
-
+    
     const result = await pool.query(
       `
       UPDATE viajes

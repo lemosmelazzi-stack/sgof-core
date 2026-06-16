@@ -81,9 +81,7 @@ async function encontrarMejorTaxiParaViaje() {
   if (!marcadorViaje) return;
 
   const posViaje = marcadorViaje.getLatLng();
-  console.log('DEBUG MARCADORES TAXI:', Object.keys(window.marcadoresPorTaxi || {}));
-console.log('DEBUG POS VIAJE:', posViaje);
-
+  
   let mejorTaxiId = null;
   let mejorETA = Infinity;
   let mejorRutaCoords = null;
@@ -100,7 +98,7 @@ console.log('DEBUG POS VIAJE:', posViaje);
 
     if (!resultado) continue;
 
-    console.log('ETA TAXI:', taxiId, resultado);
+    
 if (resultado.etaMin < mejorETA) {
   mejorETA = resultado.etaMin;
   mejorTaxiId = taxiId;
@@ -109,24 +107,11 @@ if (resultado.etaMin < mejorETA) {
   window.distanciaActualOSRM = resultado.distanciaKm;
   window.etaActualOSRM = resultado.etaMin;
 }
-
-
-  console.log('ETA GUARDADA:', {
-    distancia: window.distanciaActualOSRM,
-    eta: window.etaActualOSRM
-  });
-}
-console.log('REFRESCAR PANEL ETA:', {
-  existeFuncion: typeof mostrarViajeOperativo,
-  viajeSeleccionado: window.viajeSeleccionado
-});
-
+ 
 if (typeof mostrarViajeOperativo === 'function') {
   mostrarViajeOperativo(window.viajeSeleccionado || null);
 }
-
-  console.log('MEJOR TAXI:', mejorTaxiId, mejorETA);
-
+  
 if (mejorTaxiId) {
 
   window.mapa.eachLayer((layer) => {
@@ -140,21 +125,8 @@ if (mejorTaxiId) {
     window.lineaTaxiPasajero = null;
   }
 
-  console.log('MEJOR TAXI:', mejorTaxiId, mejorETA);
-
-console.log('DEBUG RUTA:', {
-  mejorTaxiId,
-  mejorETA,
-  mejorRutaCoords
-});
-
 if (mejorRutaCoords) {
-
-  console.log(
-    'DIBUJANDO RUTA OSRM:',
-    mejorRutaCoords.length
-  );
-
+ 
   window.lineaTaxiPasajero = L.polyline(mejorRutaCoords, {
   color: '#2563eb',
   weight: 5,
@@ -164,12 +136,6 @@ if (mejorRutaCoords) {
 window.lineaTaxiPasajero.bringToFront();
 
 window.rutaActualOSRM = mejorRutaCoords;
-
-
-console.log(
-  'CAPAS:',
-  window.mapa.hasLayer(window.lineaTaxiPasajero)
-);
 
   window.mapa.fitBounds(
     window.lineaTaxiPasajero.getBounds(),
@@ -184,13 +150,13 @@ console.log(
     'success'
   );
 }
+} 
+} 
 window.encontrarMejorTaxiParaViaje = encontrarMejorTaxiParaViaje;
 
-}
 
 async function fetchTaxis() {
-  //console.log('ENTRANDO A fetchTaxis');
-
+ 
   const res = await fetch('/taxis/positions');
 
   if (!res.ok) {
@@ -214,18 +180,24 @@ function colorTaxi(taxi) {
 
   return '#6b7280';
 }
-
 function iconoTaxi(taxi) {
+  const rumbo = Number.isFinite(Number(taxi?.rumbo_grados))
+    ? Number(taxi.rumbo_grados)
+    : 0;
+
   return L.divIcon({
     className: '',
     html: `
       <div style="
         position: relative;
-        width: 24px;
-        height: 24px;
-        transform: rotate(${taxi.heading || 0}deg);
+        width: 28px;
+        height: 28px;
+        transform: rotate(${rumbo}deg);
       ">
         <div style="
+          position: absolute;
+          left: 2px;
+          top: 2px;
           width: 0;
           height: 0;
           border-left: 12px solid transparent;
@@ -236,8 +208,8 @@ function iconoTaxi(taxi) {
 
         <div style="
           position: absolute;
-          left: 8px;
-          top: 7px;
+          left: 10px;
+          top: 9px;
           width: 0;
           height: 0;
           border-left: 4px solid transparent;
@@ -247,19 +219,15 @@ function iconoTaxi(taxi) {
       </div>
     `,
     iconSize: [28, 28],
-    iconAnchor: [14, 14]
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14]
   });
 }
-
 async function cargarTaxis() {
-  
-  //console.log('ENTRANDO A cargarTaxis');
-
-  try {
+    try {
     const data = await fetchTaxis();
     window.ultimosTaxis = data.taxis || [];
-    //console.log('RESPUESTA /taxis/positions:', data);
-
+   
     if (!data.ok || !Array.isArray(data.taxis)) {
       console.error('Respuesta inválida de taxis:', data);
       return;
@@ -309,8 +277,7 @@ if (!marker) {
   marker._sgofTipo = 'taxi';
 
   marker.on('click', () => {
-    console.log('CLICK MARKER TAXI:', taxi.taxi_id);
-
+    
     window.seleccionarTaxi(
       taxi.taxi_id,
       false,
@@ -319,7 +286,17 @@ if (!marker) {
     );
   });
 } else {
-  marker.setLatLng([latFinal, lngFinal]);
+  if (!marker._sgofAnimando) {
+    const posActual = marker.getLatLng();
+
+    const mismaPosicion =
+      Math.abs(posActual.lat - latFinal) < 0.000001 &&
+      Math.abs(posActual.lng - lngFinal) < 0.000001;
+
+    if (!mismaPosicion) {
+      marker.setLatLng([latFinal, lngFinal]);
+    }
+  }
 }
 
 const velocidad = taxi.velocidad_kmh
@@ -329,6 +306,7 @@ const velocidad = taxi.velocidad_kmh
 const fechaGps = taxi.fecha_hora_gps
   ? new Date(taxi.fecha_hora_gps).toLocaleString('es-UY')
   : '—';
+  const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
 
 marker.bindPopup(`
   🚕 <strong>${taxi.codigo_movil || taxi.taxi_id}</strong><br>
@@ -337,7 +315,12 @@ marker.bindPopup(`
   GPS: ${fechaGps}
 `);
 
-marker.setIcon(iconoTaxi(taxi));
+const firmaIcono = `${taxi.estado || taxi.estado_operativo || ''}|${taxi.rumbo_grados || ''}`;
+
+if (marker._sgofFirmaIcono !== firmaIcono) {
+  marker.setIcon(iconoTaxi(taxi));
+  marker._sgofFirmaIcono = firmaIcono;
+}
 
       window.taxisMarkers[taxi.taxi_id] = marker;
       window.marcadoresPorTaxi[taxi.taxi_id] = marker;
@@ -364,12 +347,11 @@ function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarC
   seguirTaxiSeleccionado = true;
 
   taxiSeleccionadoId = taxiId;
-  window.taxiSeleccionadoId = taxiId;
 
-  console.log('TAXI SELECCIONADO OK:', {
-    taxiSeleccionadoId,
-    windowTaxi: window.taxiSeleccionadoId
-  });
+mostrarPanelGpsTaxi(taxiId);
+
+  window.taxiSeleccionadoId = taxiId;
+    
 
   if (typeof window.dibujarLineaTaxiPasajero === 'function') {
     window.dibujarLineaTaxiPasajero();
@@ -417,6 +399,30 @@ if (cardsPorTaxi[taxiId]) {
   window.dibujarLineaTaxiPasajero();
 }
 }
+
+function obtenerTextoRumbo(grados) {
+  const valor = Number(grados);
+
+  if (!Number.isFinite(valor)) {
+    return '🧭 Rumbo: sin dato';
+  }
+
+  const direcciones = [
+    'Norte',
+    'Noreste',
+    'Este',
+    'Sureste',
+    'Sur',
+    'Suroeste',
+    'Oeste',
+    'Noroeste'
+  ];
+
+  const indice = Math.round(valor / 45) % 8;
+
+  return `🧭 Rumbo: ${direcciones[indice]}`;
+}
+
 // Genera el HTML interno de una tarjeta de taxi
 
 function getTaxiCardHTML(taxi) {
@@ -429,21 +435,60 @@ function getTaxiCardHTML(taxi) {
     ? new Date(taxi.fecha_hora_gps).toLocaleString('es-UY')
     : 'sin dato';
 
-  const velocidad = taxi.velocidad_kmh != null
-    ? `${Number(taxi.velocidad_kmh).toFixed(0)} km/h`
-    : 'sin dato';
+  const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
+
+  let velocidadTexto = taxi.velocidad_kmh != null
+  ? `Velocidad actual: ${Number(taxi.velocidad_kmh).toFixed(0)} km/h`
+  : 'Velocidad actual: sin dato';
+
+if (
+  estadoGps.texto.includes('GPS viejo') ||
+  estadoGps.texto.includes('Señal demorada')
+) {
+  velocidadTexto = 'Velocidad actual: 0 km/h';
+}
+
+  let movimiento = '⚪ Sin señal reciente';
+
+  if (
+    estadoGps.texto.includes('En línea') ||
+    estadoGps.texto.includes('Señal demorada')
+  ) {
+    movimiento =
+      Number(taxi.velocidad_kmh || 0) > 5
+        ? '🟢 En movimiento'
+        : '🟡 Detenido';
+  }
 
   const fuente = taxi.fuente ?? 'sin dato';
 
- return `
-  <strong>🚕 ${taxi.codigo_movil || 'Sin código'}</strong><br>
-  Estado: ${estadoVisible}<br>
-  Operativo: ${taxi.estado_operativo ?? 'sin dato'}<br>
-  Velocidad: ${velocidad}<br>
-  Último GPS: ${fechaGps}<br>
-  Fuente GPS: ${fuente}<br>
-  Coordenadas: ${taxi.latitud ?? 'sin dato'}, ${taxi.longitud ?? 'sin dato'}<br><br>
+  const fuenteTexto =
+    fuente === 'tablet'
+      ? '📡 Fuente: Tablet'
+      : fuente === 'backend'
+        ? '📡 Fuente: Backend'
+        : `📡 Fuente: ${fuente}`;
 
+   const rumboTexto = obtenerTextoRumbo(
+  taxi.rumbo_grados
+);     
+
+  return `
+<strong>🚕 ${taxi.codigo_movil || 'Sin código'}</strong><br>
+Estado: ${estadoVisible}<br>
+Operativo: ${taxi.estado_operativo ?? 'sin dato'}<br>
+${velocidadTexto}<br>
+${movimiento}<br>
+Último GPS: ${fechaGps}<br>
+Estado GPS: ${estadoGps.texto}<br>
+Última señal: ${estadoGps.antiguedad}<br>
+
+${fuenteTexto}<br>
+${rumboTexto}<br>
+
+Coordenadas: ${taxi.latitud ?? 'sin dato'}, ${taxi.longitud ?? 'sin dato'}<br>
+
+  
   <button
     onclick="verHistorialGpsTaxi('${taxi.taxi_id}')"
     style="
@@ -474,11 +519,20 @@ function claseEstadoTaxi(taxi) {
 
 function renderTaxiCard(taxi) {
   const div = document.createElement('div');
+const estadoGpsCard = calcularEstadoGps(taxi.fecha_hora_gps);
 
-  div.className = `taxi-card ${claseEstadoTaxi(taxi)}`;
-  div.tabIndex = -1;
+let claseGps = 'gps-viejo';
 
-  div.innerHTML = getTaxiCardHTML(taxi);
+if (estadoGpsCard.texto.includes('En línea')) {
+  claseGps = 'gps-online';
+} else if (estadoGpsCard.texto.includes('Señal demorada')) {
+  claseGps = 'gps-demora';
+}
+
+div.className = `taxi-card ${claseEstadoTaxi(taxi)} ${claseGps}`;
+div.tabIndex = -1;
+
+div.innerHTML = getTaxiCardHTML(taxi);
 
   if (!taxiDisponibleParaAsignar(taxi)) {
     div.style.opacity = '0.65';
@@ -487,19 +541,11 @@ function renderTaxiCard(taxi) {
     div.style.opacity = '1';
     div.style.cursor = 'pointer';
   }
-
   div.onclick = () => {
-    console.log('CLICK CARD TAXI:', taxi.taxi_id);
-
-    if (!taxiDisponibleParaAsignar(taxi)) {
-      mostrarMensaje('Ese taxi no está disponible', 'error');
-      return;
-    }
-
+   
     seleccionarTaxi(taxi.taxi_id, true, true, false);
-
-    console.log('CARD TAXI CLICK, voy a dibujar línea:', taxi.taxi_id);
-
+   
+    
     if (typeof window.dibujarLineaTaxiPasajero === 'function') {
       window.dibujarLineaTaxiPasajero();
     }
@@ -507,6 +553,182 @@ function renderTaxiCard(taxi) {
 
   return div;
 }
+
+
+async function mostrarPanelGpsTaxi(taxiId) {
+  const panel = document.getElementById('panelGpsTaxi');
+  const contenido = document.getElementById('contenidoGpsTaxi');
+
+  if (!panel || !contenido) return;
+
+  const taxi = window.ultimosTaxis?.find(
+    t => t.taxi_id === taxiId
+  );
+
+  if (!taxi) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  panel.style.display = 'block';
+
+  const fechaGps = taxi.fecha_hora_gps
+    ? new Date(taxi.fecha_hora_gps).toLocaleString('es-UY')
+    : 'Sin dato';
+
+    let puntosHoy = 'Sin dato';
+    let velocidadMaxima = 'Sin dato';
+
+    try {
+  const res = await fetch(
+    `/gps/resumen-hoy/${taxiId}?fecha=2026-06-10`
+  );
+
+  const data = await res.json();
+
+  if (data.ok && data.resumen) {
+
+    puntosHoy =
+      data.resumen.puntos_hoy ?? 0;
+
+    velocidadMaxima =
+      data.resumen.velocidad_maxima != null
+        ? `${Number(data.resumen.velocidad_maxima).toFixed(0)} km/h`
+        : 'Sin dato';
+  }
+
+} catch (error) {
+  console.error(
+    'Error cargando resumen GPS:',
+    error
+  );
+}
+
+  contenido.innerHTML = `
+    <strong>🚕 ${taxi.codigo_movil || 'Sin código'}</strong><br>
+
+    Estado: ${taxi.estado || '-'}<br>
+    Operativo: ${taxi.estado_operativo || '-'}<br>
+
+    Velocidad:
+    ${
+      taxi.velocidad_kmh != null
+        ? Number(taxi.velocidad_kmh).toFixed(0) + ' km/h'
+        : 'Sin dato'
+    }
+    <br>
+
+    Último GPS: ${fechaGps}<br>
+
+    Fuente GPS:
+    ${taxi.fuente || 'Sin dato'}
+    <br>
+
+    Puntos GPS hoy:
+${puntosHoy}
+<br>
+
+Distancia hoy:
+${(window.distanciaHistorialGps || 0).toFixed(2)} km
+<br>
+
+Velocidad promedio hoy:
+${(window.velocidadPromedioHistorialGps || 0).toFixed(0)} km/h
+<br>
+
+Velocidad máxima hoy:
+${velocidadMaxima}
+<br>
+
+
+Tiempo en movimiento:
+${window.tiempoMovimientoGps || 0} min
+<br>
+
+Tiempo detenido:
+${window.tiempoDetenidoGps || 0} min
+<br>
+
+    Coordenadas:
+    ${taxi.latitud || '-'},
+    ${taxi.longitud || '-'}
+    <br><br>
+    
+    <button
+      onclick="verHistorialGpsTaxi('${taxi.taxi_id}')"
+      style="
+        width:100%;
+        padding:8px;
+        background:#2563eb;
+        color:white;
+        border:none;
+        border-radius:6px;
+        cursor:pointer;
+      "
+    >
+      📍 Historial GPS
+    </button>
+  `;
+}
+
+function limpiarPanelGpsTaxi() {
+  const panel = document.getElementById('panelGpsTaxi');
+  const contenido = document.getElementById('contenidoGpsTaxi');
+
+  if (contenido) {
+    contenido.innerHTML = 'Ningún taxi seleccionado';
+  }
+
+  if (panel) {
+    panel.style.display = 'none';
+  }
+}
+function calcularEstadoGps(fechaGps) {
+  if (!fechaGps) {
+    return {
+      texto: '🔴 Sin señal',
+      antiguedad: 'Sin dato'
+    };
+  }
+
+  const fecha = new Date(fechaGps);
+  const ahora = new Date();
+
+  const diffMs = ahora - fecha;
+  const diffMin = Math.floor(diffMs / 60000);
+
+  let antiguedad = '';
+
+  if (diffMin < 1) {
+    antiguedad = 'hace menos de 1 min';
+  } else if (diffMin < 60) {
+    antiguedad = `hace ${diffMin} min`;
+  } else {
+    const horas = Math.floor(diffMin / 60);
+    antiguedad = `hace ${horas} h`;
+  }
+
+  if (diffMin <= 5) {
+    return {
+      texto: '🟢 En línea',
+      antiguedad
+    };
+  }
+
+  if (diffMin <= 15) {
+    return {
+      texto: '🟡 Señal demorada',
+      antiguedad
+    };
+  }
+
+  return {
+    texto: '🔴 GPS viejo',
+    antiguedad
+  };
+}
+
+window.limpiarPanelGpsTaxi = limpiarPanelGpsTaxi;
 
 window.fetchTaxis = fetchTaxis;
 window.cargarTaxis = cargarTaxis;

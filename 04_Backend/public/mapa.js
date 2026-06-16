@@ -54,6 +54,29 @@ marker.update();
     marker._animacionMovimiento = requestAnimationFrame(animar);
 }
 
+function calcularRumboEntrePuntos(lat1, lng1, lat2, lng2) {
+  const dy = lat2 - lat1;
+  const dx = lng2 - lng1;
+
+  let angulo = Math.atan2(dx, dy) * 180 / Math.PI;
+
+  if (angulo < 0) {
+    angulo += 360;
+  }
+
+  return angulo;
+}
+
+function aplicarRumboMarker(marker, rumbo) {
+  const el = marker.getElement?.();
+  if (!el) return;
+
+  const iconoInterno = el.querySelector('div');
+  if (!iconoInterno) return;
+
+  iconoInterno.style.transform = 'rotate(' + (rumbo - 90) + 'deg)';
+}
+
 function moverTaxiPorRutaOSRM(taxiId, ruta, intervalo = 300) {
   if (!taxiId || !Array.isArray(ruta) || ruta.length === 0) return;
 
@@ -66,24 +89,25 @@ function moverTaxiPorRutaOSRM(taxiId, ruta, intervalo = 300) {
     return;
   }
 
+  marker._sgofAnimando = true;
+
   let i = 0;
 
-  const taxiData = window.ultimosTaxis?.find(t => t.taxi_id === taxiId);
+ const taxiData = window.ultimosTaxis?.find(t => t.taxi_id === taxiId);
 
-console.log('DEBUG BLOQUEO GPS', {
-  taxiId,
-  taxiData
-});
+const tieneGpsReal =
+  taxiData?.fuente === 'gps' ||
+  taxiData?.fuente === 'tablet' ||
+  taxiData?.fuente === 'api';
 
-const modoTest = true;
+  // false = simulación SGOF
+// true = GPS real (bloquea animaciones OSRM)
 
-if (!modoTest && taxiData && taxiData.fuente === 'gps') {
-  console.log('SIMULACIÓN BLOQUEADA: taxi con GPS real', taxiId);
+const usarGpsReal = false;
+
+if (usarGpsReal && tieneGpsReal) {
+  marker._sgofAnimando = false;
   return;
-}
-
-if (modoTest && taxiData && taxiData.fuente === 'gps') {
-  console.log('MODO TEST: permitiendo simulación aunque tenga GPS real', taxiId);
 }
 
   function moverSiguienteTramo() {
@@ -92,26 +116,30 @@ if (modoTest && taxiData && taxiData.fuente === 'gps') {
 
       marker.setLatLng([latFinal, lngFinal]);
       marker.update?.();
+      marker._sgofAnimando = false;
+      //aplicarRumboMarker(marker, rumbo);
 
       window.posicionesTaxiSimuladas = window.posicionesTaxiSimuladas || {};
       window.posicionesTaxiSimuladas[taxiId] = {
         lat: latFinal,
         lng: lngFinal
-      };
-
-      console.log('TAXI FIJADO EN DESTINO:', {
-        taxiId,
-        latFinal,
-        lngFinal
-      });
-
+      };   
       return;
     }
 
     const [lat1, lng1] = ruta[i];
     const [lat2, lng2] = ruta[i + 1];
+    
+    const rumbo = calcularRumboEntrePuntos(lat1, lng1, lat2, lng2);
+     
+    marker._rumbo_grados = rumbo;
 
-    const inicio = performance.now();
+    marker.setIcon(iconoTaxi({
+  ...(taxiData || {}),
+  rumbo_grados: rumbo
+}));
+
+   const inicio = performance.now();
 
     function animar(now) {
       const progreso = Math.min((now - inicio) / intervalo, 1);
@@ -121,7 +149,7 @@ if (modoTest && taxiData && taxiData.fuente === 'gps') {
 
       marker.setLatLng([lat, lng]);
       marker.update?.();
-
+     // aplicarRumboMarker(marker, rumbo);
       if (progreso < 1) {
         requestAnimationFrame(animar);
       } else {
@@ -130,19 +158,57 @@ if (modoTest && taxiData && taxiData.fuente === 'gps') {
           lat: lat2,
           lng: lng2
         };
+
         i++;
-        moverSiguienteTramo();
+        requestAnimationFrame(moverSiguienteTramo);
       }
     }
+
     requestAnimationFrame(animar);
   }
+
   moverSiguienteTramo();
 }
+
 window.moverTaxiPorRutaOSRM = moverTaxiPorRutaOSRM;
 
+function calcularDistanciaKm(coords) {
+  let total = 0;
+
+  for (let i = 1; i < coords.length; i++) {
+    const [lat1, lng1] = coords[i - 1];
+    const [lat2, lng2] = coords[i];
+
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    total += R * c;
+  }
+
+  return total;
+}
+
+
 async function verHistorialGpsTaxi(taxiId) {
-  try {
-    const res = await fetch(`/gps/historial/${taxiId}`);
+    try {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const desde = hoy.toISOString();
+
+    const res = await fetch(
+      `/gps/historial/${taxiId}?desde=${encodeURIComponent(desde)}`
+    );
     const data = await res.json();
 
     if (!data.ok || !Array.isArray(data.puntos)) {
@@ -176,6 +242,31 @@ async function verHistorialGpsTaxi(taxiId) {
       opacity: 0.8
     }).addTo(window.mapa);
 
+   if (window.marcadorInicioHistorialGps) {
+  window.mapa.removeLayer(window.marcadorInicioHistorialGps);
+}
+
+if (window.marcadorFinHistorialGps) {
+  window.mapa.removeLayer(window.marcadorFinHistorialGps);
+}
+window.marcadorInicioHistorialGps = L.circleMarker(coords[0], {
+  radius: 8,
+  color: '#22c55e',
+  fillColor: '#22c55e',
+  fillOpacity: 0.9
+})
+  .addTo(window.mapa)
+  .bindPopup('🟢 Inicio del recorrido GPS');
+
+window.marcadorFinHistorialGps = L.circleMarker(coords[coords.length - 1], {
+  radius: 9,
+  color: '#ef4444',
+  fillColor: '#ef4444',
+  fillOpacity: 0.9
+})
+  .addTo(window.mapa)
+  .bindPopup('🔴 Fin / última posición GPS');
+
     window.mapa.fitBounds(
       window.lineaHistorialGps.getBounds(),
       { padding: [30, 30] }
@@ -184,17 +275,77 @@ async function verHistorialGpsTaxi(taxiId) {
     const primero = data.puntos[0];
     const ultimo = data.puntos[data.puntos.length - 1];
 
-    const fechaInicio = new Date(primero.fecha_hora_gps).toLocaleString('es-UY');
-    const fechaFin = new Date(ultimo.fecha_hora_gps).toLocaleString('es-UY');
+    const fechaInicioTexto = new Date(primero.fecha_hora_gps).toLocaleString('es-UY');
+    const fechaFinTexto = new Date(ultimo.fecha_hora_gps).toLocaleString('es-UY');
+
+     const distanciaKm = calcularDistanciaKm(coords);
+     window.distanciaHistorialGps = distanciaKm;
+
+     const velocidades = data.puntos
+  .map(p => Number(p.velocidad_kmh))
+  .filter(v => Number.isFinite(v));
+
+const velocidadPromedio = velocidades.length > 0
+  ? velocidades.reduce((a, b) => a + b, 0) / velocidades.length
+  : 0;
+
+window.velocidadPromedioHistorialGps = velocidadPromedio;
+
+let segundosMovimiento = 0;
+
+for (let i = 1; i < data.puntos.length; i++) {
+
+  const actual = data.puntos[i];
+  const anterior = data.puntos[i - 1];
+
+  const velocidad = Number(actual.velocidad_kmh) || 0;
+
+  if (velocidad > 0) {
+
+    const fechaActual = new Date(actual.fecha_hora_gps);
+    const fechaAnterior = new Date(anterior.fecha_hora_gps);
+
+    segundosMovimiento +=
+      (fechaActual - fechaAnterior) / 1000;
+  }
+}
+
+window.tiempoMovimientoGps =
+  Math.round(segundosMovimiento / 60);
+ 
+const inicioMovimiento = new Date(
+  data.puntos[0].fecha_hora_gps
+);
+
+const finMovimiento = new Date(
+  data.puntos[data.puntos.length - 1].fecha_hora_gps
+);
+
+const minutosTotales =
+  (finMovimiento - inicioMovimiento) / 1000 / 60;
+
+window.tiempoDetenidoGps =
+  Math.max(
+    0,
+    Math.round(minutosTotales) -
+    window.tiempoMovimientoGps
+  );
 
     window.lineaHistorialGps.bindPopup(`
-      <strong>Historial GPS</strong><br>
-      Puntos: ${coords.length}<br>
-      Desde: ${fechaInicio}<br>
-      Hasta: ${fechaFin}
-    `).openPopup();
+  <strong>Historial GPS</strong><br>
+  Puntos: ${coords.length}<br>
+  Distancia: ${distanciaKm.toFixed(2)} km<br>
+  Desde: ${fechaInicioTexto}<br>
+  Hasta: ${fechaFinTexto}
+`).openPopup();
 
-    console.log('Historial GPS dibujado:', coords.length, 'puntos');
+    
+
+if (typeof cargarTaxis === 'function') {
+  cargarTaxis();
+}
+
+
 
   } catch (error) {
     console.error('Error cargando historial GPS:', error);
@@ -215,87 +366,82 @@ if (!window.mapa || typeof window.mapa.addLayer !== 'function') {
 window.marcadoresPendientes = window.marcadoresPendientes || [];
 var marcadoresPendientes = window.marcadoresPendientes;
 
-console.log('MAPA CREADO');
 const socket = io();
-socket.on('connect', () => {
-  console.log('Conectado a Socket.IO:', socket.id);
-});
-
-socket.on('mensaje-test', (data) => {
-  console.log('SOCKET TEST:', data);
-});
-
 socket.on('viaje-creado', async (viaje) => {
-  console.log('SOCKET viaje-creado:', viaje);
+  
   await cargarPendientes();
 });
 
 socket.on('viaje-actualizado', async (viaje) => {
-  console.log('SOCKET viaje-actualizado:', viaje);
-  await cargarPendientes();
+    await cargarPendientes();
   await cargarViajeActivo();
 });
 
 socket.on('taxi-actualizado', async (taxi) => {
-  console.log('SOCKET taxi-actualizado:', taxi);
+  
   await cargarTaxis();
 });
+
 socket.on('taxi_posicion', (data) => {
-  const marker = window.taxisMarkers?.[data.taxiId];
+  const taxiId = data.taxiId || data.taxi_id;
+
+  const marker =
+    window.taxisMarkers?.[taxiId] ||
+    window.marcadoresPorTaxi?.[taxiId];
 
   if (!marker) return;
 
-  marker._sgofTipo = 'taxi';
-
-  const posicionAnterior = marker.getLatLng?.();
-
   const nuevaLat = Number(data.lat ?? data.latitud);
   const nuevaLng = Number(data.lng ?? data.longitud);
-/*
- console.log('GPS SOCKET NUMEROS:', {
-  taxiId: data.taxiId,
-  nuevaLat,
-  nuevaLng,
-  markerExiste: !!marker,
-  posicionAntes: marker.getLatLng()
-});
-*/
 
   if (!Number.isFinite(nuevaLat) || !Number.isFinite(nuevaLng)) return;
-  window.posicionesTaxiSimuladas =
-  window.posicionesTaxiSimuladas || {};
 
-window.posicionesTaxiSimuladas[data.taxiId] = {
-  lat: nuevaLat,
-  lng: nuevaLng
-};
-/*
-console.log(
-  'GUARDANDO POSICION SIMULADA:',
-  data.taxiId,
-  window.posicionesTaxiSimuladas[data.taxiId]
-);
-*/
+  marker._sgofTipo = 'taxi';
+  marker._rumbo_grados = data.rumbo_grados;
+
+  window.posicionesTaxiSimuladas =
+    window.posicionesTaxiSimuladas || {};
+
+  window.posicionesTaxiSimuladas[taxiId] = {
+    lat: nuevaLat,
+    lng: nuevaLng
+  };
+
   moverMarkerSuave(marker, nuevaLat, nuevaLng, 900);
 
-  
+  marker._rumbo_grados = data.rumbo_grados;
+
+  if (typeof iconoTaxi === 'function') {
+    marker.setIcon(iconoTaxi({
+     taxi_id: taxiId,
+      codigo_movil: data.codigo_movil,
+      estado_operativo: data.estado || 'disponible',
+      estado: data.estado || 'disponible',
+      velocidad_kmh: data.velocidad_kmh,
+      fecha_hora_gps: data.fecha_hora_gps,
+      fuente: data.fuente,
+      rumbo_grados: data.rumbo_grados
+    }));
+  }
+
   marker.bindPopup(`
     🚕 <strong>${data.codigo_movil || data.codigo || data.taxiId}</strong><br>
     Estado: ${data.estado || 'disponible'}<br>
     Velocidad: ${data.velocidad_kmh ?? 'sin dato'} km/h<br>
+    Rumbo: ${data.rumbo_grados ?? 'sin dato'}°<br>
+    Fuente: ${data.fuente || 'sin dato'}<br>
     GPS: ${data.fecha_hora_gps || 'sin fecha'}
   `);
 
-  if (window.posicionesTaxiSimuladas) {
-    window.posicionesTaxiSimuladas[data.taxiId] = {
-      lat: nuevaLat,
-      lng: nuevaLng
-    };
-/*
-    console.log('POSICION GUARDADA SOCKET:', window.posicionesTaxiSimuladas[data.taxiId]);
- */
-    }  
+ if (typeof cargarTaxis === 'function') {
+  setTimeout(() => {
+    cargarTaxis();
+  }, 800);
+}
+
+
 });
+
 
 function actualizarOrientacionTaxi(marker, latAnterior, lngAnterior, latNueva, lngNueva) {
 
@@ -399,7 +545,6 @@ centrarMapa(viaje);
     }
   }
 
-  console.log('CLICK asignarTaxiSeleccionado', {
     viajeSeleccionadoId,
     taxiSeleccionadoId
   });
@@ -416,17 +561,11 @@ centrarMapa(viaje);
 
   // acá sigue tu fetch('/viajes/asignar'...)
 
- window.dibujarLineaTaxiPasajero = function () {
-  console.log('ENTRÉ A DIBUJAR LINEA');
 
   if (!window.viajeSeleccionadoId && window.viajeSeleccionado?.id) {
     window.viajeSeleccionadoId = window.viajeSeleccionado.id;
   }
 
-  if (!window.taxiSeleccionadoId || !window.viajeSeleccionado) {
-    console.log('Falta taxi o viaje', {
-      taxi: window.taxiSeleccionadoId,
-      viaje: window.viajeSeleccionado
     });
     return;
   }
@@ -482,10 +621,6 @@ centrarMapa(viaje);
 
     });
 
-    const data = await res.json();
-
-  console.log('RESPUESTA ASIGNAR MAPA.JS:', data);  
-
 if (!data.ok) {
   alert('Error al asignar taxi');
   return;
@@ -498,19 +633,7 @@ mostrarViajeOperativo(data.viaje);
 */
 
 async function asignarTaxiSeleccionado() {
-  console.log('ANTES DE VALIDAR ASIGNAR:', {
-  windowViajeId: window.viajeSeleccionadoId,
-  windowViaje: window.viajeSeleccionado,
-  windowTaxiId: window.taxiSeleccionadoId
-});
-
-  console.log('CLICK asignarTaxiSeleccionado');
-
-  console.log('ESTADO WINDOW:', {
-  viajeId: window.viajeSeleccionadoId,
-  viaje: window.viajeSeleccionado,
-  taxi: window.taxiSeleccionadoId
-});
+ 
 
 if (!window.viajeSeleccionadoId && window.viajeSeleccionado?.id) {
   window.viajeSeleccionadoId = window.viajeSeleccionado.id;
@@ -524,12 +647,6 @@ if (!window.taxiSeleccionadoId) {
   alert('Seleccioná un taxi');
   return;
 }
-
-
-  console.log('DATOS ASIGNAR:', {
-    viaje: window.viajeSeleccionadoId,
-    taxi: window.taxiSeleccionadoId
-  });
 
   try {
 
@@ -547,9 +664,7 @@ if (!window.taxiSeleccionadoId) {
 
     const data = await res.json();
 
-    console.log('RESPUESTA ASIGNAR:', data);
-
-    if (!data.ok) {
+     if (!data.ok) {
       alert(data.mensaje || 'Error al asignar taxi');
       return;
     }
@@ -573,10 +688,7 @@ if (!window.taxiSeleccionadoId) {
 }
 window.asignarTaxiSeleccionado = asignarTaxiSeleccionado;
 
-console.log(
-  'GLOBAL asignarTaxiSeleccionado:',
-  window.asignarTaxiSeleccionado.toString().slice(0, 120)
-);
+
 
 /*await cargarPendientes();
 await cargarTaxis();
@@ -770,8 +882,6 @@ async function marcarEnOrigen() {
       alert('Error al actualizar estado');
       return;
     }
-
-    alert('Taxi en origen');
 
     window.viajeSeleccionado = data.viaje;
 window.viajeSeleccionadoId = data.viaje.id;
@@ -1009,7 +1119,7 @@ if (btnRechazarViaje) {
 }
 
 async function aceptarViaje() {
-  console.log('CLICK ACEPTAR VIAJE', viajeSeleccionadoId);
+  
 
   if (!viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
@@ -1022,9 +1132,7 @@ async function aceptarViaje() {
     });
 
     const data = await res.json();
-
-    console.log('RESPUESTA ACEPTAR:', data);
-
+    
     if (!data.ok) {
       alert(data.mensaje || 'Error al aceptar viaje');
       return;
@@ -1047,8 +1155,7 @@ async function aceptarViaje() {
 }
 
 async function rechazarViaje() {
-  console.log('CLICK RECHAZAR VIAJE', viajeSeleccionadoId);
-
+  
   if (!viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
     return;
@@ -1061,7 +1168,7 @@ async function rechazarViaje() {
 
     const data = await res.json();
 
-    console.log('RESPUESTA RECHAZAR:', data);
+    
 
     if (!data.ok) {
       alert(data.mensaje || 'Error al rechazar viaje');
@@ -1083,21 +1190,17 @@ async function rechazarViaje() {
 // INICIAR VIAJE
 // ==========================
 async function iniciarViaje() {
-  console.log('CLICK INICIAR VIAJE', viajeSeleccionadoId);
+  
   if (!viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
     return;
   }
 try {
-  console.log('FETCH INICIAR:', `/viajes/${viajeSeleccionadoId}/iniciar`);
+  
   const res = await fetch(`/viajes/${viajeSeleccionadoId}/iniciar`, {
     method: 'POST'
   });
-  console.log('STATUS INICIAR:', res.status);
-
-    const data = await res.json();
-
-    console.log('RESPUESTA INICIAR:', data);
+    const data = await res.json();   
 
     if (!data.ok) {
   alert(data.mensaje || 'Error al iniciar viaje');
@@ -1116,13 +1219,7 @@ if (window.lineaTaxiPasajero && window.mapa) {
     if (!window.taxiSeleccionadoId && data.viaje?.taxi_id) {
   window.taxiSeleccionadoId = data.viaje.taxi_id;
 } 
-console.log('DEBUG INICIAR MOVIMIENTO:', {
-  moverTaxiExiste: typeof window.moverTaxiPorRutaOSRM,
-  taxiSeleccionadoId: window.taxiSeleccionadoId,
-  rutaEsArray: Array.isArray(window.rutaActualOSRM),
-  rutaLength: Array.isArray(window.rutaActualOSRM) ? window.rutaActualOSRM.length : null,
-  rutaActualOSRM: window.rutaActualOSRM
-});
+
 
 if (
   typeof window.moverTaxiPorRutaOSRM === 'function' &&
@@ -1156,7 +1253,7 @@ if (typeof window.actualizarBotonesPorEstado === 'function') {
 // FINALIZAR VIAJE
 // ==========================
 async function finalizarViaje() {
-console.log('CLICK FINALIZAR VIAJE', viajeSeleccionadoId);
+
 
   if (!viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
@@ -1185,6 +1282,15 @@ console.log('CLICK FINALIZAR VIAJE', viajeSeleccionadoId);
 window.viajeSeleccionadoId = null;
 window.viajeSeleccionado = null;
 window.taxiSeleccionadoId = null;
+
+if (typeof window.limpiarPanelGpsTaxi === 'function') {
+  window.limpiarPanelGpsTaxi();
+}
+
+if (window.lineaHistorialGps) {
+  window.mapa.removeLayer(window.lineaHistorialGps);
+  window.lineaHistorialGps = null;
+}
 
 window.history.replaceState({}, '', '/mapa');
 
@@ -1219,7 +1325,8 @@ if (window.markerOrigen) {
 Object.values(window.taxisMarkers || {}).forEach(marker => {
   marker.setIcon(iconoTaxi({
     estado: 'disponible',
-    estado_operativo: 'disponible'
+    estado_operativo: 'disponible',
+    rumbo_grados: marker._rumbo_grados || 0
   }));
 });
 
@@ -1303,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  console.log('CLICK BTN ASIGNAR TAXI');
+  
 
   window.asignarTaxiSeleccionado();
 });
@@ -1311,33 +1418,33 @@ document.addEventListener('DOMContentLoaded', () => {
   
  /* if (btnAsignarTaxi) {
   btnAsignarTaxi.addEventListener('click', () => {
-    console.log('CLICK BTN ASIGNAR TAXI');
+   
 
     asignarTaxiSeleccionado();
   
   });
-  console.log('Botón Asignar Taxi conectado');
+ 
 }
 */
 
  /* if (btnAsignarTaxi) {
   btnAsignarTaxi.addEventListener('click', () => {
-    console.log('CLICK BTN ASIGNAR TAXI');
+    
 
     asignarTaxiSeleccionado();
   
   });
-  console.log('Botón Asignar Taxi conectado');
+ 
 }
 */
-  console.log('Botón Nuevo pedido test conectado');
-});
+
 document.addEventListener('click', (event) => {
   const btn = event.target.closest('#btn-asignar-taxi');
 
   if (!btn) return;
 
-  console.log('CLICK BTN ASIGNAR TAXI');
+  
 
   asignarTaxiSeleccionado();
+});
 });

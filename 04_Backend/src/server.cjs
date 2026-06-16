@@ -16,17 +16,17 @@ const io = new Server(server, {
     origin: '*'
   }
 });
-
 app.set('io', io);
-io.on('connection', (socket) => {
-  console.log('Cliente conectado a Socket.IO:', socket.id);
+app.set('pool', pool);
 
+io.on('connection', (socket) => {
+ 
   socket.emit('mensaje-test', {
     mensaje: 'Socket.IO funcionando correctamente'
   });
 
   socket.on('disconnect', () => {
-    console.log('Cliente desconectado de Socket.IO:', socket.id);
+    
   });
   
 });
@@ -34,7 +34,7 @@ io.on('connection', (socket) => {
 const taxisRoutes = require('./routes/taxis.cjs');
 
 const gpsPath = require.resolve('./routes/gps.cjs');
-console.log('GPS ROUTES CARGADO DESDE:', gpsPath);
+
 const gpsRoutes = require('./routes/gps.cjs');
 
 app.use(express.json());
