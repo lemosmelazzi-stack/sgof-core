@@ -168,6 +168,9 @@ async function fetchTaxis() {
 
 function colorTaxi(taxi) {
   const estado = taxi.estado_operativo || taxi.estado || 'desconocido';
+  const tipoGps = detectarTipoGps(taxi);
+
+  if (tipoGps.tipo === 'offline') return '#6b7280';
 
   if (estado === 'ocupado') return '#ef4444';
   if (estado === 'asignado') return '#ef4444';
@@ -176,10 +179,13 @@ function colorTaxi(taxi) {
 
   if (taxi.taxi_id === window.taxiSeleccionadoId) return '#f59e0b';
 
+  if (tipoGps.tipo === 'simulado') return '#2563eb';
+
   if (estado === 'disponible') return '#22c55e';
 
   return '#6b7280';
 }
+
 function iconoTaxi(taxi) {
   const rumbo = Number.isFinite(Number(taxi?.rumbo_grados))
     ? Number(taxi.rumbo_grados)
@@ -307,6 +313,7 @@ const fechaGps = taxi.fecha_hora_gps
   ? new Date(taxi.fecha_hora_gps).toLocaleString('es-UY')
   : '—';
   const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
+  const tipoGps = detectarTipoGps(taxi);
 
 marker.bindPopup(`
   🚕 <strong>${taxi.codigo_movil || taxi.taxi_id}</strong><br>
@@ -436,6 +443,7 @@ function getTaxiCardHTML(taxi) {
     : 'sin dato';
 
   const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
+  const tipoGps = detectarTipoGps(taxi);
 
   let velocidadTexto = taxi.velocidad_kmh != null
   ? `Velocidad actual: ${Number(taxi.velocidad_kmh).toFixed(0)} km/h`
@@ -481,6 +489,7 @@ ${velocidadTexto}<br>
 ${movimiento}<br>
 Último GPS: ${fechaGps}<br>
 Estado GPS: ${estadoGps.texto}<br>
+Tipo GPS: ${tipoGps.texto}<br>
 Última señal: ${estadoGps.antiguedad}<br>
 
 ${fuenteTexto}<br>
@@ -520,6 +529,7 @@ function claseEstadoTaxi(taxi) {
 function renderTaxiCard(taxi) {
   const div = document.createElement('div');
 const estadoGpsCard = calcularEstadoGps(taxi.fecha_hora_gps);
+const tipoGps = detectarTipoGps(taxi);
 
 let claseGps = 'gps-viejo';
 
@@ -726,6 +736,55 @@ function calcularEstadoGps(fechaGps) {
     texto: '🔴 GPS viejo',
     antiguedad
   };
+}
+
+function detectarTipoGps(taxi) {
+  const fuente = String(taxi.fuente || '').toLowerCase();
+
+  const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
+  
+
+  if (
+    estadoGps.texto === '🔴 GPS viejo' ||
+    estadoGps.texto === '🔴 Sin señal'
+  ) {
+    return {
+      tipo: 'offline',
+      texto: '⚫ Offline'
+    };
+  }
+if (taxi.codigo_movil === 'TX-01') {
+  return {
+    tipo: 'real',
+    texto: '🛰️ GPS Real'
+  };
+}
+
+if (
+  taxi.codigo_movil === 'TX-02' ||
+  taxi.codigo_movil === 'TX-03'
+) {
+  return {
+    tipo: 'simulado',
+    texto: '🧪 Simulado'
+  };
+}
+
+if (
+  fuente === 'gps' ||
+  fuente === 'tablet' ||
+  fuente === 'api'
+) {
+  return {
+    tipo: 'real',
+    texto: '🛰️ GPS Real'
+  };
+}
+
+return {
+  tipo: 'simulado',
+  texto: '🧪 Simulado'
+};
 }
 
 window.limpiarPanelGpsTaxi = limpiarPanelGpsTaxi;
