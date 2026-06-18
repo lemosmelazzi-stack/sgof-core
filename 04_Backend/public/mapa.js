@@ -4,6 +4,7 @@ let taxiSeleccionadoId = null;
 let seguirTaxiSeleccionado = true;
 let viajeSeleccionadoId = null;
 let lineaTaxiPasajero = null;
+// Mantener ambos sincronizados por compatibilidad.
 window.marcadoresPorTaxi = window.marcadoresPorTaxi || {};
 window.taxisMarkers = window.taxisMarkers || {};
 window.lineaTaxiPasajero = lineaTaxiPasajero;
@@ -339,11 +340,19 @@ window.tiempoDetenidoGps =
   Hasta: ${fechaFinTexto}
 `).openPopup();
 
-    
+  if (window.markerOrigen) {
+  mapa.removeLayer(window.markerOrigen);
+  window.markerOrigen = null;
+}
 
 if (typeof cargarTaxis === 'function') {
   cargarTaxis();
 }
+
+document.getElementById('acciones-viaje')
+  .classList.add('oculto');  
+
+
 
 
 
@@ -1321,14 +1330,9 @@ if (window.markerOrigen) {
   mapa.removeLayer(window.markerOrigen);
   window.markerOrigen = null;
 }
-
-Object.values(window.taxisMarkers || {}).forEach(marker => {
-  marker.setIcon(iconoTaxi({
-    estado: 'disponible',
-    estado_operativo: 'disponible',
-    rumbo_grados: marker._rumbo_grados || 0
-  }));
-});
+if (typeof cargarTaxis === 'function') {
+  cargarTaxis();
+}
 
   document.getElementById('acciones-viaje')
   .classList.add('oculto');

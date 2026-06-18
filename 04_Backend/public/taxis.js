@@ -165,12 +165,9 @@ async function fetchTaxis() {
 
   return await res.json();
 }
-
 function colorTaxi(taxi) {
   const estado = taxi.estado_operativo || taxi.estado || 'desconocido';
   const tipoGps = detectarTipoGps(taxi);
-
-  if (tipoGps.tipo === 'offline') return '#6b7280';
 
   if (estado === 'ocupado') return '#ef4444';
   if (estado === 'asignado') return '#ef4444';
@@ -178,6 +175,8 @@ function colorTaxi(taxi) {
   if (estado === 'en_camino_origen') return '#ef4444';
 
   if (taxi.taxi_id === window.taxiSeleccionadoId) return '#f59e0b';
+
+  if (tipoGps.tipo === 'offline') return '#6b7280';
 
   if (tipoGps.tipo === 'simulado') return '#2563eb';
 
@@ -239,6 +238,8 @@ async function cargarTaxis() {
       return;
     }
 
+    // Ambos diccionarios apuntan a los mismos markers.
+    // Se mantienen por compatibilidad entre mapa.js y taxis.js.
     window.marcadoresPorTaxi = window.marcadoresPorTaxi || {};
     window.taxisMarkers = window.taxisMarkers || {};
     window.posicionesTaxiSimuladas = window.posicionesTaxiSimuladas || {};
@@ -315,6 +316,7 @@ const fechaGps = taxi.fecha_hora_gps
   const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
   const tipoGps = detectarTipoGps(taxi);
 
+
 marker.bindPopup(`
   🚕 <strong>${taxi.codigo_movil || taxi.taxi_id}</strong><br>
   Estado: ${taxi.estado || taxi.estado_operativo || '—'}<br>
@@ -322,8 +324,15 @@ marker.bindPopup(`
   GPS: ${fechaGps}
 `);
 
-const firmaIcono = `${taxi.estado || taxi.estado_operativo || ''}|${taxi.rumbo_grados || ''}`;
-
+const firmaIcono = `${
+  taxi.estado_operativo || taxi.estado || ''
+}|${
+  taxi.rumbo_grados || ''
+}|${
+  window.taxiSeleccionadoId === taxi.taxi_id ? 'seleccionado' : ''
+}|${
+  detectarTipoGps(taxi).tipo
+}`;
 if (marker._sgofFirmaIcono !== firmaIcono) {
   marker.setIcon(iconoTaxi(taxi));
   marker._sgofFirmaIcono = firmaIcono;
@@ -445,6 +454,15 @@ function getTaxiCardHTML(taxi) {
   const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
   const tipoGps = detectarTipoGps(taxi);
 
+const fuenteGpsTexto =
+  taxi.fuente === 'gps'
+    ? '🛰️ Fuente: GPS'
+    : taxi.fuente === 'tablet'
+      ? '📱 Fuente: Tablet'
+      : taxi.fuente === 'backend'
+        ? '🧪 Fuente: Simulación'
+        : `📡 Fuente: ${taxi.fuente || 'Sin dato'}`;
+
   let velocidadTexto = taxi.velocidad_kmh != null
   ? `Velocidad actual: ${Number(taxi.velocidad_kmh).toFixed(0)} km/h`
   : 'Velocidad actual: sin dato';
@@ -529,7 +547,7 @@ function claseEstadoTaxi(taxi) {
 function renderTaxiCard(taxi) {
   const div = document.createElement('div');
 const estadoGpsCard = calcularEstadoGps(taxi.fecha_hora_gps);
-const tipoGps = detectarTipoGps(taxi);
+
 
 let claseGps = 'gps-viejo';
 
@@ -586,6 +604,18 @@ async function mostrarPanelGpsTaxi(taxiId) {
     ? new Date(taxi.fecha_hora_gps).toLocaleString('es-UY')
     : 'Sin dato';
 
+    const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
+   const tipoGps = detectarTipoGps(taxi);
+
+  const fuenteGpsTexto =
+  taxi.fuente === 'gps'
+    ? '🛰️ Fuente: GPS'
+    : taxi.fuente === 'tablet'
+      ? '📱 Fuente: Tablet'
+      : taxi.fuente === 'backend'
+        ? '🧪 Fuente: Backend'
+        : `📡 Fuente: ${taxi.fuente || 'Sin dato'}`;
+
     let puntosHoy = 'Sin dato';
     let velocidadMaxima = 'Sin dato';
 
@@ -629,10 +659,16 @@ async function mostrarPanelGpsTaxi(taxiId) {
     <br>
 
     Último GPS: ${fechaGps}<br>
+    Estado GPS:
+   ${estadoGps.texto}
+   <br>
 
-    Fuente GPS:
-    ${taxi.fuente || 'Sin dato'}
-    <br>
+   Tipo GPS:
+   ${tipoGps.texto}
+   <br>
+
+    ${fuenteGpsTexto}
+<br>
 
     Puntos GPS hoy:
 ${puntosHoy}
@@ -681,6 +717,7 @@ ${window.tiempoDetenidoGps || 0} min
   `;
 }
 
+//POSIBLEOBSOLETA- REVISAR ANTES DE BORRAR//
 function limpiarPanelGpsTaxi() {
   const panel = document.getElementById('panelGpsTaxi');
   const contenido = document.getElementById('contenidoGpsTaxi');
