@@ -675,12 +675,15 @@ if (viaje.estado !== 'en_origen') {
     });
   }
 });
-
 router.post('/:id/finalizar', async (req, res) => {
+  const client = await pool.connect();
+
   try {
     const { id } = req.params;
-    
-    const viajeResult = await pool.query(`
+
+    await client.query('BEGIN');
+
+    const viajeResult = await client.query(`
       SELECT id, estado, taxi_id
       FROM viajes
       WHERE id = $1
@@ -688,6 +691,7 @@ router.post('/:id/finalizar', async (req, res) => {
     `, [id]);
 
     if (viajeResult.rows.length === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).json({
         ok: false,
         mensaje: 'Viaje no encontrado'
@@ -697,36 +701,22 @@ router.post('/:id/finalizar', async (req, res) => {
     const viaje = viajeResult.rows[0];
 
     if (viaje.estado !== 'en_curso') {
+      await client.query('ROLLBACK');
       return res.status(400).json({
         ok: false,
-       mensaje: `No se puede finalizar un viaje en estado ${viaje.estado}`
-      });    }
+        mensaje: `No se puede finalizar un viaje en estado ${viaje.estado}`
+      });
+    }
 
     if (!viaje.taxi_id) {
+      await client.query('ROLLBACK');
       return res.status(400).json({
         ok: false,
         mensaje: 'El viaje no tiene taxi asignado'
       });
     }
 
-    const taxiResult = await pool.query(`
-      SELECT id, estado
-      FROM taxis
-      WHERE id = $1
-      LIMIT 1
-    `, [viaje.taxi_id]);
-
-    if (taxiResult.rows.length === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: 'Taxi no encontrado'
-      });
-    }
-
-    const taxi = taxiResult.rows[0];
-
-
-    const result = await pool.query(`
+    const result = await client.query(`
       UPDATE viajes
       SET estado = 'finalizado',
           fecha_hora_fin = NOW(),
@@ -735,12 +725,14 @@ router.post('/:id/finalizar', async (req, res) => {
       RETURNING *
     `, [id]);
 
-    await pool.query(`
+    await client.query(`
       UPDATE taxis
       SET estado = 'disponible',
           fecha_actualizacion = NOW()
       WHERE id = $1
     `, [viaje.taxi_id]);
+
+    await client.query('COMMIT');
 
     res.json({
       ok: true,
@@ -749,12 +741,18 @@ router.post('/:id/finalizar', async (req, res) => {
     });
 
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.error('Error finalizar viaje:', error);
+
     res.status(500).json({
       ok: false,
       mensaje: 'Error interno al finalizar viaje',
       error: error.message
     });
+
+  } finally {
+    client.release();
   }
 });
 

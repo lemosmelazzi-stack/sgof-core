@@ -104,11 +104,12 @@ async function asignarTaxiSeleccionado() {
       return;
     }
 
-await cargarPendientes();
-await cargarTaxis();
-
 window.viajeSeleccionado = data.viaje;
 window.viajeSeleccionadoId = data.viaje.id;
+window.taxiSeleccionadoId = data.viaje.taxi_id;
+
+await cargarPendientes();
+await cargarTaxis();
 
 mostrarViajeOperativo(data.viaje);
 
@@ -229,6 +230,16 @@ async function cargarPendientes() {
     const pendientes = (result.data || []).filter(
       (v) => v.estado === 'pendiente'
     );
+
+  window.totalViajesPendientes = pendientes.length;
+
+if (typeof window.actualizarResumenOperativo === 'function') {
+  window.actualizarResumenOperativo();
+}
+
+window.totalViajesAsignados = 0;
+window.totalViajesEnCurso = 0;
+
 if (pendientes.length === 0) {
   lista.innerHTML = '<p>No hay pendientes</p>';
 
@@ -606,19 +617,37 @@ async function cargarViajeActivo() {
 
     const acciones = document.getElementById('acciones-viaje');
 
-    const viaje = data.data.find(v =>
+    const viajes = data.data || [];
+
+window.totalViajesAsignados = viajes.filter(v =>
+  v.estado === 'asignado' ||
+  v.estado === 'en_camino_origen' ||
+  v.estado === 'en_origen'
+).length;
+
+window.totalViajesEnCurso = viajes.filter(v =>
+  v.estado === 'en_curso'
+).length;
+
+if (typeof window.actualizarResumenOperativo === 'function') {
+  window.actualizarResumenOperativo();
+}
+
+    const viaje = viajes.find(v =>
       v.estado === 'en_camino_origen' ||
       v.estado === 'en_origen' ||
       v.estado === 'en_curso'
     );
 if (!viaje) {
 
-  if (window.viajeSeleccionadoId) {
-    return;
-  }
+ if (window.viajeSeleccionadoId && window.viajeSeleccionado?.estado !== 'finalizado') {
+  return;
+}
 
 window.viajeSeleccionado = null;
 window.viajeSeleccionadoId = null;
+window.taxiSeleccionadoId = null;
+window.rutaActualOSRM = null;
 
  window.actualizarBotonesPorEstado(null);
 
@@ -660,7 +689,23 @@ async function cargarViajePorId(id) {
   try {
     const res = await fetch(`/viajes/${id}`);
     const data = await res.json();
-    
+
+    const viajes = data.data || [];
+
+window.totalViajesAsignados = viajes.filter(v =>
+  v.estado === 'asignado' ||
+  v.estado === 'en_camino_origen' ||
+  v.estado === 'en_origen'
+).length;
+
+window.totalViajesEnCurso = viajes.filter(v =>
+  v.estado === 'en_curso'
+).length;
+
+if (typeof window.actualizarResumenOperativo === 'function') {
+  window.actualizarResumenOperativo();
+}
+       
     const viaje = data.viaje || data.data;
 
     if (!viaje) {

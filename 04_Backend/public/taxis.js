@@ -1,27 +1,22 @@
 let filtroActivo = 'todos';
 function taxiDisponibleParaAsignar(taxi) {
-  return (taxi.estado || '').toLowerCase() === 'disponible' &&
-         (taxi.estado_operativo || '').toLowerCase() === 'disponible';
-}
+  const estado = (taxi.estado || '').toLowerCase();
+  const operativo = (taxi.estado_operativo || '').toLowerCase();
+  const fuente = (taxi.fuente || '').toLowerCase();
 
-function crearTaxiState(taxi, marker) {
-  const lat = parseFloat(taxi.latitud);
-  const lng = parseFloat(taxi.longitud);
+  const tipoGps = detectarTipoGps(taxi);
 
-  return {
-    id: taxi.taxi_id,
-    marker,
-    data: taxi,
-    currentLat: lat,
-    currentLng: lng,
-    startLat: lat,
-    startLng: lng,
-    targetLat: lat,
-    targetLng: lng,
-    animStartTime: 0,
-    animDuration: ANIMATION_DURATION,
-    angle: 0
-  };
+  const esSimulado =
+    fuente === 'backend' ||
+    fuente === 'simulado';
+
+  const gpsValido =
+    esSimulado ||
+    !tipoGps.texto.includes('Offline');
+
+  return estado === 'disponible' &&
+         operativo === 'disponible' &&
+         gpsValido;
 }
 
 function mostrarResumenRuta(distanciaKm, etaMin) {
@@ -85,19 +80,28 @@ async function encontrarMejorTaxiParaViaje() {
   let mejorTaxiId = null;
   let mejorETA = Infinity;
   let mejorRutaCoords = null;
+for (const taxiId in window.marcadoresPorTaxi) {
 
-  for (const taxiId in window.marcadoresPorTaxi) {
+  const markerTaxi = window.marcadoresPorTaxi[taxiId];
 
-    const markerTaxi = window.marcadoresPorTaxi[taxiId];
+  if (!markerTaxi) continue;
 
-    if (!markerTaxi) continue;
+  const taxi = window.ultimosTaxis?.find(
+    t => String(t.taxi_id) === String(taxiId)
+  );
 
-    const posTaxi = markerTaxi.getLatLng();
+  if (!taxi || !taxiDisponibleParaAsignar(taxi)) {
+    continue;
+  }
 
-    const resultado = await calcularETAEntrePuntos(posTaxi, posViaje);
+  const posTaxi = markerTaxi.getLatLng();
 
-    if (!resultado) continue;
+  const resultado = await calcularETAEntrePuntos(
+    posTaxi,
+    posViaje
+  );
 
+  if (!resultado) continue;
     
 if (resultado.etaMin < mejorETA) {
   mejorETA = resultado.etaMin;
@@ -143,7 +147,7 @@ window.rutaActualOSRM = mejorRutaCoords;
   );
 }
  
-  seleccionarTaxi(mejorTaxiId, true, true, true);
+  seleccionarTaxi(mejorTaxiId, true, false, true);
 
   mostrarMensaje(
     `🚕 Mejor taxi encontrado (${Math.round(mejorETA)} min)`,
@@ -228,6 +232,48 @@ function iconoTaxi(taxi) {
     popupAnchor: [0, -14]
   });
 }
+
+function actualizarResumenOperativo() {
+  const resumenFlota = document.getElementById('resumen-flota');
+  if (!resumenFlota) return;
+
+  const taxis = window.ultimosTaxis || [];
+
+  const asignables = taxis.filter(t => taxiDisponibleParaAsignar(t)).length;
+  const noAsignables = taxis.length - asignables;
+
+  const offline = taxis.filter(t =>
+    detectarTipoGps(t).tipo === 'offline'
+  ).length;
+
+  const fuenteGps = taxis.filter(t =>
+    (t.fuente || '').toLowerCase() === 'gps'
+  ).length;
+
+  const fuenteSimulada = taxis.filter(t =>
+    ['backend', 'simulado'].includes((t.fuente || '').toLowerCase())
+  ).length;
+
+  const pendientes = window.totalViajesPendientes || 0;
+  const asignados = window.totalViajesAsignados || 0;
+const enCurso = window.totalViajesEnCurso || 0;
+resumenFlota.innerHTML = `
+  <strong>🚕 Flota</strong><br>
+  🚕 Taxis totales: ${taxis.length}<br>
+  ✅ Asignables: ${asignables}<br>
+  ⛔ No asignables: ${noAsignables}<br>
+  ⚫ Offline: ${offline}<br>
+  🛰️ GPS reales: ${fuenteGps}
+🧪 Simulados: ${fuenteSimulada}
+  <br>
+  <strong>📞 Viajes</strong><br>
+  🟡 Pendientes: ${pendientes}<br>
+  🟠 Asignados: ${asignados}<br>
+  🔴 En curso: ${enCurso}
+`;
+}
+window.actualizarResumenOperativo = actualizarResumenOperativo;
+
 async function cargarTaxis() {
     try {
     const data = await fetchTaxis();
@@ -246,11 +292,16 @@ async function cargarTaxis() {
 
     const contenedor = document.getElementById('taxis');
 
-    if (contenedor) {
-      contenedor.innerHTML = '';
-    }
+if (contenedor) {
+  contenedor.innerHTML = '';
+}
 
-    data.taxis.forEach((taxi) => {
+window.ultimosTaxis = data.taxis || [];
+
+actualizarResumenOperativo();
+
+data.taxis.forEach((taxi) => {
+
      const posSimulada = window.posicionesTaxiSimuladas[taxi.taxi_id];
 
 const latGPS = Number(taxi.latitud);
@@ -284,14 +335,20 @@ if (!marker) {
   marker._sgofTipo = 'taxi';
 
   marker.on('click', () => {
-    
-    window.seleccionarTaxi(
-      taxi.taxi_id,
-      false,
-      true,
-      true
-    );
-  });
+
+  if (!taxiDisponibleParaAsignar(taxi)) {
+    return;
+  }
+
+  window.seleccionarTaxi(
+    taxi.taxi_id,
+    false,
+    true,
+    true
+  );
+
+});
+
 } else {
   if (!marker._sgofAnimando) {
     const posActual = marker.getLatLng();
@@ -306,16 +363,23 @@ if (!marker) {
   }
 }
 
-const velocidad = taxi.velocidad_kmh
-  ? `${Number(taxi.velocidad_kmh).toFixed(0)} km/h`
-  : '—';
-
 const fechaGps = taxi.fecha_hora_gps
   ? new Date(taxi.fecha_hora_gps).toLocaleString('es-UY')
   : '—';
-  const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
-  const tipoGps = detectarTipoGps(taxi);
 
+const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
+const tipoGps = detectarTipoGps(taxi);
+
+const gpsNoConfiable =
+  estadoGps.texto.includes('GPS viejo') ||
+  estadoGps.texto.includes('Sin señal') ||
+  estadoGps.texto.includes('Señal demorada');
+
+const velocidad = gpsNoConfiable
+  ? '0 km/h'
+  : taxi.velocidad_kmh
+    ? `${Number(taxi.velocidad_kmh).toFixed(0)} km/h`
+    : '—';
 
 marker.bindPopup(`
   🚕 <strong>${taxi.codigo_movil || taxi.taxi_id}</strong><br>
@@ -407,9 +471,13 @@ if (cardsPorTaxi[taxiId]) {
     });
   }
 
-  if (marker && abrirPopup) {
-    marker.openPopup();
-  }
+  if (
+  marker &&
+  abrirPopup &&
+  window.viajeSeleccionadoId
+) {
+  marker.openPopup();
+}
  
   if (typeof window.dibujarLineaTaxiPasajero === 'function') {
   window.dibujarLineaTaxiPasajero();
@@ -473,63 +541,78 @@ if (
 ) {
   velocidadTexto = 'Velocidad actual: 0 km/h';
 }
+let movimiento = '⚪ Sin señal reciente';
 
-  let movimiento = '⚪ Sin señal reciente';
+if (tipoGps.tipo === 'simulado') {
 
-  if (
-    estadoGps.texto.includes('En línea') ||
-    estadoGps.texto.includes('Señal demorada')
-  ) {
-    movimiento =
-      Number(taxi.velocidad_kmh || 0) > 5
-        ? '🟢 En movimiento'
-        : '🟡 Detenido';
-  }
+  movimiento = '🧪 Modo simulación';
 
-  const fuente = taxi.fuente ?? 'sin dato';
+} else if (
+  estadoGps.texto.includes('En línea') ||
+  estadoGps.texto.includes('Señal demorada')
+) {
+  movimiento =
+    Number(taxi.velocidad_kmh || 0) > 5
+      ? '🟢 En movimiento'
+      : '🟡 Detenido';
+}
+const fuente = taxi.fuente || 'sin dato';
 
-  const fuenteTexto =
-    fuente === 'tablet'
-      ? '📡 Fuente: Tablet'
-      : fuente === 'backend'
-        ? '📡 Fuente: Backend'
+ const fuenteTexto =
+  tipoGps.tipo === 'simulado'
+    ? ''
+    : fuente === 'gps'
+      ? '🛰 Fuente: GPS Real'
+      : fuente === 'tablet'
+        ? '🛰 Fuente: Tablet'
         : `📡 Fuente: ${fuente}`;
 
-   const rumboTexto = obtenerTextoRumbo(
-  taxi.rumbo_grados
-);     
+   const rumboTexto = obtenerTextoRumbo(taxi.rumbo_grados);
 
-  return `
+const asignableTexto = taxiDisponibleParaAsignar(taxi)
+  ? '✅ Disponible para asignar'
+  : '⛔ No asignable';
+
+ return `
+
 <strong>🚕 ${taxi.codigo_movil || 'Sin código'}</strong><br>
 Estado: ${estadoVisible}<br>
 Operativo: ${taxi.estado_operativo ?? 'sin dato'}<br>
+${asignableTexto}<br>
 ${velocidadTexto}<br>
 ${movimiento}<br>
-Último GPS: ${fechaGps}<br>
-Estado GPS: ${estadoGps.texto}<br>
-Tipo GPS: ${tipoGps.texto}<br>
-Última señal: ${estadoGps.antiguedad}<br>
 
-${fuenteTexto}<br>
+${tipoGps.tipo === 'simulado'
+  ? `
+    Última posición: simulada<br>
+  `
+  : `
+    Último GPS: ${fechaGps}<br>
+    Estado GPS: ${estadoGps.texto}<br>
+    Tipo GPS: ${tipoGps.texto}<br>
+    Última señal: ${estadoGps.antiguedad}<br>
+  `
+}
+
+${fuenteTexto ? `${fuenteTexto}<br>` : ''}
 ${rumboTexto}<br>
 
 Coordenadas: ${taxi.latitud ?? 'sin dato'}, ${taxi.longitud ?? 'sin dato'}<br>
 
-  
-  <button
-    onclick="verHistorialGpsTaxi('${taxi.taxi_id}')"
-    style="
-      width:100%;
-      padding:6px;
-      background:#2563eb;
-      color:white;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-    "
-  >
-    📍 Historial GPS
-  </button>
+<button
+  onclick="verHistorialGpsTaxi('${taxi.taxi_id}')"
+  style="
+    width:100%;
+    padding:6px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+  "
+>
+  📍 Historial GPS
+</button>
 `;
 }
 
@@ -570,9 +653,11 @@ div.innerHTML = getTaxiCardHTML(taxi);
     div.style.cursor = 'pointer';
   }
   div.onclick = () => {
-   
-    seleccionarTaxi(taxi.taxi_id, true, true, false);
-   
+  if (!taxiDisponibleParaAsignar(taxi)) {
+    return;
+  }
+
+  seleccionarTaxi(taxi.taxi_id, true, true, false);
     
     if (typeof window.dibujarLineaTaxiPasajero === 'function') {
       window.dibujarLineaTaxiPasajero();
@@ -774,12 +859,23 @@ function calcularEstadoGps(fechaGps) {
     antiguedad
   };
 }
-
 function detectarTipoGps(taxi) {
   const fuente = String(taxi.fuente || '').toLowerCase();
+  const codigo = String(taxi.codigo_movil || '').toUpperCase();
+
+  if (
+    codigo === 'TX-02' ||
+    codigo === 'TX-03' ||
+    fuente === 'backend' ||
+    fuente === 'simulado'
+  ) {
+    return {
+      tipo: 'simulado',
+      texto: '🧪 Simulado'
+    };
+  }
 
   const estadoGps = calcularEstadoGps(taxi.fecha_hora_gps);
-  
 
   if (
     estadoGps.texto === '🔴 GPS viejo' ||
@@ -790,42 +886,21 @@ function detectarTipoGps(taxi) {
       texto: '⚫ Offline'
     };
   }
-if (taxi.codigo_movil === 'TX-01') {
-  return {
-    tipo: 'real',
-    texto: '🛰️ GPS Real'
-  };
-}
 
-if (
-  taxi.codigo_movil === 'TX-02' ||
-  taxi.codigo_movil === 'TX-03'
-) {
+  if (
+    codigo === 'TX-01' ||
+    fuente === 'gps' ||
+    fuente === 'tablet' ||
+    fuente === 'api'
+  ) {
+    return {
+      tipo: 'real',
+      texto: '🛰️ GPS Real'
+    };
+  }
+
   return {
     tipo: 'simulado',
     texto: '🧪 Simulado'
   };
 }
-
-if (
-  fuente === 'gps' ||
-  fuente === 'tablet' ||
-  fuente === 'api'
-) {
-  return {
-    tipo: 'real',
-    texto: '🛰️ GPS Real'
-  };
-}
-
-return {
-  tipo: 'simulado',
-  texto: '🧪 Simulado'
-};
-}
-
-window.limpiarPanelGpsTaxi = limpiarPanelGpsTaxi;
-
-window.fetchTaxis = fetchTaxis;
-window.cargarTaxis = cargarTaxis;
-window.seleccionarTaxi = seleccionarTaxi;

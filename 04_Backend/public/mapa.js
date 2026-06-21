@@ -680,9 +680,13 @@ if (!window.taxiSeleccionadoId) {
 
     window.viajeSeleccionado = data.viaje;
     window.viajeSeleccionadoId = data.viaje.id;
+    window.taxiSeleccionadoId = data.viaje.taxi_id || window.taxiSeleccionadoId;
+
+if (typeof window.dibujarLineaTaxiPasajero === 'function') {
+  await window.dibujarLineaTaxiPasajero();
+}
 
     mostrarViajeOperativo(data.viaje);
-
     await cargarPendientes();
     await cargarTaxis();
 
@@ -1224,26 +1228,27 @@ if (window.lineaTaxiPasajero && window.mapa) {
   window.lineaTaxiPasajero = null;
 }
 
+const taxiIdViaje = data.viaje?.taxi_id || window.viajeSeleccionado?.taxi_id;
 
-    if (!window.taxiSeleccionadoId && data.viaje?.taxi_id) {
-  window.taxiSeleccionadoId = data.viaje.taxi_id;
-} 
-
+if (taxiIdViaje) {
+  window.taxiSeleccionadoId = taxiIdViaje;
+}
 
 if (
   typeof window.moverTaxiPorRutaOSRM === 'function' &&
-  window.taxiSeleccionadoId &&
+  taxiIdViaje &&
   Array.isArray(window.rutaActualOSRM) &&
   window.rutaActualOSRM.length > 0
 ) {
   window.moverTaxiPorRutaOSRM(
-    window.taxiSeleccionadoId,
+    taxiIdViaje,
     window.rutaActualOSRM,
     350
   );
 } else {
   console.warn('NO SE PUDO MOVER TAXI: falta función, taxi o ruta');
 }
+
 await cargarViajeActivo();
 await cargarTaxis();
 
@@ -1259,25 +1264,26 @@ if (typeof window.actualizarBotonesPorEstado === 'function') {
 }
 
 // ==========================
-// FINALIZAR VIAJE
-// ==========================
+//
 async function finalizarViaje() {
-
-
-  if (!viajeSeleccionadoId) {
-    alert('Seleccioná un viaje primero');
-    return;
-  }
-
-  if (!viajeSeleccionadoId) {
+  if (!window.viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
     return;
   }
 
   try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/finalizar`, {
-      method: 'POST'
-    });
+
+ console.log(
+  'FINALIZAR VIAJE:',
+  window.viajeSeleccionadoId
+);
+
+const idFinalizar = window.viajeSeleccionadoId;
+
+const res = await fetch(`/viajes/${idFinalizar}/finalizar`, {
+  method: 'POST'
+});
+
 
     const data = await res.json();
 
@@ -1286,117 +1292,77 @@ async function finalizarViaje() {
       return;
     }
 
+    window.viajeSeleccionadoId = null;
+    window.viajeSeleccionado = null;
+    window.taxiSeleccionadoId = null;
+    window.rutaActualOSRM = null;
 
-
-window.viajeSeleccionadoId = null;
-window.viajeSeleccionado = null;
-window.taxiSeleccionadoId = null;
-
-if (typeof window.limpiarPanelGpsTaxi === 'function') {
-  window.limpiarPanelGpsTaxi();
-}
-
-if (window.lineaHistorialGps) {
-  window.mapa.removeLayer(window.lineaHistorialGps);
-  window.lineaHistorialGps = null;
-}
-
-window.history.replaceState({}, '', '/mapa');
-
-mostrarViajeSeleccionadoEnPanel(null);
-/*
-if (typeof mostrarViajeOperativo === 'function') {
-  mostrarViajeOperativo(null);
-}
-*/
-if (lineaTaxiPasajero) {
-  mapa.removeLayer(lineaTaxiPasajero);
-  lineaTaxiPasajero = null;
-  window.lineaTaxiPasajero = null;
-}
-
-if (window.rutaTaxiPasajero) {
-  mapa.removeLayer(window.rutaTaxiPasajero);
-  window.rutaTaxiPasajero = null;
-}
-if (window.markersViajes) {
-  window.markersViajes.forEach(marker => {
-    mapa.removeLayer(marker);
-  });
-  window.markersViajes = [];
-}
-
-if (window.markerOrigen) {
-  mapa.removeLayer(window.markerOrigen);
-  window.markerOrigen = null;
-}
-if (typeof cargarTaxis === 'function') {
-  cargarTaxis();
-}
-
-  document.getElementById('acciones-viaje')
-  .classList.add('oculto');
-
-actualizarBotonesPorEstado(null);
-
-const acciones = document.getElementById('acciones-viaje');
-
-if (acciones) {
-  acciones.classList.add('oculto');
-  acciones.style.display = 'none';
-}
-
-mapa.eachLayer((layer) => {
-  if (layer instanceof L.Marker) {
-    const iconHtml = layer.options?.icon?.options?.html || '';
-
-    if (iconHtml.includes('red') || iconHtml.includes('🔺') || iconHtml.includes('▲')) {
-      mapa.removeLayer(layer);
+    if (window.lineaTaxiPasajero && window.mapa) {
+      window.mapa.removeLayer(window.lineaTaxiPasajero);
+      window.lineaTaxiPasajero = null;
     }
-  }
-});
 
-mapa.eachLayer((layer) => {
-  if (layer instanceof L.Marker && layer._sgofTipo !== 'taxi') {
-    mapa.removeLayer(layer);
-  }
-});
+    if (window.rutaTaxiPasajero && window.mapa) {
+      window.mapa.removeLayer(window.rutaTaxiPasajero);
+      window.rutaTaxiPasajero = null;
+    }
 
-mapa.eachLayer((layer) => {
-  if (layer instanceof L.Marker) {
-    mapa.removeLayer(layer);
-  }
-});
-
-window.taxisMarkers = {};
-window.marcadoresPorTaxi = {};
-
-if (typeof marcadoresPorTaxi !== 'undefined') {
-  marcadoresPorTaxi = {};
+    if (window.mapa) {
+  window.mapa.closePopup();
 }
 
-if (typeof marcadorViaje !== 'undefined') {
-  marcadorViaje = null;
-}
-if (window.lineaTaxiPasajero) {
-  window.mapa.removeLayer(window.lineaTaxiPasajero);
-  window.lineaTaxiPasajero = null;
-}
+    if (window.lineaHistorialGps && window.mapa) {
+      window.mapa.removeLayer(window.lineaHistorialGps);
+      window.lineaHistorialGps = null;
+    }
 
-if (typeof lineaTaxiPasajero !== 'undefined' && lineaTaxiPasajero) {
-  mapa.removeLayer(lineaTaxiPasajero);
-  lineaTaxiPasajero = null;
-}
+    if (window.markerOrigen && window.mapa) {
+      window.mapa.removeLayer(window.markerOrigen);
+      window.markerOrigen = null;
+    }
 
-await cargarPendientes();
-await cargarTaxis();
-alert('Viaje finalizado');
+    if (window.markersViajes && window.mapa) {
+      window.markersViajes.forEach(marker => {
+        window.mapa.removeLayer(marker);
+      });
+      window.markersViajes = [];
+    }
+
+    Object.values(window.marcadoresPorTaxi || {}).forEach(marker => {
+      marker._sgofAnimando = false;
+    });
+
+    if (typeof window.limpiarPanelGpsTaxi === 'function') {
+      window.limpiarPanelGpsTaxi();
+    }
+
+    mostrarViajeSeleccionadoEnPanel(null);
+
+    if (typeof window.actualizarBotonesPorEstado === 'function') {
+      window.actualizarBotonesPorEstado(null);
+    }
+
+    const acciones = document.getElementById('acciones-viaje');
+    if (acciones) {
+      acciones.classList.add('oculto');
+      acciones.style.display = 'none';
+    }
+
+    window.history.replaceState({}, '', '/mapa');
+    window.mapa.closePopup();
+    await cargarPendientes();
+    await cargarViajeActivo();
+    await cargarTaxis();
+    
+    window.mapa.closePopup();
+    alert('Viaje finalizado');
 
   } catch (error) {
     console.error(error);
     alert('Error de conexión');
   }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('btn-nuevo-pedido-test');
