@@ -169,21 +169,21 @@ async function fetchTaxis() {
 
   return await res.json();
 }
+
 function colorTaxi(taxi) {
   const estado = taxi.estado_operativo || taxi.estado || 'desconocido';
   const tipoGps = detectarTipoGps(taxi);
 
   if (estado === 'ocupado') return '#ef4444';
-  if (estado === 'asignado') return '#ef4444';
   if (estado === 'en_curso') return '#ef4444';
-  if (estado === 'en_camino_origen') return '#ef4444';
+
+  if (estado === 'asignado') return '#f59e0b';
+  if (estado === 'en_camino_origen') return '#f59e0b';
 
   if (taxi.taxi_id === window.taxiSeleccionadoId) return '#f59e0b';
 
   if (tipoGps.tipo === 'offline') return '#6b7280';
-
   if (tipoGps.tipo === 'simulado') return '#2563eb';
-
   if (estado === 'disponible') return '#22c55e';
 
   return '#6b7280';
@@ -387,7 +387,6 @@ marker.bindPopup(`
   Velocidad: ${velocidad}<br>
   GPS: ${fechaGps}
 `);
-
 const firmaIcono = `${
   taxi.estado_operativo || taxi.estado || ''
 }|${
@@ -396,7 +395,11 @@ const firmaIcono = `${
   window.taxiSeleccionadoId === taxi.taxi_id ? 'seleccionado' : ''
 }|${
   detectarTipoGps(taxi).tipo
+}|${
+  colorTaxi(taxi)
 }`;
+
+
 if (marker._sgofFirmaIcono !== firmaIcono) {
   marker.setIcon(iconoTaxi(taxi));
   marker._sgofFirmaIcono = firmaIcono;

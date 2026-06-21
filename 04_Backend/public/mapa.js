@@ -800,51 +800,45 @@ async function asignarAutomatico() {
     alert('Error de conexión');
   }
 }
-
 function obtenerColor(taxi) {
-
   const estado = (
-    taxi.estado_operativo ||
-    taxi.estado ||
+    taxi?.estado_operativo ||
+    taxi?.estado ||
     ''
   ).toLowerCase();
 
-  // EN VIAJE / OCUPADO → rojo
- // EN VIAJE
-if (
-  estado === 'en_curso' ||
-  estado === 'ocupado'
-) {
-  return '#f59e0b'; // naranja
+  if (
+    taxi?.taxi_id === window.taxiSeleccionadoId ||
+    taxi?.id === window.taxiSeleccionadoId
+  ) {
+    return '#ff8800';
+  }
+
+  if (
+    estado === 'asignado' ||
+    estado === 'en_camino_origen' ||
+    estado === 'en_origen'
+  ) {
+    return '#f59e0b';
+  }
+
+  if (
+    estado === 'ocupado' ||
+    estado === 'en_curso'
+  ) {
+    return '#ef4444';
+  }
+
+  if (
+    estado === 'disponible' ||
+    estado === ''
+  ) {
+    return '#22c55e';
+  }
+
+  return '#6b7280';
 }
 
-// ASIGNADO / CAMINO AL PASAJERO
-if (
-  estado === 'asignado' ||
-  estado === 'en_camino_origen'
-) {
-  return '#3b82f6'; // azul
-}
-
-// TAXI SELECCIONADO
-if (
-  taxi.taxi_id === taxiSeleccionadoId ||
-  taxi.id === taxiSeleccionadoId
-) {
-  return '#ff8800';
-}
-
-// DISPONIBLE
-if (
-  estado === 'disponible' ||
-  estado === ''
-) {
-  return '#22c55e';
-}
-
-// OFFLINE
-return '#6b7280';
-}
 
 
 function easeInOutCubic(t) {
@@ -1002,13 +996,23 @@ function mostrarViajeSeleccionadoEnPanel(viaje) {
   if (!panel) return;
 
   if (
-    viaje &&
-    viaje.estado &&
-    viaje.estado !== 'pendiente'
-  ) {
-    mostrarViajeOperativo(viaje);
-    return;
+  viaje &&
+  viaje.estado &&
+  viaje.estado !== 'pendiente'
+) {
+  if (viaje.taxi_id) {
+    taxiSeleccionadoId = viaje.taxi_id;
+    window.taxiSeleccionadoId = viaje.taxi_id;
   }
+
+  mostrarViajeOperativo(viaje);
+
+  if (typeof cargarTaxis === 'function') {
+    cargarTaxis();
+  }
+
+  return;
+}
 
   if (
     !viaje ||
@@ -1273,11 +1277,6 @@ async function finalizarViaje() {
 
   try {
 
- console.log(
-  'FINALIZAR VIAJE:',
-  window.viajeSeleccionadoId
-);
-
 const idFinalizar = window.viajeSeleccionadoId;
 
 const res = await fetch(`/viajes/${idFinalizar}/finalizar`, {
@@ -1347,15 +1346,25 @@ const res = await fetch(`/viajes/${idFinalizar}/finalizar`, {
       acciones.classList.add('oculto');
       acciones.style.display = 'none';
     }
+   
 
     window.history.replaceState({}, '', '/mapa');
-    window.mapa.closePopup();
+
     await cargarPendientes();
-    await cargarViajeActivo();
     await cargarTaxis();
-    
-    window.mapa.closePopup();
-    alert('Viaje finalizado');
+
+   mostrarViajeSeleccionadoEnPanel(null);
+
+   if (typeof window.actualizarBotonesPorEstado === 'function') {
+   window.actualizarBotonesPorEstado(null);
+}
+
+   if (window.mapa) {
+   window.mapa.closePopup();
+   window.mapa.setView([-34.8879, -56.1403], 13);
+}
+
+   alert('Viaje finalizado');
 
   } catch (error) {
     console.error(error);

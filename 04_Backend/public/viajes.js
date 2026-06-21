@@ -633,11 +633,14 @@ if (typeof window.actualizarResumenOperativo === 'function') {
   window.actualizarResumenOperativo();
 }
 
-    const viaje = viajes.find(v =>
-      v.estado === 'en_camino_origen' ||
-      v.estado === 'en_origen' ||
-      v.estado === 'en_curso'
-    );
+   const viaje = viajes.find(v =>
+  v.estado === 'asignado' ||
+  v.estado === 'en_camino_origen' ||
+  v.estado === 'en_origen' ||
+  v.estado === 'en_curso'
+); 
+
+
 if (!viaje) {
 
  if (window.viajeSeleccionadoId && window.viajeSeleccionado?.estado !== 'finalizado') {
@@ -648,6 +651,11 @@ window.viajeSeleccionado = null;
 window.viajeSeleccionadoId = null;
 window.taxiSeleccionadoId = null;
 window.rutaActualOSRM = null;
+
+viajeSeleccionado = null;
+viajeSeleccionadoId = null;
+taxiSeleccionadoId = null;
+rutaActualOSRM = null;
 
  window.actualizarBotonesPorEstado(null);
 
@@ -660,27 +668,33 @@ window.rutaActualOSRM = null;
   if (detalle) {
     detalle.innerHTML = '';
   }
+  if (typeof cargarTaxis === 'function') {
+  await cargarTaxis();
+}
 
   return;
 }
 
 window.viajeSeleccionado = viaje;
 window.viajeSeleccionadoId = viaje.id;
-
 viajeSeleccionadoId = viaje.id;
+
+if (viaje.taxi_id) {
+  window.taxiSeleccionadoId = viaje.taxi_id;
+  taxiSeleccionadoId = viaje.taxi_id;
+}
 
 acciones.classList.remove('oculto');
 
     mostrarViajeSeleccionadoEnPanel(viaje);
     
-
    if (typeof window.actualizarBotonesPorEstado === 'function') {
   window.actualizarBotonesPorEstado(viaje);
 }
    
-  } catch (error) {
-    console.error('Error cargando viaje activo:', error);
-  }
+ } catch (error) {
+  console.warn('No se pudo cargar viaje activo. Reintentará en el próximo ciclo.');
+}
 }
 
 async function cargarViajePorId(id) {
