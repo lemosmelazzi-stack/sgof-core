@@ -1170,9 +1170,7 @@ async function aceptarViaje() {
     alert('Error de conexión al aceptar viaje');
   }
 }
-
 async function rechazarViaje() {
-  
   if (!viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
     return;
@@ -1185,8 +1183,6 @@ async function rechazarViaje() {
 
     const data = await res.json();
 
-    
-
     if (!data.ok) {
       alert(data.mensaje || 'Error al rechazar viaje');
       return;
@@ -1194,8 +1190,25 @@ async function rechazarViaje() {
 
     await cargarPendientes();
     await cargarTaxis();
+    await cargarViajePorId(viajeSeleccionadoId);
 
-    mostrarMensaje('Viaje rechazado');
+    console.log('VIAJE DESPUÉS DE RECHAZAR:', window.viajeSeleccionado);
+console.log('TAXI REASIGNADO:', data.taxi_reasignado);
+
+    if (window.viajeSeleccionado?.taxi_id) {
+      taxiSeleccionadoId = window.viajeSeleccionado.taxi_id;
+      window.taxiSeleccionadoId = window.viajeSeleccionado.taxi_id;
+
+      if (typeof dibujarRutaTaxiAsignado === 'function') {
+  await dibujarRutaTaxiAsignado(window.viajeSeleccionado);
+}
+
+      if (typeof dibujarLineaTaxiPasajero === 'function') {
+        dibujarLineaTaxiPasajero();
+      }
+    }
+
+    mostrarMensaje(data.mensaje || 'Viaje rechazado y reasignado');
 
   } catch (error) {
     console.error('ERROR RECHAZAR VIAJE:', error);
@@ -1238,7 +1251,8 @@ if (taxiIdViaje) {
   window.taxiSeleccionadoId = taxiIdViaje;
 }
 
-if (
+console.log('Viaje iniciado sin animación automática de ruta OSRM');
+/*if (
   typeof window.moverTaxiPorRutaOSRM === 'function' &&
   taxiIdViaje &&
   Array.isArray(window.rutaActualOSRM) &&
@@ -1252,7 +1266,7 @@ if (
 } else {
   console.warn('NO SE PUDO MOVER TAXI: falta función, taxi o ruta');
 }
-
+*/
 await cargarViajeActivo();
 await cargarTaxis();
 

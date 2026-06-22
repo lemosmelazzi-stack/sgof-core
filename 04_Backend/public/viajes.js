@@ -704,22 +704,6 @@ async function cargarViajePorId(id) {
     const res = await fetch(`/viajes/${id}`);
     const data = await res.json();
 
-    const viajes = data.data || [];
-
-window.totalViajesAsignados = viajes.filter(v =>
-  v.estado === 'asignado' ||
-  v.estado === 'en_camino_origen' ||
-  v.estado === 'en_origen'
-).length;
-
-window.totalViajesEnCurso = viajes.filter(v =>
-  v.estado === 'en_curso'
-).length;
-
-if (typeof window.actualizarResumenOperativo === 'function') {
-  window.actualizarResumenOperativo();
-}
-       
     const viaje = data.viaje || data.data;
 
     if (!viaje) {
@@ -727,18 +711,21 @@ if (typeof window.actualizarResumenOperativo === 'function') {
       return;
     }
 
-    
     viajeSeleccionadoId = viaje.id;
+    window.viajeSeleccionadoId = viaje.id;
 
+    viajeSeleccionado = viaje;
     window.viajeSeleccionado = viaje;
-window.viajeSeleccionadoId = viaje.id;
-    mostrarViajeOperativo(viaje);
-   dibujarLineaTaxiPasajero(); 
+
+    if (typeof mostrarViajeOperativo === 'function') {
+      mostrarViajeOperativo(viaje);
+    }
 
   } catch (error) {
     console.error('Error cargando viaje por ID:', error);
   }
 }
+
 function mostrarViajeOperativo(viaje) {
   const contenedor = document.getElementById('detalle-viaje');
   if (!contenedor) return;

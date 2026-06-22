@@ -510,17 +510,14 @@ router.post('/:id/rechazar-taxi', async (req, res) => {
     });
   }
 });
-
-router.post('/:id/rechazar-y-reasignar', async (req, res) => {
+router.post('/:id/rechazar', async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1. Rechazar taxi actual
     const viajeActual = await pool.query(`
-      SELECT taxi_id
+      SELECT id, codigo, estado, taxi_id
       FROM viajes
       WHERE id = $1
-      fecha_hora_asignacion = NOW()
       LIMIT 1
     `, [id]);
 
@@ -531,78 +528,83 @@ router.post('/:id/rechazar-y-reasignar', async (req, res) => {
       });
     }
 
-    const taxiActualId = viajeActual.rows[0].taxi_id;
+    const viaje = viajeActual.rows[0];
+    const taxiActualId = viaje.taxi_id;
 
-    if (taxiActualId) {
-      await pool.query(`
-        UPDATE viajes
-        SET taxi_id = NULL,
-            estado = 'pendiente',
-            fecha_actualizacion = NOW()
-        WHERE id = $1
-      `, [id]);
-
-      await pool.query(`
-        UPDATE taxis
-        SET posicion_cola = (
-          SELECT COALESCE(MAX(posicion_cola), 0) + 1
-          FROM taxis
-        ),
-        estado = 'disponible'
-        WHERE id = $1
-      `, [taxiActualId]);
+    if (!taxiActualId) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El viaje no tiene taxi asignado para rechazar'
+      });
     }
 
-    // 2. Buscar siguiente taxi disponible por cola
+    await pool.query(`
+      UPDATE taxis
+      SET estado = 'disponible',
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+    `, [taxiActualId]);
+
     const siguienteTaxi = await pool.query(`
       SELECT id, codigo_movil
       FROM taxis
       WHERE estado = 'disponible'
         AND activo = true
-      ORDER BY posicion_cola ASC
+        AND id <> $1
+      ORDER BY codigo_movil ASC
       LIMIT 1
-    `);
+    `, [taxiActualId]);
 
     if (siguienteTaxi.rows.length === 0) {
+      const viajePendiente = await pool.query(`
+        UPDATE viajes
+        SET taxi_id = NULL,
+            estado = 'pendiente',
+            fecha_actualizacion = NOW()
+        WHERE id = $1
+        RETURNING id, codigo, estado, taxi_id
+      `, [id]);
+
       return res.json({
         ok: true,
-        mensaje: 'Taxi rechazado, pero no hay otro taxi disponible'
+        mensaje: 'Taxi rechazado. No hay otro taxi disponible.',
+        viaje: viajePendiente.rows[0],
+        taxi_reasignado: null
       });
     }
 
-    const nuevoTaxiId = siguienteTaxi.rows[0].id;
+    const nuevoTaxi = siguienteTaxi.rows[0];
 
-    // 3. Asignar siguiente taxi
-    const resultViaje = await pool.query(`
+    const viajeReasignado = await pool.query(`
       UPDATE viajes
       SET taxi_id = $1,
-      estado = 'en_camino_origen',
+          estado = 'asignado',
+          fecha_hora_asignacion = NOW(),
           fecha_actualizacion = NOW()
       WHERE id = $2
       RETURNING id, codigo, estado, taxi_id
-    `, [nuevoTaxiId, id]);
-await pool.query(`
-  UPDATE taxis
-  SET estado = 'en_camino_origen',
-      posicion_cola = (
-        SELECT COALESCE(MAX(posicion_cola), 0) + 1
-        FROM taxis
-      )
-  WHERE id = $1
-`, [nuevoTaxiId]);
+    `, [nuevoTaxi.id, id]);
+
+    await pool.query(`
+      UPDATE taxis
+      SET estado = 'ocupado',
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+    `, [nuevoTaxi.id]);
 
     res.json({
       ok: true,
-      mensaje: 'Taxi rechazado y viaje reasignado',
-      viaje: resultViaje.rows[0],
-      taxi_reasignado: siguienteTaxi.rows[0]
+      mensaje: `Taxi rechazado. Viaje reasignado a ${nuevoTaxi.codigo_movil}`,
+      viaje: viajeReasignado.rows[0],
+      taxi_reasignado: nuevoTaxi
     });
 
   } catch (error) {
-    console.error('Error en rechazar-y-reasignar:', error);
+    console.error('Error en POST /viajes/:id/rechazar:', error);
+
     res.status(500).json({
       ok: false,
-      mensaje: 'Error al rechazar y reasignar',
+      mensaje: 'Error al rechazar y reasignar viaje',
       error: error.message
     });
   }

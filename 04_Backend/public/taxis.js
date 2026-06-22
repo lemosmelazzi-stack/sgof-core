@@ -70,93 +70,133 @@ async function calcularETAEntrePuntos(posTaxi, posViaje) {
     return null;
   }
 }
-
 async function encontrarMejorTaxiParaViaje() {
-
   if (!marcadorViaje) return;
 
   const posViaje = marcadorViaje.getLatLng();
-  
+
   let mejorTaxiId = null;
   let mejorETA = Infinity;
   let mejorRutaCoords = null;
-for (const taxiId in window.marcadoresPorTaxi) {
+  let mejorDistanciaKm = null;
 
-  const markerTaxi = window.marcadoresPorTaxi[taxiId];
+  for (const taxiId in window.marcadoresPorTaxi) {
+    const markerTaxi = window.marcadoresPorTaxi[taxiId];
 
-  if (!markerTaxi) continue;
+    if (!markerTaxi) continue;
 
-  const taxi = window.ultimosTaxis?.find(
-    t => String(t.taxi_id) === String(taxiId)
-  );
+    const taxi = window.ultimosTaxis?.find(
+      t => String(t.taxi_id) === String(taxiId)
+    );
 
-  if (!taxi || !taxiDisponibleParaAsignar(taxi)) {
-    continue;
+    if (!taxi || !taxiDisponibleParaAsignar(taxi)) {
+      continue;
+    }
+
+    const posTaxi = markerTaxi.getLatLng();
+
+    const resultado = await calcularETAEntrePuntos(posTaxi, posViaje);
+
+    if (!resultado) continue;
+
+    if (resultado.etaMin < mejorETA) {
+      mejorETA = resultado.etaMin;
+      mejorTaxiId = taxiId;
+      mejorRutaCoords = resultado.coords;
+      mejorDistanciaKm = resultado.distanciaKm;
+    }
   }
 
-  const posTaxi = markerTaxi.getLatLng();
+  if (!mejorTaxiId || !mejorRutaCoords) {
+    mostrarMensaje('No hay taxi disponible con ruta calculada', 'warning');
+    return;
+  }
 
-  const resultado = await calcularETAEntrePuntos(
-    posTaxi,
-    posViaje
-  );
-
-  if (!resultado) continue;
-    
-if (resultado.etaMin < mejorETA) {
-  mejorETA = resultado.etaMin;
-  mejorTaxiId = taxiId;
-  mejorRutaCoords = resultado.coords;
-
-  window.distanciaActualOSRM = resultado.distanciaKm;
-  window.etaActualOSRM = resultado.etaMin;
-}
- 
-if (typeof mostrarViajeOperativo === 'function') {
-  mostrarViajeOperativo(window.viajeSeleccionado || null);
-}
-  
-if (mejorTaxiId) {
-
-  window.mapa.eachLayer((layer) => {
-    if (layer instanceof L.Marker && layer._sgofTipo !== 'taxi') {
-      window.mapa.removeLayer(layer);
-    }
-  });
+  window.distanciaActualOSRM = mejorDistanciaKm;
+  window.etaActualOSRM = mejorETA;
+  window.rutaActualOSRM = mejorRutaCoords;
 
   if (window.lineaTaxiPasajero) {
     window.mapa.removeLayer(window.lineaTaxiPasajero);
     window.lineaTaxiPasajero = null;
   }
 
-if (mejorRutaCoords) {
- 
   window.lineaTaxiPasajero = L.polyline(mejorRutaCoords, {
-  color: '#2563eb',
-  weight: 5,
-  opacity: 0.9
-}).addTo(window.mapa);
+    color: '#2563eb',
+    weight: 5,
+    opacity: 0.9
+  }).addTo(window.mapa);
 
-window.lineaTaxiPasajero.bringToFront();
-
-window.rutaActualOSRM = mejorRutaCoords;
+  window.lineaTaxiPasajero.bringToFront();
 
   window.mapa.fitBounds(
     window.lineaTaxiPasajero.getBounds(),
     { padding: [40, 40] }
   );
-}
- 
+
   seleccionarTaxi(mejorTaxiId, true, false, true);
+
+  if (typeof mostrarViajeOperativo === 'function') {
+    mostrarViajeOperativo(window.viajeSeleccionado || null);
+  }
 
   mostrarMensaje(
     `🚕 Mejor taxi encontrado (${Math.round(mejorETA)} min)`,
     'success'
   );
 }
-} 
-} 
+
+
 window.encontrarMejorTaxiParaViaje = encontrarMejorTaxiParaViaje;
+
+async function dibujarRutaTaxiAsignado(viaje) {
+
+  if (!viaje || !viaje.taxi_id || !marcadorViaje) return;
+
+  const markerTaxi = window.marcadoresPorTaxi?.[viaje.taxi_id];
+
+  if (!markerTaxi) return;
+
+  const posTaxi = markerTaxi.getLatLng();
+  const posViaje = marcadorViaje.getLatLng();
+
+  const resultado = await calcularETAEntrePuntos(
+    posTaxi,
+    posViaje
+  );
+
+  if (!resultado) return;
+
+  window.distanciaActualOSRM = resultado.distanciaKm;
+  window.etaActualOSRM = resultado.etaMin;
+  window.rutaActualOSRM = resultado.coords;
+
+  if (window.lineaTaxiPasajero) {
+    window.mapa.removeLayer(window.lineaTaxiPasajero);
+    window.lineaTaxiPasajero = null;
+  }
+
+  window.lineaTaxiPasajero = L.polyline(resultado.coords, {
+    color: '#2563eb',
+    weight: 5,
+    opacity: 0.9
+  }).addTo(window.mapa);
+
+  window.lineaTaxiPasajero.bringToFront();
+
+  window.mapa.fitBounds(
+    window.lineaTaxiPasajero.getBounds(),
+    { padding: [40, 40] }
+  );
+
+  seleccionarTaxi(viaje.taxi_id, true, false, true);
+
+  if (typeof mostrarViajeOperativo === 'function') {
+    mostrarViajeOperativo(viaje);
+  }
+}
+
+window.dibujarRutaTaxiAsignado = dibujarRutaTaxiAsignado;
 
 
 async function fetchTaxis() {
