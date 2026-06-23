@@ -643,23 +643,33 @@ if (viaje.estado !== 'en_origen') {
       });
     }
 
-    const resultViaje = await pool.query(`
-      UPDATE viajes
-      SET estado = 'en_curso',
-          fecha_hora_inicio = NOW(),
-          fecha_actualizacion = NOW()
-      WHERE id = $1
-      RETURNING id, codigo, estado, taxi_id
-    `, [id]);
+   const resultViaje = await pool.query(`
+  UPDATE viajes
+  SET estado = 'en_curso',
+      fecha_hora_inicio = NOW(),
+      fecha_actualizacion = NOW()
+  WHERE id = $1
+  RETURNING
+    id,
+    codigo,
+    estado,
+    taxi_id,
+    origen_latitud,
+    origen_longitud,
+    origen_direccion,
+    destino_latitud,
+    destino_longitud,
+    destino_direccion
+`, [id]);
 
-    const resultTaxi = await pool.query(`
-      UPDATE taxis
-      SET estado = 'ocupado',
-          fecha_actualizacion = NOW()
-      WHERE id = $1
-      RETURNING id, codigo_movil, estado
-    `, [viaje.taxi_id]);
-    
+   const resultTaxi = await pool.query(`
+  UPDATE taxis
+  SET estado = 'ocupado',
+      fecha_actualizacion = NOW()
+  WHERE id = $1
+  RETURNING id, codigo_movil, estado
+`, [viaje.taxi_id]);
+  
     res.json({
       ok: true,
       mensaje: 'Viaje iniciado correctamente',
@@ -760,7 +770,6 @@ router.post('/:id/finalizar', async (req, res) => {
 
 router.post('/test', async (req, res) => {
   
-
   try {
    const empresaId = '4b593c63-8fdd-4c9d-bd48-54cb6ae89623'; 
     const result = await pool.query(`

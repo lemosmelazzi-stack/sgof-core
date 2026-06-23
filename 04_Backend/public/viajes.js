@@ -520,6 +520,8 @@ function dibujarPendientesEnMapa(viajes) {
         <em>${esAproximado ? 'Ubicación aproximada' : 'Ubicación real'}</em>
       `);
 
+      marcador._sgofTipo = 'pendiente';
+
     marcadoresPendientes.push(marcador);
   });
 }

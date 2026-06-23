@@ -4,6 +4,8 @@ let taxiSeleccionadoId = null;
 let seguirTaxiSeleccionado = true;
 let viajeSeleccionadoId = null;
 let lineaTaxiPasajero = null;
+window.rutaViajeOSRM = null;
+window.lineaRutaViaje = null;
 // Mantener ambos sincronizados por compatibilidad.
 window.marcadoresPorTaxi = window.marcadoresPorTaxi || {};
 window.taxisMarkers = window.taxisMarkers || {};
@@ -1101,6 +1103,7 @@ marcadorViaje = L.marker([lat, lng])
     ${viaje.origen_direccion || ''}
   `)
   .openPopup();
+  marcadorViaje._sgofTipo = 'pasajero';
 }
     
 const btnAsignarTaxi = document.getElementById('btn-asignar-taxi');
@@ -1192,8 +1195,7 @@ async function rechazarViaje() {
     await cargarTaxis();
     await cargarViajePorId(viajeSeleccionadoId);
 
-    console.log('VIAJE DESPUÉS DE RECHAZAR:', window.viajeSeleccionado);
-console.log('TAXI REASIGNADO:', data.taxi_reasignado);
+    
 
     if (window.viajeSeleccionado?.taxi_id) {
       taxiSeleccionadoId = window.viajeSeleccionado.taxi_id;
@@ -1245,28 +1247,16 @@ if (window.lineaTaxiPasajero && window.mapa) {
   window.lineaTaxiPasajero = null;
 }
 
-const taxiIdViaje = data.viaje?.taxi_id || window.viajeSeleccionado?.taxi_id;
 
-if (taxiIdViaje) {
-  window.taxiSeleccionadoId = taxiIdViaje;
-}
-
-console.log('Viaje iniciado sin animación automática de ruta OSRM');
-/*if (
-  typeof window.moverTaxiPorRutaOSRM === 'function' &&
-  taxiIdViaje &&
-  Array.isArray(window.rutaActualOSRM) &&
-  window.rutaActualOSRM.length > 0
-) {
-  window.moverTaxiPorRutaOSRM(
-    taxiIdViaje,
-    window.rutaActualOSRM,
-    350
+if (typeof window.dibujarRutaViajeEnCurso === 'function') {
+  await window.dibujarRutaViajeEnCurso(
+    data.viaje || window.viajeSeleccionado
   );
 } else {
-  console.warn('NO SE PUDO MOVER TAXI: falta función, taxi o ruta');
+  console.warn('dibujarRutaViajeEnCurso no está disponible');
 }
-*/
+
+
 await cargarViajeActivo();
 await cargarTaxis();
 
@@ -1314,6 +1304,13 @@ const res = await fetch(`/viajes/${idFinalizar}/finalizar`, {
       window.mapa.removeLayer(window.lineaTaxiPasajero);
       window.lineaTaxiPasajero = null;
     }
+
+    if (window.lineaRutaViaje && window.mapa) {
+  window.mapa.removeLayer(window.lineaRutaViaje);
+  window.lineaRutaViaje = null;
+}
+
+window.rutaViajeOSRM = null;
 
     if (window.rutaTaxiPasajero && window.mapa) {
       window.mapa.removeLayer(window.rutaTaxiPasajero);
@@ -1372,6 +1369,25 @@ const res = await fetch(`/viajes/${idFinalizar}/finalizar`, {
    if (typeof window.actualizarBotonesPorEstado === 'function') {
    window.actualizarBotonesPorEstado(null);
 }
+if (Array.isArray(window.marcadoresPendientes) && window.mapa) {
+  window.marcadoresPendientes.forEach(marker => {
+    window.mapa.removeLayer(marker);
+  });
+
+  window.marcadoresPendientes = [];
+  marcadoresPendientes = window.marcadoresPendientes;
+}
+
+if (window.mapa) {
+  window.mapa.eachLayer(layer => {
+    if (layer._sgofTipo === 'pendiente' || layer._sgofTipo === 'pasajero') {
+      window.mapa.removeLayer(layer);
+    }
+  });
+}
+ dibujarPendientesEnMapa([]);
+  marcadorViaje = null;
+  window.marcadorViaje = null;
 
    if (window.mapa) {
    window.mapa.closePopup();
@@ -1380,6 +1396,8 @@ const res = await fetch(`/viajes/${idFinalizar}/finalizar`, {
 
    alert('Viaje finalizado');
 
+  window.mapa.eachLayer(layer => {
+  
   } catch (error) {
     console.error(error);
     alert('Error de conexión');

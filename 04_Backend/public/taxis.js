@@ -175,6 +175,12 @@ async function dibujarRutaTaxiAsignado(viaje) {
     window.mapa.removeLayer(window.lineaTaxiPasajero);
     window.lineaTaxiPasajero = null;
   }
+  if (window.lineaRutaViaje && window.mapa) {
+  window.mapa.removeLayer(window.lineaRutaViaje);
+  window.lineaRutaViaje = null;
+}
+
+window.rutaViajeOSRM = null;
 
   window.lineaTaxiPasajero = L.polyline(resultado.coords, {
     color: '#2563eb',
@@ -198,6 +204,52 @@ async function dibujarRutaTaxiAsignado(viaje) {
 
 window.dibujarRutaTaxiAsignado = dibujarRutaTaxiAsignado;
 
+async function dibujarRutaViajeEnCurso(viaje) {
+  if (!viaje || !window.mapa) return;
+
+  const origenLat = Number(viaje.origen_latitud);
+  const origenLng = Number(viaje.origen_longitud);
+  const destinoLat = Number(viaje.destino_latitud);
+  const destinoLng = Number(viaje.destino_longitud);
+
+  if (
+    !Number.isFinite(origenLat) ||
+    !Number.isFinite(origenLng) ||
+    !Number.isFinite(destinoLat) ||
+    !Number.isFinite(destinoLng)
+  ) {
+    console.warn('No hay coordenadas válidas para ruta del viaje');
+    return;
+  }
+
+  const resultado = await calcularETAEntrePuntos(
+    L.latLng(origenLat, origenLng),
+    L.latLng(destinoLat, destinoLng)
+  );
+
+  if (!resultado || !Array.isArray(resultado.coords)) return;
+
+  window.rutaViajeOSRM = resultado.coords;
+
+  if (window.lineaRutaViaje) {
+    window.mapa.removeLayer(window.lineaRutaViaje);
+    window.lineaRutaViaje = null;
+  }
+  window.lineaRutaViaje = L.polyline(resultado.coords, {
+  color: '#0ea5e9',
+  weight: 6,
+  opacity: 0.85
+  }).addTo(window.mapa);
+  
+  window.lineaRutaViaje.bringToFront();
+
+  window.mapa.fitBounds(
+    window.lineaRutaViaje.getBounds(),
+    { padding: [40, 40] }
+  );
+}
+
+window.dibujarRutaViajeEnCurso = dibujarRutaViajeEnCurso;
 
 async function fetchTaxis() {
  
