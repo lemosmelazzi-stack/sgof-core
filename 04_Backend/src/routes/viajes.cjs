@@ -94,6 +94,38 @@ VALUES (
   }
 });
 
+async function queryConReintento(pool, sql, params = [], intentos = 2) {
+  try {
+    return await pool.query(sql, params);
+  } catch (error) {
+    const mensaje = error.message || '';
+
+    const esConexionCortada =
+      mensaje.includes('Connection terminated unexpectedly') ||
+      mensaje.includes('ECONNRESET') ||
+      mensaje.includes('timeout');
+
+    if (!esConexionCortada || intentos <= 1) {
+      throw error;
+    }
+
+   console.warn(
+  'Reintentando consulta PostgreSQL:',
+  sql.substring(0, 80)
+);
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    return queryConReintento(
+      pool,
+      sql,
+      params,
+      intentos - 1
+    );
+  }
+}
+
+
 router.get('/resumen', async (req, res) => {
   try {
     const { desde, hasta, estado } = req.query;
@@ -300,8 +332,17 @@ if (parsedOffset) {
   query += ` OFFSET $${values.length}`;
 }
 
-const countResult = await pool.query(countQuery, values.slice(0, conditions.length));
-const result = await pool.query(query, values);
+const countResult = await queryConReintento(
+  pool,
+  countQuery,
+  values.slice(0, conditions.length)
+);
+
+const result = await queryConReintento(
+  pool,
+  query,
+  values
+);
 
 res.json({
   ok: true,

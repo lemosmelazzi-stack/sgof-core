@@ -1,13 +1,39 @@
 const express = require('express');
 const router = express.Router();
 
+async function queryConReintento(pool, sql, params = [], intentos = 2) {
+  try {
+    return await pool.query(sql, params);
+  } catch (error) {
+    const mensaje = error.message || '';
+
+    const esConexionCortada =
+      mensaje.includes('Connection terminated unexpectedly') ||
+      mensaje.includes('ECONNRESET') ||
+      mensaje.includes('timeout');
+
+    if (!esConexionCortada || intentos <= 1) {
+      throw error;
+    }
+
+    console.warn(
+  'Reintentando consulta PostgreSQL en taxis:',
+  sql.substring(0, 80)
+);
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    return queryConReintento(pool, sql, params, intentos - 1);
+  }
+}
+
 module.exports = (pool) => {
 
   // LISTAR TAXIS
   router.get('/', async (req, res) => {
 
     try {
-const result = await pool.query(`
+const result = await queryConReintento(pool, `
   SELECT
     t.id AS taxi_id,
     t.codigo_movil,
@@ -37,8 +63,8 @@ const result = await pool.query(`
   // POSICIONES GPS ACTUALES
 router.get('/positions', async (req, res) => {
 
-  try {
-  const result = await pool.query(`
+ try {
+  const result = await queryConReintento(pool, `
   SELECT DISTINCT ON (g.taxi_id)
   g.taxi_id,
   g.latitud,

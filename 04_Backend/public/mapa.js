@@ -1380,11 +1380,18 @@ if (Array.isArray(window.marcadoresPendientes) && window.mapa) {
 
 if (window.mapa) {
   window.mapa.eachLayer(layer => {
-    if (layer._sgofTipo === 'pendiente' || layer._sgofTipo === 'pasajero') {
+
+    if (
+      layer._sgofTipo === 'pendiente' ||
+      layer._sgofTipo === 'pasajero'
+    ) {
       window.mapa.removeLayer(layer);
     }
+
   });
 }
+
+
  dibujarPendientesEnMapa([]);
   marcadorViaje = null;
   window.marcadorViaje = null;
@@ -1395,15 +1402,12 @@ if (window.mapa) {
 }
 
    alert('Viaje finalizado');
-
-  window.mapa.eachLayer(layer => {
   
   } catch (error) {
     console.error(error);
     alert('Error de conexión');
   }
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('btn-nuevo-pedido-test');
