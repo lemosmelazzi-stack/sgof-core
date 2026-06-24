@@ -1190,6 +1190,22 @@ async function rechazarViaje() {
       alert(data.mensaje || 'Error al rechazar viaje');
       return;
     }
+    window.rutaActualOSRM = null;
+
+if (window.lineaTaxiPasajero && window.mapa) {
+  window.mapa.removeLayer(window.lineaTaxiPasajero);
+  window.lineaTaxiPasajero = null;
+}
+
+if (window.lineaRutaViaje && window.mapa) {
+  window.mapa.removeLayer(window.lineaRutaViaje);
+  window.lineaRutaViaje = null;
+}
+
+if (window.rutaTaxiPasajero && window.mapa) {
+  window.mapa.removeLayer(window.rutaTaxiPasajero);
+  window.rutaTaxiPasajero = null;
+}
 
     await cargarPendientes();
     await cargarTaxis();
@@ -1402,6 +1418,24 @@ if (window.mapa) {
 }
 
    alert('Viaje finalizado');
+
+   if (window.lineaTaxiPasajero && window.mapa) {
+  window.mapa.removeLayer(window.lineaTaxiPasajero);
+  window.lineaTaxiPasajero = null;
+}
+
+if (window.lineaRutaViaje && window.mapa) {
+  window.mapa.removeLayer(window.lineaRutaViaje);
+  window.lineaRutaViaje = null;
+}
+
+if (window.rutaTaxiPasajero && window.mapa) {
+  window.mapa.removeLayer(window.rutaTaxiPasajero);
+  window.rutaTaxiPasajero = null;
+}
+
+window.rutaActualOSRM = null;
+window.rutaViajeOSRM = null;
   
   } catch (error) {
     console.error(error);

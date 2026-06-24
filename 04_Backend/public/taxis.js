@@ -229,6 +229,15 @@ async function dibujarRutaViajeEnCurso(viaje) {
 
   if (!resultado || !Array.isArray(resultado.coords)) return;
 
+  if (window.lineaTaxiPasajero && window.mapa) {
+  window.mapa.removeLayer(window.lineaTaxiPasajero);
+  window.lineaTaxiPasajero = null;
+}
+
+if (window.rutaActualOSRM) {
+  window.rutaActualOSRM = null;
+}
+
   window.rutaViajeOSRM = resultado.coords;
 
   if (window.lineaRutaViaje) {
@@ -413,7 +422,9 @@ const lng = tieneGPS
 
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-     let marker = window.marcadoresPorTaxi[taxi.taxi_id];
+let marker =
+  window.marcadoresPorTaxi[taxi.taxi_id] ||
+  window.taxisMarkers[taxi.taxi_id];
 
 
 const latFinal = posSimulada ? posSimulada.lat : lat;
@@ -425,6 +436,9 @@ if (!marker) {
   }).addTo(window.mapa);
 
   marker._sgofTipo = 'taxi';
+
+  window.marcadoresPorTaxi[taxi.taxi_id] = marker;
+window.taxisMarkers[taxi.taxi_id] = marker;
 
   marker.on('click', () => {
 
@@ -444,6 +458,9 @@ if (!marker) {
 } else {
   if (!marker._sgofAnimando) {
     const posActual = marker.getLatLng();
+
+    window.marcadoresPorTaxi[taxi.taxi_id] = marker;
+    window.taxisMarkers[taxi.taxi_id] = marker;
 
     const mismaPosicion =
       Math.abs(posActual.lat - latFinal) < 0.000001 &&
