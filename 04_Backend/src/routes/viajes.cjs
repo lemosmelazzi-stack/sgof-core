@@ -670,6 +670,14 @@ router.post('/:id/iniciar', async (req, res) => {
     }
 
     const viaje = viajeResult.rows[0];
+   if (viaje.estado === 'en_curso') {
+  return res.json({
+    ok: true,
+    mensaje: 'Viaje ya iniciado',
+    viaje
+  });
+}
+
 if (viaje.estado !== 'en_origen') {
   return res.status(400).json({
     ok: false,
@@ -769,14 +777,13 @@ router.post('/:id/finalizar', async (req, res) => {
       });
     }
 
-    const result = await client.query(`
-      UPDATE viajes
-      SET estado = 'finalizado',
-          fecha_hora_fin = NOW(),
-          fecha_actualizacion = NOW()
-      WHERE id = $1
-      RETURNING *
-    `, [id]);
+    const taxiResult = await client.query(`
+  UPDATE taxis
+  SET estado = 'disponible',
+      fecha_actualizacion = NOW()
+  WHERE id = $1
+  RETURNING id, codigo_movil, estado
+`, [viaje.taxi_id]);
 
     await client.query(`
       UPDATE taxis
@@ -787,11 +794,12 @@ router.post('/:id/finalizar', async (req, res) => {
 
     await client.query('COMMIT');
 
-    res.json({
-      ok: true,
-      mensaje: 'Viaje finalizado correctamente',
-      viaje: result.rows[0]
-    });
+   res.json({
+  ok: true,
+  mensaje: 'Viaje finalizado correctamente',
+  viaje: viajeResult.rows[0],
+  taxi: taxiResult.rows[0]
+});
 
   } catch (error) {
     await client.query('ROLLBACK');

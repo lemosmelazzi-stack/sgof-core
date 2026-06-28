@@ -129,12 +129,12 @@ async function encontrarMejorTaxiParaViaje() {
 
   window.lineaTaxiPasajero.bringToFront();
 
-  window.mapa.fitBounds(
-    window.lineaTaxiPasajero.getBounds(),
-    { padding: [40, 40] }
-  );
+  //window.mapa.fitBounds(
+    //window.lineaTaxiPasajero.getBounds(),
+    //{ padding: [40, 40] }
+  //);
 
-  seleccionarTaxi(mejorTaxiId, true, false, true);
+  seleccionarTaxi(mejorTaxiId, false, false, true);
 
   if (typeof mostrarViajeOperativo === 'function') {
     mostrarViajeOperativo(window.viajeSeleccionado || null);
@@ -149,16 +149,50 @@ async function encontrarMejorTaxiParaViaje() {
 
 window.encontrarMejorTaxiParaViaje = encontrarMejorTaxiParaViaje;
 
-async function dibujarRutaTaxiAsignado(viaje) {
+
+  async function dibujarRutaTaxiAsignado(viaje) {
+
+    if (!viaje || !viaje.taxi_id || !marcadorViaje) return;
+
+    // Solo dibujar la ruta de asignación antes de iniciar el viaje
+    if (
+        viaje.estado !== 'asignado' &&
+        viaje.estado !== 'en_camino_origen' &&
+        viaje.estado !== 'en_origen'
+    ) {
+
+        if (window.lineaTaxiPasajero && window.mapa) {
+            window.mapa.removeLayer(window.lineaTaxiPasajero);
+            window.lineaTaxiPasajero = null;
+        }
+
+        if (window.rutaTaxiPasajero && window.mapa) {
+            window.mapa.removeLayer(window.rutaTaxiPasajero);
+            window.rutaTaxiPasajero = null;
+        }
+
+        return;
+    }
 
   if (!viaje || !viaje.taxi_id || !marcadorViaje) return;
 
   const markerTaxi = window.marcadoresPorTaxi?.[viaje.taxi_id];
 
-  if (!markerTaxi) return;
+//console.log('========================');
+//console.log('TAXI DEL VIAJE:', viaje.taxi_id);
+//console.log('MARKER:', markerTaxi);
 
-  const posTaxi = markerTaxi.getLatLng();
-  const posViaje = marcadorViaje.getLatLng();
+if (!markerTaxi) return;
+
+const posTaxi = markerTaxi.getLatLng();
+const posViaje = marcadorViaje.getLatLng();
+
+//console.log('RUTA TAXI ASIGNADO');
+//console.log('viaje.taxi_id:', viaje.taxi_id);
+//console.log('posTaxi usada:', posTaxi);
+//console.log('posViaje origen:', posViaje);
+//console.log('marcadores disponibles:', Object.keys(window.marcadoresPorTaxi));
+//console.log('========================');
 
   const resultado = await calcularETAEntrePuntos(
     posTaxi,
@@ -190,15 +224,14 @@ window.rutaViajeOSRM = null;
 
   window.lineaTaxiPasajero.bringToFront();
 
-  window.mapa.fitBounds(
-    window.lineaTaxiPasajero.getBounds(),
-    { padding: [40, 40] }
-  );
+ // window.mapa.fitBounds(
+ //   window.lineaTaxiPasajero.getBounds(),
+  //  { padding: [40, 40] }
+ // );
 
-  seleccionarTaxi(viaje.taxi_id, true, false, true);
-
+  seleccionarTaxi(viaje.taxi_id, false, false, false);
   if (typeof mostrarViajeOperativo === 'function') {
-    mostrarViajeOperativo(viaje);
+  mostrarViajeOperativo(viaje);
   }
 }
 
@@ -206,6 +239,10 @@ window.dibujarRutaTaxiAsignado = dibujarRutaTaxiAsignado;
 
 async function dibujarRutaViajeEnCurso(viaje) {
   if (!viaje || !window.mapa) return;
+
+  if (viaje.estado !== 'en_curso') {
+  return;
+}
 
   const origenLat = Number(viaje.origen_latitud);
   const origenLng = Number(viaje.origen_longitud);
@@ -221,6 +258,11 @@ async function dibujarRutaViajeEnCurso(viaje) {
     console.warn('No hay coordenadas válidas para ruta del viaje');
     return;
   }
+
+//if (viaje.taxi_id && window.marcadoresPorTaxi?.[viaje.taxi_id]) {
+ // const marker = window.marcadoresPorTaxi[viaje.taxi_id];
+ // marker.setLatLng([origenLat, origenLng]);
+//}
 
   const resultado = await calcularETAEntrePuntos(
     L.latLng(origenLat, origenLng),
@@ -252,10 +294,10 @@ if (window.rutaActualOSRM) {
   
   window.lineaRutaViaje.bringToFront();
 
-  window.mapa.fitBounds(
-    window.lineaRutaViaje.getBounds(),
-    { padding: [40, 40] }
-  );
+  //window.mapa.fitBounds(
+    //window.lineaRutaViaje.getBounds(),
+    //{ padding: [40, 40] }
+  //);
 }
 
 window.dibujarRutaViajeEnCurso = dibujarRutaViajeEnCurso;
@@ -270,21 +312,21 @@ async function fetchTaxis() {
 
   return await res.json();
 }
-
 function colorTaxi(taxi) {
   const estado = taxi.estado_operativo || taxi.estado || 'desconocido';
   const tipoGps = detectarTipoGps(taxi);
 
+  if (taxi.taxi_id === window.taxiSeleccionadoId) return '#f59e0b';
+
   if (estado === 'ocupado') return '#ef4444';
   if (estado === 'en_curso') return '#ef4444';
 
-  if (estado === 'asignado') return '#f59e0b';
-  if (estado === 'en_camino_origen') return '#f59e0b';
-
-  if (taxi.taxi_id === window.taxiSeleccionadoId) return '#f59e0b';
+  if (estado === 'asignado') return '#2563eb';
+  if (estado === 'en_camino_origen') return '#2563eb';
+  if (estado === 'en_origen') return '#2563eb';
 
   if (tipoGps.tipo === 'offline') return '#6b7280';
-  if (tipoGps.tipo === 'simulado') return '#2563eb';
+
   if (estado === 'disponible') return '#22c55e';
 
   return '#6b7280';
@@ -426,9 +468,41 @@ let marker =
   window.marcadoresPorTaxi[taxi.taxi_id] ||
   window.taxisMarkers[taxi.taxi_id];
 
+ if (marker && marker._sgofTaxiId && marker._sgofTaxiId !== taxi.taxi_id) {
+  console.warn('Marcador cruzado detectado. Se elimina:', {
+    esperado: taxi.taxi_id,
+    encontrado: marker._sgofTaxiId
+  });
 
-const latFinal = posSimulada ? posSimulada.lat : lat;
-const lngFinal = posSimulada ? posSimulada.lng : lng;
+  if (window.mapa.hasLayer(marker)) {
+    window.mapa.removeLayer(marker);
+  }
+
+  marker = null;
+}
+  
+const usarPosSimulada =
+  posSimulada &&
+  (
+    taxi.estado === 'ocupado' ||
+    taxi.estado === 'asignado' ||
+    taxi.estado_operativo === 'ocupado' ||
+    taxi.estado_operativo === 'asignado'
+  );
+
+const latFinal = usarPosSimulada ? posSimulada.lat : lat;
+const lngFinal = usarPosSimulada ? posSimulada.lng : lng;
+
+//console.log('--------------------------------');
+//console.log('Taxi:', taxi.codigo_movil);
+//console.log('taxi_id:', taxi.taxi_id);
+//console.log('GPS:', lat, lng);
+//console.log('SIMULADA:', posSimulada);
+//console.log('FINAL:', latFinal, lngFinal);
+
+//console.log('FUENTE:', taxi.fuente);
+//console.log('ESTADO:', taxi.estado);
+//console.log('OBJETO:', taxi);
 
 if (!marker) {
   marker = L.marker([latFinal, lngFinal], {
@@ -436,7 +510,7 @@ if (!marker) {
   }).addTo(window.mapa);
 
   marker._sgofTipo = 'taxi';
-
+  marker._sgofTaxiId = taxi.taxi_id;
   window.marcadoresPorTaxi[taxi.taxi_id] = marker;
 window.taxisMarkers[taxi.taxi_id] = marker;
 
@@ -454,7 +528,6 @@ window.taxisMarkers[taxi.taxi_id] = marker;
   );
 
 });
-
 } else {
   if (!marker._sgofAnimando) {
     const posActual = marker.getLatLng();
@@ -535,65 +608,43 @@ if (marker._sgofFirmaIcono !== firmaIcono) {
 }
 
 function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarCard = true) {
-
   seguirTaxiSeleccionado = true;
 
   taxiSeleccionadoId = taxiId;
-
-mostrarPanelGpsTaxi(taxiId);
-
   window.taxiSeleccionadoId = taxiId;
-    
 
-  if (typeof window.dibujarLineaTaxiPasajero === 'function') {
-    window.dibujarLineaTaxiPasajero();
+  if (typeof mostrarPanelGpsTaxi === 'function') {
+    mostrarPanelGpsTaxi(taxiId);
   }
 
-  Object.values(cardsPorTaxi).forEach(card => {
+  Object.values(cardsPorTaxi || {}).forEach(card => {
     card.classList.remove('seleccionado');
   });
-if (cardsPorTaxi[taxiId]) {
-  cardsPorTaxi[taxiId].classList.add('seleccionado');
-}
-if (cardsPorTaxi[taxiId]) {
-  cardsPorTaxi[taxiId].scrollIntoView({
-    behavior: 'smooth',
-    block: 'center'
-  });
-}
-  const card = cardsPorTaxi[taxiId];
+
+  const card = cardsPorTaxi?.[taxiId];
   if (card) {
     card.classList.add('seleccionado');
-
-    if (enfocarCard) {
-      card.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-      card.focus({ preventScroll: true });
-    }
   }
 
   const marker = window.marcadoresPorTaxi?.[taxiId];
 
-  if (marker && centrarMapa) {
-    mapa.flyTo(marker.getLatLng(), 16, {
-      animate: true,
-      duration: 0.8
-    });
+  if (
+    marker &&
+    abrirPopup &&
+    window.viajeSeleccionadoId
+  ) {
+    marker.openPopup();
   }
 
-  if (
-  marker &&
-  abrirPopup &&
-  window.viajeSeleccionadoId
-) {
-  marker.openPopup();
-}
- 
+  if (typeof window.dibujarRutaTaxiAsignado === 'function' &&
+      window.viajeSeleccionado &&
+      window.viajeSeleccionado.taxi_id) {
+    window.dibujarRutaTaxiAsignado(window.viajeSeleccionado);
+  }
+
   if (typeof window.dibujarLineaTaxiPasajero === 'function') {
-  window.dibujarLineaTaxiPasajero();
-}
+    window.dibujarLineaTaxiPasajero();
+  }
 }
 
 function obtenerTextoRumbo(grados) {
@@ -927,6 +978,9 @@ function limpiarPanelGpsTaxi() {
     panel.style.display = 'none';
   }
 }
+
+
+
 function calcularEstadoGps(fechaGps) {
   if (!fechaGps) {
     return {
@@ -1011,8 +1065,9 @@ function detectarTipoGps(taxi) {
     };
   }
 
-  return {
+    return {
     tipo: 'simulado',
     texto: '🧪 Simulado'
   };
 }
+
