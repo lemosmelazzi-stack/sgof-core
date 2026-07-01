@@ -552,6 +552,7 @@ router.post('/:id/rechazar-taxi', async (req, res) => {
     });
   }
 });
+
 router.post('/:id/rechazar', async (req, res) => {
   try {
     const { id } = req.params;
@@ -588,14 +589,15 @@ router.post('/:id/rechazar', async (req, res) => {
     `, [taxiActualId]);
 
     const siguienteTaxi = await pool.query(`
-      SELECT id, codigo_movil
-      FROM taxis
-      WHERE estado = 'disponible'
-        AND activo = true
-        AND id <> $1
-      ORDER BY codigo_movil ASC
-      LIMIT 1
-    `, [taxiActualId]);
+  SELECT id, codigo_movil
+  FROM taxis
+  WHERE estado = 'disponible'
+    AND activo = true
+    AND orden_cola IS NOT NULL
+    AND id <> $1
+  ORDER BY orden_cola ASC
+  LIMIT 1
+`, [taxiActualId]);
 
     if (siguienteTaxi.rows.length === 0) {
       const viajePendiente = await pool.query(`
@@ -737,6 +739,7 @@ if (viaje.estado !== 'en_origen') {
     });
   }
 });
+
 router.post('/:id/finalizar', async (req, res) => {
   const client = await pool.connect();
 
