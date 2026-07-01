@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const colaTaxis = require('../services/colaTaxis.cjs');
 
 async function queryConReintento(pool, sql, params = [], intentos = 2) {
   try {
@@ -102,6 +103,26 @@ ORDER BY g.taxi_id, g.fecha_hora_gps DESC
 
 });
 
+
+  router.get('/cola', async (req, res) => {
+  try {
+    const cola = await colaTaxis.obtenerCola(pool);
+
+    res.json({
+      ok: true,
+      data: cola
+    });
+
+  } catch (error) {
+    console.error('Error obteniendo cola de taxis:', error);
+
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error obteniendo cola de taxis'
+    });
+  }
+});
+
   // TAXI POR ID
   router.get('/:id', async (req, res) => {
 
@@ -142,3 +163,4 @@ ORDER BY g.taxi_id, g.fecha_hora_gps DESC
   return router;
 
 };
+

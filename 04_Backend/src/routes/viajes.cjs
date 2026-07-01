@@ -2,6 +2,7 @@ const ESTADOS = require('../constants/estados.cjs');
 const express = require('express');
 const router = express.Router();
 const pool = require('../../config/db');
+const colaTaxis = require('../services/colaTaxis.cjs');
 
 // ✅ CREAR PEDIDO + VIAJE TEST
 router.post('/', async (req, res) => {
@@ -1049,15 +1050,20 @@ const resultViaje = await pool.query(`
   WHERE id = $1
   RETURNING id, codigo_movil, estado
 `, [taxi_id]);  
-   // Mover taxi asignado al final de la cola
-await pool.query(`
-  UPDATE taxis
-  SET posicion_cola = (
-    SELECT COALESCE(MAX(posicion_cola), 0) + 1
-    FROM taxis
-  )
-  WHERE id = $1
-`, [taxi_id]);
+
+console.log('******** MOVIENDO TAXI AL FINAL DE LA COLA ********');
+  
+  console.log('=== ANTES DE MOVER COLA ===');
+console.log('Taxi:', taxi_id);
+
+const resultadoCola = await colaTaxis.moverTaxiAlFinal(
+  pool,
+  taxi_id,
+  'Taxi asignado a viaje'
+);
+
+console.log('=== DESPUÉS DE MOVER COLA ===');
+console.log(resultadoCola);
 
   } catch (error) {
     console.error('Error en PUT /viajes/:id/asignar-taxi:', error);
@@ -1328,6 +1334,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 
   return R * c;
 }
+
 router.post('/:id/aceptar', async (req, res) => {
   try {
     const { id } = req.params;
@@ -1351,10 +1358,20 @@ router.post('/:id/aceptar', async (req, res) => {
       });
     }
 
+    const viaje = result.rows[0];
+
+    if (viaje.taxi_id) {
+      await colaTaxis.moverTaxiAlFinal(
+        pool,
+        viaje.taxi_id,
+        'Taxi aceptó viaje'
+      );
+    }
+
     res.json({
       ok: true,
       mensaje: 'Viaje aceptado',
-      viaje: result.rows[0]
+      viaje
     });
 
   } catch (error) {
@@ -1365,6 +1382,7 @@ router.post('/:id/aceptar', async (req, res) => {
     });
   }
 });
+
 router.put('/:id/en-origen', async (req, res) => {
   try {
     const { id } = req.params;
