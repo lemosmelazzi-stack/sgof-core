@@ -116,6 +116,8 @@ async function reordenarCola(pool) {
         ROW_NUMBER() OVER (ORDER BY orden_cola ASC) AS nuevo_orden
       FROM taxis
       WHERE orden_cola IS NOT NULL
+        AND estado = 'disponible'
+        AND activo = true
     )
     UPDATE taxis t
     SET

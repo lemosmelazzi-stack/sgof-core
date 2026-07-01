@@ -768,22 +768,16 @@ disponibles.forEach(taxi => {
 
 window.seleccionarMejorTaxi = seleccionarMejorTaxi;
 
-async function asignarAutomatico() {
+async function asignacionAutomaticaPorCola() {
   if (!viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
     return;
   }
  
   try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/asignar-taxi`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        taxi_id: taxiSeleccionadoId
-      })
-    });
+   const res = await fetch(`/viajes/${viajeSeleccionadoId}/asignar-automatico`, {
+  method: 'POST'
+});
 
     const data = await res.json();
 
@@ -792,10 +786,11 @@ async function asignarAutomatico() {
       return;
     }
 
-    alert('Taxi inteligente asignado');
+    alert(data.mensaje || 'Taxi inteligente asignado');
 
-    await mostrarViajeEnMapa();
-    await cargarTaxis();
+await cargarViajePorId(viajeSeleccionadoId);
+await cargarPendientes();
+await cargarTaxis();
 
   } catch (error) {
     console.error(error);
@@ -1109,10 +1104,19 @@ const btnFinalizarViaje = document.getElementById('btn-finalizar-viaje');
 const btnAceptarViaje = document.getElementById('btn-aceptar-viaje');
 const btnRechazarViaje = document.getElementById('btn-rechazar-viaje');
 const btnAsignarAuto = document.getElementById('btn-asignar-auto');
+const btnAsignarAutoCola = document.getElementById('btn-asignar-auto-cola');
+
+if (btnAsignarTaxi) {
+  btnAsignarTaxi.onclick = asignarTaxiSeleccionado;
+}
 
 if (btnAsignarAuto) {
-  btnAsignarAuto.onclick = asignarAutomatico;
+  btnAsignarAuto.onclick = asignarTaxiSeleccionado;
 }
+if (btnAsignarAutoCola) {
+  btnAsignarAutoCola.onclick = asignacionAutomaticaPorCola;
+};
+
 
 if (btnEnOrigen) {
   btnEnOrigen.onclick = marcarEnOrigen;
@@ -1206,11 +1210,10 @@ if (window.rutaTaxiPasajero && window.mapa) {
   window.rutaTaxiPasajero = null;
 }
 
-    await cargarPendientes();
-    await cargarTaxis();
-    await cargarViajePorId(viajeSeleccionadoId);
+   await cargarPendientes();
+await cargarTaxis();
 
-    
+await cargarViajePorId(viajeSeleccionadoId);
 
     if (window.viajeSeleccionado?.taxi_id) {
       taxiSeleccionadoId = window.viajeSeleccionado.taxi_id;
