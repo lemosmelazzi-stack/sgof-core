@@ -728,12 +728,22 @@ router.post('/:id/finalizar', async (req, res) => {
 
     await client.query('COMMIT');
 
-    res.json({
-      ok: true,
-      mensaje: 'Viaje finalizado correctamente',
-      viaje: viajeFinalizado.rows[0],
-      taxi: taxiResult.rows[0]
-    });
+
+const io = req.app.get('io');
+
+if (io) {
+  io.emit('viaje-actualizado', viajeFinalizado.rows[0]);
+  io.emit('taxi-actualizado', taxiResult.rows[0]);
+  io.emit('cola-operativa-actualizada');
+}
+
+res.json({
+  ok: true,
+  mensaje: 'Viaje finalizado correctamente',
+  viaje: viajeFinalizado.rows[0],
+  taxi: taxiResult.rows[0]
+});
+
 
   } catch (error) {
     await client.query('ROLLBACK');
@@ -1088,60 +1098,14 @@ router.post('/asignar', async (req, res) => {
       [taxi_id]
     );
 
-    const io = req.app.get('io');
+  const io = req.app.get('io');
 
-    if (io) {
-
-        io.emit('taxi-actualizado', taxiUpdate.rows[0]);
-
-     io.emit('taxi-actualizado', taxiUpdate.rows[0]);
-
-const taxiAsignado = taxiUpdate.rows[0];
-
-const posicionTaxi = await pool.query(`
-    SELECT latitud, longitud
-    FROM gps_logs
-    WHERE taxi_id = $1
-    ORDER BY fecha_hora_gps DESC
-    LIMIT 1
-`, [taxiAsignado.id]);
-
-const latInicio = Number(posicionTaxi.rows[0]?.latitud);
-const lngInicio = Number(posicionTaxi.rows[0]?.longitud);
-
-const latDestino = Number(result.rows[0].origen_latitud);
-const lngDestino = Number(result.rows[0].origen_longitud);
-
-
-io.emit('taxi_posicion', {
-    taxiId: taxiAsignado.id,
-    lat: latInicio,
-    lng: lngInicio,
-    estado: taxiAsignado.estado
-});
-
-const pasos = 20;
-/*
-  for (let i = 1; i <= pasos; i++) {
-    setTimeout(() => {
-        const progreso = i / pasos;
-
-        const lat = latInicio + (latDestino - latInicio) * progreso;
-        const lng = lngInicio + (lngDestino - lngInicio) * progreso;
-
-        io.emit('taxi_posicion', {
-            taxiId: taxiAsignado.id,
-            lat,
-            lng,
-            estado: taxiAsignado.estado
-        });
-    }, i * 500);
+   if (io) {
+  io.emit('taxi-actualizado', taxiUpdate.rows[0]);
+  io.emit('viaje-actualizado', result.rows[0]);
+  io.emit('cola-operativa-actualizada');
 }
-*/
-   
-      io.emit('viaje-actualizado', result.rows[0]);
-    }
-
+    
     res.json({
       ok: true,
       mensaje: 'Taxi asignado correctamente',
@@ -1227,6 +1191,14 @@ router.post('/:id/asignar-automatico', async (req, res) => {
       ...resultViaje.rows[0],
       taxi_codigo: resultTaxi.rows[0].codigo_movil
     };
+
+     const io = req.app.get('io');
+
+if (io) {
+  io.emit('viaje-actualizado', viajeConTaxi);
+  io.emit('taxi-actualizado', resultTaxi.rows[0]);
+  io.emit('cola-operativa-actualizada');
+}
 
     res.json({
       ok: true,

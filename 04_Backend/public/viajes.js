@@ -950,11 +950,17 @@ if (!window.taxiSeleccionadoId) {
     }
 });
 */
+
 window.cargarPendientes = cargarPendientes;
 window.cargarTaxis = cargarTaxis;
 window.cargarViajeActivo = cargarViajeActivo;
- window.finalizarViaje = finalizarViaje;
- 
- window.iniciarViaje = iniciarViaje;
+
+if (typeof finalizarViaje !== 'undefined') {
+  window.finalizarViaje = finalizarViaje;
+}
+
+if (typeof iniciarViaje !== 'undefined') {
+  window.iniciarViaje = iniciarViaje;
+}
+
 window.asignarTaxiSeleccionado = asignarTaxiSeleccionado;
- 

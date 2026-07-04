@@ -389,8 +389,14 @@ socket.on('viaje-actualizado', async (viaje) => {
 });
 
 socket.on('taxi-actualizado', async (taxi) => {
-  
+
   await cargarTaxis();
+  await cargarColaOperativa();
+
+});
+
+socket.on('cola-operativa-actualizada', async () => {
+  await cargarColaOperativa();
 });
 
 socket.on('taxi_posicion', (data) => {
@@ -482,6 +488,59 @@ function actualizarOrientacionTaxi(marker, latAnterior, lngAnterior, latNueva, l
     icono.style.transform += ` rotate(${angulo}deg)`;
 }
 
+async function cargarColaOperativa() {
+  try {
+    const contenedor = document.getElementById('cola-operativa-contenido');
+    if (!contenedor) return;
+
+    const res = await fetch('/taxis/cola');
+    const data = await res.json();
+    
+    if (!data.ok || !Array.isArray(data.data)) {
+      contenedor.innerHTML = 'No se pudo cargar la cola.';
+      return;
+    }
+
+    const cola = data.data;
+
+    if (cola.length === 0) {
+      contenedor.innerHTML = 'No hay taxis en cola.';
+      return;
+    }
+
+    const proximo = cola.find(t =>
+      t.estado === 'disponible' &&
+      t.activo !== false
+    );
+
+    contenedor.innerHTML = `
+      <div style="margin-bottom: 8px;">
+        <strong>Próximo:</strong>
+        ${proximo ? `➡ ${proximo.codigo_movil}` : '—'}
+      </div>
+
+      ${cola.map((taxi, index) => `
+        <div style="
+          display: flex;
+          justify-content: space-between;
+          padding: 4px 0;
+          border-bottom: 1px solid #1e293b;
+        ">
+          <span>${index + 1}. ${taxi.codigo_movil}</span>
+          <span>${taxi.estado || '—'}</span>
+        </div>
+      `).join('')}
+    `;
+    
+      } catch (error) {
+    const contenedor = document.getElementById('cola-operativa-contenido');
+
+    if (contenedor) {
+      contenedor.innerHTML = 'Cola no disponible momentáneamente.';
+    }
+  }
+}
+
 function obtenerViajeIdDesdeURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get('viajeId');
@@ -538,114 +597,8 @@ centrarMapa(viaje);
   }
 }
 
-/*async function asignarTaxiSeleccionado() {
-
-  if (!viajeSeleccionadoId && window.viajeSeleccionadoId) {
-    viajeSeleccionadoId = window.viajeSeleccionadoId;
-  }
-
-  if (!viajeSeleccionado && window.viajeSeleccionado) {
-    viajeSeleccionado = window.viajeSeleccionado;
-  }
-
-  if (!viajeSeleccionadoId) {
-    const cardSeleccionada = document.querySelector('.card-viaje.seleccionado');
-
-    if (cardSeleccionada?.dataset?.viajeId) {
-      viajeSeleccionadoId = cardSeleccionada.dataset.viajeId;
-    }
-  }
-
-    viajeSeleccionadoId,
-    taxiSeleccionadoId
-  });
-
-  if (!viajeSeleccionadoId) {
-    alert('Primero seleccioná un viaje.');
-    return;
-  }
-
-  if (!taxiSeleccionadoId) {
-    alert('Primero seleccioná un taxi.');
-    return;
-  }
-
-  // acá sigue tu fetch('/viajes/asignar'...)
-
-
-  if (!window.viajeSeleccionadoId && window.viajeSeleccionado?.id) {
-    window.viajeSeleccionadoId = window.viajeSeleccionado.id;
-  }
-
-    });
-    return;
-  }
-
-  const markerTaxi = window.marcadoresPorTaxi?.[window.taxiSeleccionadoId];
-
-  if (!markerTaxi) {
-    console.warn('No encontré markerTaxi:', window.taxiSeleccionadoId);
-    return;
-  }
-
-  const latViaje = Number(
-    window.viajeSeleccionado.origen_latitud ??
-    window.viajeSeleccionado.latitud
-  );
-
-  const lngViaje = Number(
-    window.viajeSeleccionado.origen_longitud ??
-    window.viajeSeleccionado.longitud
-  );
-
-  if (!Number.isFinite(latViaje) || !Number.isFinite(lngViaje)) {
-    console.warn('Viaje sin coordenadas para línea:', window.viajeSeleccionado);
-    return;
-  }
-
-  const posTaxi = markerTaxi.getLatLng();
-  const posViaje = L.latLng(latViaje, lngViaje);
-
-  window.dibujarRutaRealTaxiPasajero(posTaxi, posViaje);
-};
-
-  if (!window.viajeSeleccionadoId) {
-  alert('Seleccioná un viaje');
-  return;
-}
-
-  if (!taxiSeleccionadoId) {
-    alert('Primero seleccioná un taxi.');
-    return;
-  }
-  try {
-    const res = await fetch('/viajes/asignar', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-
-     body: JSON.stringify({
-  viaje_id: window.viajeSeleccionadoId,
-  taxi_id: window.taxiSeleccionadoId
-})
-
-    });
-
-if (!data.ok) {
-  alert('Error al asignar taxi');
-  return;
-}
-
-// 👇 ESTO ES LO QUE FALTA
-viajeSeleccionado = data.viaje;
-viajeSeleccionadoId = data.viaje.id;
-mostrarViajeOperativo(data.viaje);
-*/
-
 async function asignarTaxiSeleccionado() {
  
-
 if (!window.viajeSeleccionadoId && window.viajeSeleccionado?.id) {
   window.viajeSeleccionadoId = window.viajeSeleccionado.id;
 }
@@ -691,6 +644,8 @@ if (typeof window.dibujarLineaTaxiPasajero === 'function') {
     mostrarViajeOperativo(data.viaje);
     await cargarPendientes();
     await cargarTaxis();
+    await cargarColaOperativa();
+
 
     mostrarMensaje('Taxi asignado correctamente');
 
@@ -704,30 +659,6 @@ if (typeof window.dibujarLineaTaxiPasajero === 'function') {
 window.asignarTaxiSeleccionado = asignarTaxiSeleccionado;
 
 
-
-/*await cargarPendientes();
-await cargarTaxis();
-mostrarViajeOperativo(viajeSeleccionado);
-const accionesViaje = document.getElementById('acciones-viaje');
-if (accionesViaje) {
-  accionesViaje.classList.remove('oculto');
-  accionesViaje.style.setProperty('display', 'block', 'important');
-}
-
-await cargarPendientes();
-await cargarTaxis();
-
-    alert('Taxi asignado correctamente.');
-
-    //await mostrarViajeEnMapa();
-
-
-  } catch (error) {
-    console.error('Error asignando taxi:', error);
-    alert('Error al asignar taxi.');
-  }
-}
-*/
 function seleccionarMejorTaxi(origen, taxis) {
 
   // SIN FILTRO (temporal)
@@ -1500,7 +1431,6 @@ window.rutaViajeOSRM = null;
     alert('Error de conexión');
   }
 }
-
 document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('btn-nuevo-pedido-test');
 
@@ -1511,47 +1441,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btn.addEventListener('click', crearPedidoTest);
 
+  cargarColaOperativa();
+
   document.addEventListener('click', (event) => {
+    const btnAsignar = event.target.closest('#btn-asignar-taxi');
 
-  if (event.target?.id !== 'btn-asignar-taxi') {
-    return;
-  }
+    if (!btnAsignar) return;
 
-  
-
-  window.asignarTaxiSeleccionado();
-});
-
-  
- /* if (btnAsignarTaxi) {
-  btnAsignarTaxi.addEventListener('click', () => {
-   
-
-    asignarTaxiSeleccionado();
-  
+    window.asignarTaxiSeleccionado();
   });
- 
-}
-*/
-
- /* if (btnAsignarTaxi) {
-  btnAsignarTaxi.addEventListener('click', () => {
-    
-
-    asignarTaxiSeleccionado();
-  
-  });
- 
-}
-*/
-
-document.addEventListener('click', (event) => {
-  const btn = event.target.closest('#btn-asignar-taxi');
-
-  if (!btn) return;
-
-  
-
-  asignarTaxiSeleccionado();
-});
 });
