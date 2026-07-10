@@ -1002,15 +1002,16 @@ console.log(resultadoCola);
     });
   }
 });
-/*
+
 router.post('/:id/aceptar', async (req, res) => {
   try {
     const { id } = req.params;
 
     const viajeResult = await pool.query(`
-      SELECT id, taxi_id
+      SELECT id, taxi_id, estado
       FROM viajes
       WHERE id = $1
+      LIMIT 1
     `, [id]);
 
     if (viajeResult.rows.length === 0) {
@@ -1020,40 +1021,49 @@ router.post('/:id/aceptar', async (req, res) => {
       });
     }
 
-    const taxi_id = viajeResult.rows[0].taxi_id;
+    const viaje = viajeResult.rows[0];
 
-   
-      taxi_id
-    });
-
-    if (!taxi_id) {
+    if (!viaje.taxi_id) {
       return res.status(400).json({
         ok: false,
         mensaje: 'El viaje no tiene taxi asignado'
       });
     }
 
-    await pool.query(`
+    if (viaje.estado !== 'asignado') {
+      return res.status(400).json({
+        ok: false,
+        mensaje: `No se puede aceptar un viaje en estado ${viaje.estado}`
+      });
+    }
+
+    const viajeUpdate = await pool.query(`
       UPDATE viajes
-      SET estado = 'en_curso',
-          fecha_hora_inicio = NOW(),
+      SET estado = 'en_camino_origen',
           fecha_actualizacion = NOW()
       WHERE id = $1
+      RETURNING *
     `, [id]);
 
     const taxiUpdate = await pool.query(`
-  UPDATE taxis
-  SET estado = 'en_camino_origen'
-      fecha_actualizacion = NOW()
-  WHERE id = $1
-  RETURNING id, codigo_movil, estado
-`, [taxi_id]);
+      UPDATE taxis
+      SET estado = 'ocupado',
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+      RETURNING id, codigo_movil, estado
+    `, [viaje.taxi_id]);
 
+    const io = req.app.get('io');
 
-    
+    if (io) {
+      io.emit('viaje-actualizado', viajeUpdate.rows[0]);
+      io.emit('taxi-actualizado', taxiUpdate.rows[0]);
+    }
 
     return res.json({
       ok: true,
+      mensaje: 'Viaje aceptado',
+      viaje: viajeUpdate.rows[0],
       taxi: taxiUpdate.rows[0]
     });
 
@@ -1062,11 +1072,12 @@ router.post('/:id/aceptar', async (req, res) => {
 
     res.status(500).json({
       ok: false,
+      mensaje: 'Error al aceptar viaje',
       error: error.message
     });
   }
 });
- */
+
 router.post('/asignar', async (req, res) => {
 
   try {
@@ -1122,6 +1133,7 @@ router.post('/asignar', async (req, res) => {
   });
 }
 });
+/*
 router.post('/:id/asignar-automatico', async (req, res) => {
   const { id } = req.params;
 
@@ -1144,6 +1156,11 @@ router.post('/:id/asignar-automatico', async (req, res) => {
         mensaje: 'El viaje no está pendiente'
       });
     }
+    try {
+  await diagnosticarAsignacionInteligente(pool, id);
+} catch (diagError) {
+  console.error('Error en diagnóstico asignación inteligente:', diagError.message);
+}
 
     const taxi = await pool.query(`
       SELECT id, codigo_movil
@@ -1216,7 +1233,67 @@ if (io) {
       error: error.message
     });
   }
-});
+}); 
+*/
+function calcularScoreOperativo({
+  distanciaKm,
+  gps,
+  ordenCola
+}) {
+  let score = 100;
+
+  score -= distanciaKm * 5;
+
+  if (gps.estado === 'demorado') {
+    score -= 10;
+  }
+
+  if (gps.estado === 'viejo' || gps.estado === 'sin_gps') {
+    score -= 100;
+  }
+
+  score -= (Number(ordenCola) - 1) * 2;
+
+  return Number(score.toFixed(1));
+}
+
+function evaluarCalidadGps(fechaHoraGps) {
+
+  if (!fechaHoraGps) {
+    return {
+      estado: 'sin_gps',
+      minutos: null,
+      participa: false
+    };
+  }
+
+  const ahora = new Date();
+  const gps = new Date(fechaHoraGps);
+
+  const minutos = (ahora - gps) / 1000 / 60;
+
+  if (minutos <= 5) {
+    return {
+      estado: 'bueno',
+      minutos: Number(minutos.toFixed(1)),
+      participa: true
+    };
+  }
+
+  if (minutos <= 15) {
+    return {
+      estado: 'demorado',
+      minutos: Number(minutos.toFixed(1)),
+      participa: true
+    };
+  }
+
+  return {
+    estado: 'viejo',
+    minutos: Number(minutos.toFixed(1)),
+    participa: false
+  };
+}
 
 function calcularDistancia(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -1228,57 +1305,418 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(lat1 * Math.PI / 180) *
     Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return R * c;
 }
 
-router.post('/:id/aceptar', async (req, res) => {
-  try {
-    const { id } = req.params;
+async function diagnosticarAsignacionInteligente(pool, viajeId) {
+  const viajeResult = await pool.query(`
+    SELECT
+      id,
+      estado,
+      origen_latitud,
+      origen_longitud
+    FROM viajes
+    WHERE id = $1
+    LIMIT 1
+  `, [viajeId]);
 
-    const result = await pool.query(
-      `
-      UPDATE viajes
-      SET
-        estado = 'en_camino_origen',
-        fecha_actualizacion = NOW()
-      WHERE id = $1
-      RETURNING *
-      `,
-      [id]
+  if (viajeResult.rows.length === 0) {
+    console.log('DIAG INTELIGENTE: viaje no encontrado');
+    return;
+  }
+
+  const viaje = viajeResult.rows[0];
+
+  const taxisResult = await pool.query(`
+    SELECT 
+      t.id,
+      t.codigo_movil,
+      t.orden_cola,
+      gl.latitud,
+      gl.longitud,
+      gl.fecha_hora_gps
+    FROM taxis t
+    LEFT JOIN LATERAL (
+      SELECT latitud, longitud, fecha_hora_gps
+      FROM gps_logs
+      WHERE taxi_id = t.id
+      ORDER BY fecha_hora_gps DESC
+      LIMIT 1
+    ) gl ON true
+    WHERE t.estado = 'disponible'
+      AND t.activo = true
+      AND t.orden_cola IS NOT NULL
+    ORDER BY t.orden_cola ASC
+  `);
+
+  const taxisConDistancia = taxisResult.rows.map((taxi) => {
+    const distanciaKm = calcularDistancia(
+      Number(taxi.latitud),
+      Number(taxi.longitud),
+      Number(viaje.origen_latitud),
+      Number(viaje.origen_longitud)
     );
 
+    const gps = evaluarCalidadGps(taxi.fecha_hora_gps);
+
+    const score = calcularScoreOperativo({
+      ordenCola: taxi.orden_cola,
+      distanciaKm,
+      gps
+    });
+
+    return {
+      ...taxi,
+      distancia_origen_km: distanciaKm,
+      gps,
+      score
+    };
+  });
+
+  console.log('==============================');
+  console.log('DIAGNÓSTICO ASIGNACIÓN INTELIGENTE');
+  console.log('Viaje:', viaje.id);
+  console.log('Estado:', viaje.estado);
+  console.log('Origen:', viaje.origen_latitud, viaje.origen_longitud);
+  console.log('Taxis disponibles por cola:');
+
+  taxisConDistancia.forEach((taxi, index) => {
+    console.log(`${index + 1}. ${taxi.codigo_movil}`, {
+      taxi_id: taxi.id,
+      orden_cola: taxi.orden_cola,
+      latitud: taxi.latitud,
+      longitud: taxi.longitud,
+      fecha_hora_gps: taxi.fecha_hora_gps,
+      distancia_origen_km: Number(taxi.distancia_origen_km.toFixed(2)),
+      gps_estado: taxi.gps.estado,
+      gps_minutos: taxi.gps.minutos,
+      participa: taxi.gps.participa,
+      score: taxi.score
+    });
+  });
+
+  if (taxisConDistancia.length === 0) {
+    console.log('No hay taxis disponibles para diagnóstico');
+    console.log('==============================');
+    return;
+  }
+
+  const taxiBase = taxisConDistancia[0];
+
+  const taxiMasCercano = taxisConDistancia.reduce((mejor, actual) => {
+    return actual.distancia_origen_km < mejor.distancia_origen_km
+      ? actual
+      : mejor;
+  }, taxiBase);
+
+  const taxisParticipantes = taxisConDistancia.filter(taxi =>
+    taxi.gps.participa === true
+  );
+
+  const hayParticipantes = taxisParticipantes.length > 0;
+
+  const taxiMejorScore = hayParticipantes
+    ? taxisParticipantes.reduce((mejor, actual) => {
+        return actual.score > mejor.score ? actual : mejor;
+      }, taxisParticipantes[0])
+    : taxiBase;
+
+  const taxiRecomendado = hayParticipantes ? taxiMejorScore : null;
+  const taxiRespaldoOperativo = taxiBase;
+
+  const diferenciaKm =
+    taxiBase.distancia_origen_km - taxiMasCercano.distancia_origen_km;
+
+  const UMBRAL_KM_ROMPER_COLA = 0.8;
+
+  const decisionActual = diferenciaKm >= UMBRAL_KM_ROMPER_COLA
+    ? taxiMasCercano
+    : taxiBase;
+
+  const motivosRecomendado = [];
+
+  if (taxiRecomendado) {
+    motivosRecomendado.push(`Mayor Score Operativo: ${taxiRecomendado.score}`);
+
+    motivosRecomendado.push(
+      `Distancia al origen: ${Number(taxiRecomendado.distancia_origen_km.toFixed(2))} km`
+    );
+
+    motivosRecomendado.push(
+      `GPS: ${taxiRecomendado.gps.estado} (${taxiRecomendado.gps.minutos} min)`
+    );
+
+    if (taxiRecomendado.id === taxiBase.id) {
+      motivosRecomendado.push('Respeta la cola operativa');
+    }
+
+    if (taxiRecomendado.id === taxiMasCercano.id) {
+      motivosRecomendado.push('Es el taxi más cercano');
+    }
+
+    if (taxiRecomendado.gps.participa) {
+      motivosRecomendado.push('GPS válido para participar');
+    } else {
+      motivosRecomendado.push('GPS no válido para participar');
+    }
+  }
+
+  console.log('Taxi base por cola:', taxiBase.codigo_movil);
+  console.log('Taxi más cercano:', taxiMasCercano.codigo_movil);
+  console.log('Taxi mejor score:', taxiMejorScore.codigo_movil);
+  console.log('Diferencia km:', Number(diferenciaKm.toFixed(2)));
+
+  console.log(
+    'Decisión sugerida:',
+    diferenciaKm >= UMBRAL_KM_ROMPER_COLA
+      ? 'ROMPER COLA por proximidad'
+      : 'RESPETAR COLA'
+  );
+
+  console.log('Decisión actual elegiría:', decisionActual.codigo_movil);
+
+  if (taxiRecomendado) {
+    console.log('Decisión por score elegiría:', taxiRecomendado.codigo_movil);
+    console.log(
+      'Coinciden:',
+      decisionActual.id === taxiRecomendado.id ? 'SI' : 'NO'
+    );
+  } else {
+    console.log('Decisión por score elegiría: SIN RECOMENDADO CONFIABLE');
+    console.log('Coinciden: NO APLICA');
+  }
+
+  console.log('');
+
+  if (taxiRecomendado) {
+    console.log('RECOMENDADO ⭐');
+    console.log('Taxi:', taxiRecomendado.codigo_movil);
+    console.log('Motivos:');
+
+    motivosRecomendado.forEach((motivo) => {
+      console.log('-', motivo);
+    });
+  } else {
+    console.log('SIN RECOMENDADO CONFIABLE ⚠️');
+    console.log('Motivo: ningún taxi tiene GPS válido');
+    console.log('Respaldo operativo:', taxiRespaldoOperativo.codigo_movil, 'por cola');
+  }
+
+  if (taxiRecomendado && decisionActual.id !== taxiRecomendado.id) {
+    console.log('');
+    console.log('⚠️ ATENCIÓN');
+    console.log('La decisión actual y el recomendado NO coinciden.');
+    console.log('Motivo probable:');
+
+    if (!taxiBase.gps.participa) {
+      console.log('- El taxi de la cola tiene GPS no válido.');
+    }
+
+    if (taxiRecomendado.score > decisionActual.score) {
+      console.log('- Existe una mejor alternativa operativa.');
+    }
+  }
+
+  console.log('==============================');
+}
+
+async function seleccionarTaxiInteligente(viajeId) {
+  const viajeResult = await pool.query(`
+    SELECT id, estado, origen_latitud, origen_longitud
+    FROM viajes
+    WHERE id = $1
+    LIMIT 1
+  `, [viajeId]);
+
+  if (viajeResult.rows.length === 0) {
+    return { ok: false, mensaje: 'Viaje no encontrado' };
+  }
+
+  const viaje = viajeResult.rows[0];
+
+  if (viaje.estado !== 'pendiente') {
+    return { ok: false, mensaje: 'El viaje no está pendiente' };
+  }
+
+  const origenLat = Number(viaje.origen_latitud);
+  const origenLng = Number(viaje.origen_longitud);
+
+  const taxisResult = await pool.query(`
+    SELECT DISTINCT ON (t.id)
+      t.id AS taxi_id,
+      t.codigo_movil,
+      t.orden_cola,
+      g.latitud,
+      g.longitud,
+      g.fecha_hora_gps
+    FROM taxis t
+    LEFT JOIN gps_logs g ON g.taxi_id = t.id
+    WHERE t.estado = 'disponible'
+      AND t.activo = true
+      AND t.orden_cola IS NOT NULL
+    ORDER BY t.id, g.fecha_hora_gps DESC NULLS LAST
+  `);
+
+  const ahora = new Date();
+
+  const taxis = taxisResult.rows
+    .map(t => {
+      const lat = Number(t.latitud);
+      const lng = Number(t.longitud);
+      const fechaGps = t.fecha_hora_gps ? new Date(t.fecha_hora_gps) : null;
+      const gpsMinutos = fechaGps ? Math.round((ahora - fechaGps) / 60000) : null;
+
+      const gpsValido =
+        Number.isFinite(lat) &&
+        Number.isFinite(lng) &&
+        gpsMinutos !== null &&
+        gpsMinutos <= 15;
+
+      const distanciaKm = gpsValido
+        ? calcularDistanciaKm(origenLat, origenLng, lat, lng)
+        : null;
+
+      return {
+        ...t,
+        gps_valido: gpsValido,
+        gps_minutos: gpsMinutos,
+        gps_calidad: gpsValido
+          ? (gpsMinutos <= 5 ? 'bueno' : 'demorado')
+          : 'viejo',
+        distancia_origen_km: distanciaKm
+      };
+    })
+    .sort((a, b) => Number(a.orden_cola) - Number(b.orden_cola));
+
+  if (taxis.length === 0) {
+    return { ok: false, mensaje: 'No hay taxis disponibles' };
+  }
+
+  const taxisValidos = taxis.filter(t => t.gps_valido);
+
+  let recomendado;
+  let motivo;
+
+  if (taxisValidos.length === 0) {
+    recomendado = taxis[0];
+    motivo = `SIN RECOMENDADO CONFIABLE. Se usa respaldo por cola: ${recomendado.codigo_movil}.`;
+  } else {
+    const primeroColaValido = taxisValidos[0];
+    const masCercano = [...taxisValidos].sort(
+      (a, b) => a.distancia_origen_km - b.distancia_origen_km
+    )[0];
+
+    const diferenciaKm =
+      primeroColaValido.distancia_origen_km - masCercano.distancia_origen_km;
+
+    if (
+      masCercano.taxi_id !== primeroColaValido.taxi_id &&
+      diferenciaKm >= 1.5
+    ) {
+      recomendado = masCercano;
+      motivo = `Se rompe cola: ${masCercano.codigo_movil} está ${diferenciaKm.toFixed(2)} km más cerca que ${primeroColaValido.codigo_movil}.`;
+    } else {
+      recomendado = primeroColaValido;
+      motivo = `Se respeta cola: ${primeroColaValido.codigo_movil} es el primer taxi con GPS válido.`;
+    }
+  }
+
+    const viajeOperativoTaxi = await pool.query(`
+    SELECT id, codigo, estado
+    FROM viajes
+    WHERE taxi_id = $1
+      AND estado IN ('asignado', 'en_camino_origen', 'en_origen', 'en_curso')
+    LIMIT 1
+  `, [recomendado.taxi_id]);
+
+  if (viajeOperativoTaxi.rows.length > 0) {
+    return {
+      ok: false,
+      mensaje: `El taxi ${recomendado.codigo_movil} ya posee un viaje operativo.`,
+      viaje_operativo: viajeOperativoTaxi.rows[0]
+    };
+  }
+
+  return {
+    ok: true,
+    taxi_id: recomendado.taxi_id,
+    codigo_movil: recomendado.codigo_movil,
+    motivo,
+    recomendado,
+    diagnostico: taxis
+  };
+}
+router.post('/:id/asignar-automatico', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const decision = await seleccionarTaxiInteligente(id);
+
+    if (!decision.ok) {
+      return res.status(400).json(decision);
+    }
+
+    const result = await pool.query(`
+      UPDATE viajes
+      SET
+        taxi_id = $1,
+        estado = 'asignado',
+        fecha_hora_asignacion = NOW(),
+        fecha_actualizacion = NOW()
+      WHERE id = $2
+        AND estado = 'pendiente'
+      RETURNING *
+    `, [decision.taxi_id, id]);
+
     if (result.rows.length === 0) {
-      return res.status(404).json({
+      return res.status(400).json({
         ok: false,
-        mensaje: 'Viaje no encontrado'
+        mensaje: 'No se pudo asignar el viaje'
       });
     }
 
-    const viaje = result.rows[0];
+    await pool.query(`
+      UPDATE taxis
+      SET
+        estado = 'ocupado',
+        fecha_actualizacion = NOW()
+      WHERE id = $1
+    `, [decision.taxi_id]);
 
-    if (viaje.taxi_id) {
-      await colaTaxis.moverTaxiAlFinal(
-        pool,
-        viaje.taxi_id,
-        'Taxi aceptó viaje'
-      );
-    }
+    req.io?.emit('viaje-actualizado', result.rows[0]);
 
-    res.json({
+    req.io?.emit('taxi-actualizado', {
+      taxi_id: decision.taxi_id,
+      estado: 'ocupado'
+    });
+
+    return res.json({
       ok: true,
-      mensaje: 'Viaje aceptado',
-      viaje
+      mensaje: `Viaje asignado automáticamente a ${decision.codigo_movil}`,
+      data: result.rows[0],
+      decision: {
+        taxi_id: decision.taxi_id,
+        codigo_movil: decision.codigo_movil,
+        motivo: decision.motivo,
+        gps_calidad: decision.recomendado.gps_calidad,
+        gps_minutos: decision.recomendado.gps_minutos,
+        distancia_origen_km: decision.recomendado.distancia_origen_km
+      },
+      diagnostico: decision.diagnostico
     });
 
   } catch (error) {
-    console.error('ERROR /viajes/:id/aceptar:', error);
-    res.status(500).json({
+    console.error('Error en asignación automática inteligente:', error);
+
+    return res.status(500).json({
       ok: false,
-      mensaje: 'Error al aceptar viaje'
+      mensaje: 'Error interno en asignación automática inteligente',
+      error: error.message
     });
   }
 });

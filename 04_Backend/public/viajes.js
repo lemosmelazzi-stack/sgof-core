@@ -681,9 +681,20 @@ window.viajeSeleccionado = viaje;
 window.viajeSeleccionadoId = viaje.id;
 viajeSeleccionadoId = viaje.id;
 
-if (viaje.taxi_id) {
-  window.taxiSeleccionadoId = viaje.taxi_id;
-  taxiSeleccionadoId = viaje.taxi_id;
+const estadosConTaxiActivo = [
+  'asignado',
+  'en_camino_origen',
+  'en_origen',
+  'en_curso'
+];
+
+if (
+  viaje.taxi_id &&
+  estadosConTaxiActivo.includes(viaje.estado)
+) {
+  window.establecerTaxiSeleccionado(viaje.taxi_id);
+} else {
+  window.limpiarTaxiSeleccionado();
 }
 
 acciones.classList.remove('oculto');
@@ -728,6 +739,14 @@ async function cargarViajePorId(id) {
   }
 }
 
+function buscarCodigoTaxi(taxiId) {
+  const taxi = (window.ultimosTaxis || []).find(t =>
+    t.taxi_id === taxiId || t.id === taxiId
+  );
+
+  return taxi?.codigo_movil || null;
+}
+
 function mostrarViajeOperativo(viaje) {
   const contenedor = document.getElementById('detalle-viaje');
   if (!contenedor) return;
@@ -747,12 +766,19 @@ function mostrarViajeOperativo(viaje) {
     return;
   }
 
-  const estado = viaje.estado || '—';
-  const codigo = viaje.codigo || 'Sin código';
-  const taxi = viaje.taxi_codigo || viaje.codigo_movil || viaje.taxi_id || 'Sin taxi';
+ const estado = viaje.estado || '—';
+const codigo = viaje.codigo || 'Sin código';
 
-  let bloqueTimer = '';
+const taxi =
+  viaje.taxi_codigo ||
+  viaje.codigo_movil ||
+  buscarCodigoTaxi(viaje.taxi_id) ||
+  'Sin taxi';
 
+let titulo = 'Viaje seleccionado';
+let bloqueTimer = '';
+let bloqueAcciones = '';
+ 
   if (estado === 'en_camino_origen' && viaje.fecha_hora_asignacion) {
     const segundosPasados = Math.floor(
       (Date.now() - new Date(viaje.fecha_hora_asignacion).getTime()) / 1000

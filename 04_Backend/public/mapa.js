@@ -1279,16 +1279,29 @@ const res = await fetch(`/viajes/${idFinalizar}/finalizar`, {
       return;
     }
 
-    window.viajeSeleccionadoId = null;
-    window.viajeSeleccionado = null;
-    window.taxiSeleccionadoId = null;
-    window.rutaActualOSRM = null;
+   window.viajeSeleccionadoId = null;
+window.viajeSeleccionado = null;
+window.taxiSeleccionadoId = null;
+window.rutaActualOSRM = null;
 
-    taxiSeleccionadoId = null;
+taxiSeleccionadoId = null;
+seguirTaxiSeleccionado = false;
 
-    document.querySelectorAll('.taxi-card.seleccionado').forEach(card => {
-    card.classList.remove('seleccionado');
-  });
+Object.values(window.marcadoresPorTaxi || {}).forEach(marker => {
+  marker._sgofSeleccionado = false;
+  marker._sgofAnimando = false;
+
+  const el = marker.getElement?.();
+
+  if (el) {
+    el.classList.remove('seleccionado');
+  }
+});
+
+document.querySelectorAll('.taxi-card.seleccionado').forEach(card => {
+  card.classList.remove('seleccionado');
+});
+
 
     if (window.lineaTaxiPasajero && window.mapa) {
       window.mapa.removeLayer(window.lineaTaxiPasajero);
@@ -1331,8 +1344,7 @@ window.rutaViajeOSRM = null;
     Object.values(window.marcadoresPorTaxi || {}).forEach(marker => {
       marker._sgofAnimando = false;
     });
-
-    if (data.taxi && window.marcadoresPorTaxi?.[data.taxi.id]) {
+ if (data.taxi && window.marcadoresPorTaxi?.[data.taxi.id]) {
   const markerTaxiFinalizado = window.marcadoresPorTaxi[data.taxi.id];
 
   markerTaxiFinalizado._sgofAnimando = false;
@@ -1341,29 +1353,33 @@ window.rutaViajeOSRM = null;
     cancelAnimationFrame(markerTaxiFinalizado._animacionMovimiento);
     markerTaxiFinalizado._animacionMovimiento = null;
   }
+
+  const taxiFinalizado = {
+    ...data.taxi,
+    taxi_id: data.taxi.id,
+    estado: 'disponible',
+    estado_operativo: 'disponible'
+  };
+
+  markerTaxiFinalizado.setIcon(iconoTaxi(taxiFinalizado));
+  markerTaxiFinalizado._sgofFirmaIcono = null;
+
+  if (markerTaxiFinalizado.getElement) {
+    const el = markerTaxiFinalizado.getElement();
+    if (el) {
+      el.classList.remove('seleccionado');
+    }
+  }
 }
 
-    if (typeof window.limpiarPanelGpsTaxi === 'function') {
-      window.limpiarPanelGpsTaxi();
-    }
+window.taxiSeleccionadoId = null;
+taxiSeleccionadoId = null;
 
-    mostrarViajeSeleccionadoEnPanel(null);
-
-    if (typeof window.actualizarBotonesPorEstado === 'function') {
-      window.actualizarBotonesPorEstado(null);
-    }
-
-    const acciones = document.getElementById('acciones-viaje');
-    if (acciones) {
-      acciones.classList.add('oculto');
-      acciones.style.display = 'none';
-    }
-   
-
-    window.history.replaceState({}, '', '/mapa');
-
-    await cargarPendientes();
 await cargarTaxis();
+
+if (typeof window.actualizarResumenOperativo === 'function') {
+  window.actualizarResumenOperativo();
+}
 
 setTimeout(() => {
   cargarTaxis();
