@@ -1694,6 +1694,7 @@ router.post('/:id/asignar-automatico', async (req, res) => {
       taxi_id: decision.taxi_id,
       estado: 'ocupado'
     });
+    req.io?.emit('cola-operativa-actualizada');
 
     return res.json({
       ok: true,

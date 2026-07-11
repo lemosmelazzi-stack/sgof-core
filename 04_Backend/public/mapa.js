@@ -388,10 +388,9 @@ socket.on('viaje-actualizado', async (viaje) => {
   await cargarViajeActivo();
 });
 
-socket.on('taxi-actualizado', async (taxi) => {
+socket.on('taxi-actualizado', async () => {
 
   await cargarTaxis();
-  await cargarColaOperativa();
 
 });
 
