@@ -697,6 +697,8 @@ if (
   window.limpiarTaxiSeleccionado();
 }
 
+await cargarTaxis();
+
 acciones.classList.remove('oculto');
 
     mostrarViajeSeleccionadoEnPanel(viaje);

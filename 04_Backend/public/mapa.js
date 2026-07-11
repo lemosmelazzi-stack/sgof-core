@@ -928,10 +928,10 @@ function mostrarViajeSeleccionadoEnPanel(viaje) {
   viaje.estado &&
   viaje.estado !== 'pendiente'
 ) {
+  
   if (viaje.taxi_id) {
-    taxiSeleccionadoId = viaje.taxi_id;
-    window.taxiSeleccionadoId = viaje.taxi_id;
-  }
+  window.establecerTaxiSeleccionado(viaje.taxi_id);
+}
 
   mostrarViajeOperativo(viaje);
 
@@ -1088,9 +1088,11 @@ async function aceptarViaje() {
       alert(data.mensaje || 'Error al aceptar viaje');
       return;
     }
-   taxiSeleccionadoId = null;
-   window.taxiSeleccionadoId = null;
+    window.limpiarTaxiSeleccionado();
 
+if (typeof window.limpiarPanelGpsTaxi === 'function') {
+  window.limpiarPanelGpsTaxi();
+}
 
     window.viajeSeleccionado = data.viaje;
     window.viajeSeleccionadoId = data.viaje.id;

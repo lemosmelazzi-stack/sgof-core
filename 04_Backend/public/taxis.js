@@ -320,26 +320,72 @@ async function fetchTaxis() {
 }
 
 function colorTaxi(taxi) {
-  const estado = taxi.estado_operativo || taxi.estado || 'desconocido';
+  const estadoTaxi =
+    taxi.estado_operativo ||
+    taxi.estado ||
+    'desconocido';
+
   const tipoGps = detectarTipoGps(taxi);
 
   const idTaxiColor = taxi.taxi_id || taxi.id;
   const idTaxiSeleccionado = window.taxiSeleccionadoId;
 
-  if (idTaxiSeleccionado && idTaxiColor === idTaxiSeleccionado) {
+  const viajeActivo = window.viajeSeleccionado;
+
+  const perteneceAlViajeActivo =
+    viajeActivo &&
+    viajeActivo.taxi_id &&
+    viajeActivo.taxi_id === idTaxiColor;
+
+  const estadoViaje = perteneceAlViajeActivo
+    ? viajeActivo.estado
+    : null;
+
+  // El estado del viaje tiene prioridad visual
+  if (estadoViaje === 'en_curso') {
+    return '#ef4444';
+  }
+
+  if (
+    estadoViaje === 'asignado' ||
+    estadoViaje === 'en_camino_origen' ||
+    estadoViaje === 'en_origen'
+  ) {
+    return '#2563eb';
+  }
+
+  // Estados propios del taxi
+  if (
+    estadoTaxi === 'ocupado' ||
+    estadoTaxi === 'en_curso'
+  ) {
+    return '#ef4444';
+  }
+
+  if (
+    estadoTaxi === 'asignado' ||
+    estadoTaxi === 'en_camino_origen' ||
+    estadoTaxi === 'en_origen'
+  ) {
+    return '#2563eb';
+  }
+
+  if (tipoGps.tipo === 'offline') {
+    return '#6b7280';
+  }
+
+  // Naranja solamente para selección manual de un taxi disponible
+  if (
+    estadoTaxi === 'disponible' &&
+    idTaxiSeleccionado &&
+    idTaxiColor === idTaxiSeleccionado
+  ) {
     return '#f59e0b';
   }
 
-  if (estado === 'ocupado') return '#ef4444';
-  if (estado === 'en_curso') return '#ef4444';
-
-  if (estado === 'asignado') return '#2563eb';
-  if (estado === 'en_camino_origen') return '#2563eb';
-  if (estado === 'en_origen') return '#2563eb';
-
-  if (tipoGps.tipo === 'offline') return '#6b7280';
-
-  if (estado === 'disponible') return '#22c55e';
+  if (estadoTaxi === 'disponible') {
+    return '#22c55e';
+  }
 
   return '#6b7280';
 }
@@ -523,24 +569,28 @@ if (!marker) {
 
   marker._sgofTipo = 'taxi';
   marker._sgofTaxiId = taxi.taxi_id;
+
   window.marcadoresPorTaxi[taxi.taxi_id] = marker;
-window.taxisMarkers[taxi.taxi_id] = marker;
+  window.taxisMarkers[taxi.taxi_id] = marker;
 
   marker.on('click', () => {
+    if (!taxiDisponibleParaAsignar(taxi)) {
+      return;
+    }
 
-  if (!taxiDisponibleParaAsignar(taxi)) {
-    return;
-  }
+    window.seleccionarTaxi(
+      taxi.taxi_id,
+      false,
+      true,
+      true
+    );
+  });
 
-  window.seleccionarTaxi(
-    taxi.taxi_id,
-    false,
-    true,
-    true
-  );
-
-});
 } else {
+
+  // Actualiza inmediatamente color, rumbo y estado visual
+  marker.setIcon(iconoTaxi(taxi));
+
   if (!marker._sgofAnimando) {
     const posActual = marker.getLatLng();
 
@@ -556,6 +606,7 @@ window.taxisMarkers[taxi.taxi_id] = marker;
     }
   }
 }
+
 
 const fechaGps = taxi.fecha_hora_gps
   ? new Date(taxi.fecha_hora_gps).toLocaleString('es-UY')
@@ -605,9 +656,24 @@ if (marker._sgofFirmaIcono !== firmaIcono) {
       if (contenedor) {
         const card = renderTaxiCard(taxi);
 
-        if (window.taxiSeleccionadoId === taxi.taxi_id) {
-          card.classList.add('seleccionado');
-        }
+      const estadosViajeOperativo = [
+  'asignado',
+  'en_camino_origen',
+  'en_origen',
+  'en_curso'
+];
+
+const taxiPerteneceAViajeActivo =
+  window.viajeSeleccionado &&
+  estadosViajeOperativo.includes(window.viajeSeleccionado.estado) &&
+  String(window.viajeSeleccionado.taxi_id) === String(taxi.taxi_id);
+
+if (
+  taxiPerteneceAViajeActivo &&
+  String(window.taxiSeleccionadoId) === String(taxi.taxi_id)
+) {
+  card.classList.add('seleccionado');
+}
 
         contenedor.appendChild(card);
         cardsPorTaxi[taxi.taxi_id] = card;
@@ -622,15 +688,27 @@ function establecerTaxiSeleccionado(taxiId) {
   taxiSeleccionadoId = taxiId || null;
   window.taxiSeleccionadoId = taxiId || null;
 }
-
 function limpiarTaxiSeleccionado() {
   taxiSeleccionadoId = null;
   window.taxiSeleccionadoId = null;
   seguirTaxiSeleccionado = false;
-}
 
-window.establecerTaxiSeleccionado = establecerTaxiSeleccionado;
-window.limpiarTaxiSeleccionado = limpiarTaxiSeleccionado;
+  Object.values(cardsPorTaxi || {}).forEach(card => {
+    card.classList.remove('seleccionado');
+  });
+
+  document.querySelectorAll('.taxi-card.seleccionado').forEach(card => {
+    card.classList.remove('seleccionado');
+  });
+
+  if (typeof limpiarPanelGpsTaxi === 'function') {
+    limpiarPanelGpsTaxi();
+  }
+
+  Object.values(window.marcadoresPorTaxi || {}).forEach(marker => {
+    marker._sgofFirmaIcono = null;
+  });
+}
 
 function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarCard = true) {
   seguirTaxiSeleccionado = true;
@@ -1003,6 +1081,8 @@ function limpiarPanelGpsTaxi() {
   if (panel) {
     panel.style.display = 'none';
   }
+window.limpiarPanelGpsTaxi = limpiarPanelGpsTaxi;
+
 }
 
 
