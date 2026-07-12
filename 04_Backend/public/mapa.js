@@ -382,14 +382,24 @@ socket.on('viaje-creado', async (viaje) => {
   
   await cargarPendientes();
 });
-
 socket.on('viaje-actualizado', async (viaje) => {
-    await cargarPendientes();
+  const estado = viaje?.estado;
+
+  if (
+    estado === 'en_camino_origen' ||
+    estado === 'en_origen' ||
+    estado === 'en_curso' ||
+    estado === 'finalizado'
+  ) {
+    await cargarViajeActivo();
+    return;
+  }
+
+  await cargarPendientes();
   await cargarViajeActivo();
 });
 
 socket.on('taxi-actualizado', async () => {
-
   await cargarTaxis();
 
 });

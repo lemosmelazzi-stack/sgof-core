@@ -362,6 +362,7 @@ const resultTaxi = await pool.query(`
 router.put('/:id/desasignar-taxi', async (req, res) => {
   const { id } = req.params;
 
+  
   try {
     const viajeExiste = await pool.query(
       'SELECT id, estado, taxi_id FROM viajes WHERE id = $1',

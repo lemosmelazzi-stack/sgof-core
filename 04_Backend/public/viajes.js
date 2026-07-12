@@ -237,9 +237,6 @@ if (typeof window.actualizarResumenOperativo === 'function') {
   window.actualizarResumenOperativo();
 }
 
-window.totalViajesAsignados = 0;
-window.totalViajesEnCurso = 0;
-
 if (pendientes.length === 0) {
   lista.innerHTML = '<p>No hay pendientes</p>';
 
@@ -696,8 +693,6 @@ if (
 } else {
   window.limpiarTaxiSeleccionado();
 }
-
-await cargarTaxis();
 
 acciones.classList.remove('oculto');
 

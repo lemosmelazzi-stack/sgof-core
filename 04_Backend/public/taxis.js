@@ -268,15 +268,14 @@ async function dibujarRutaViajeEnCurso(viaje) {
  // const marker = window.marcadoresPorTaxi[viaje.taxi_id];
  // marker.setLatLng([origenLat, origenLng]);
 //}
+const resultado = await calcularETAEntrePuntos(
+  L.latLng(origenLat, origenLng),
+  L.latLng(destinoLat, destinoLng)
+);
 
-  const resultado = await calcularETAEntrePuntos(
-    L.latLng(origenLat, origenLng),
-    L.latLng(destinoLat, destinoLng)
-  );
+if (!resultado || !Array.isArray(resultado.coords)) return;
 
-  if (!resultado || !Array.isArray(resultado.coords)) return;
-
-  if (window.lineaTaxiPasajero && window.mapa) {
+if (window.lineaTaxiPasajero && window.mapa) {
   window.mapa.removeLayer(window.lineaTaxiPasajero);
   window.lineaTaxiPasajero = null;
 }
@@ -285,21 +284,20 @@ if (window.rutaActualOSRM) {
   window.rutaActualOSRM = null;
 }
 
-  window.rutaViajeOSRM = resultado.coords;
+window.rutaViajeOSRM = resultado.coords;
 
-  if (window.lineaRutaViaje) {
-    window.mapa.removeLayer(window.lineaRutaViaje);
-    window.lineaRutaViaje = null;
-  }
- 
+if (window.lineaRutaViaje) {
+  window.mapa.removeLayer(window.lineaRutaViaje);
+  window.lineaRutaViaje = null;
+}
+
 window.lineaRutaViaje = L.polyline(resultado.coords, {
   color: '#0ea5e9',
   weight: 6,
   opacity: 0.85
 }).addTo(window.mapa);
 
-  window.lineaRutaViaje.bringToFront();
-
+window.lineaRutaViaje.bringToFront();
   //window.mapa.fitBounds(
     //window.lineaRutaViaje.getBounds(),
     //{ padding: [40, 40] }

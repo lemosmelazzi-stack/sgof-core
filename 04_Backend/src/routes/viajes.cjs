@@ -643,14 +643,19 @@ if (
   RETURNING id, codigo_movil, estado
 `, [viaje.taxi_id]);
 
-   
+   const io = req.app.get('io');
+
+if (io) {
+  io.emit('viaje-actualizado', resultViaje.rows[0]);
+  io.emit('taxi-actualizado', resultTaxi.rows[0]);
+}
   
     res.json({
-      ok: true,
-      mensaje: 'Viaje iniciado correctamente',
-      viaje: resultViaje.rows[0],
-      taxi: resultTaxi.rows[0]
-    });
+  ok: true,
+  mensaje: 'Viaje iniciado correctamente',
+  viaje: resultViaje.rows[0],
+  taxi: resultTaxi.rows[0]
+});
 
   } catch (error) {
     console.error('Error en POST /viajes/:id/iniciar:', error);
@@ -1680,6 +1685,8 @@ router.post('/:id/asignar-automatico', async (req, res) => {
       });
     }
 
+ 
+
     await pool.query(`
       UPDATE taxis
       SET
@@ -1745,11 +1752,19 @@ router.put('/:id/en-origen', async (req, res) => {
       });
     }
 
-    res.json({
-      ok: true,
-      mensaje: 'Taxi en origen',
-      viaje: result.rows[0]
-    });
+
+const io = req.app.get('io');
+
+if (io) {
+  io.emit('viaje-actualizado', result.rows[0]);
+}
+
+res.json({
+  ok: true,
+  mensaje: 'Taxi en origen',
+  viaje: result.rows[0]
+});
+
 
   } catch (error) {
     console.error('ERROR /viajes/:id/en-origen:', error);
