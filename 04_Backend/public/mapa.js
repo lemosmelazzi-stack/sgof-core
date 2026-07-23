@@ -7,7 +7,6 @@ window.rutaViajeOSRM = null;
 window.lineaRutaViaje = null;
 // Mantener ambos sincronizados por compatibilidad.
 window.marcadoresPorTaxi = window.marcadoresPorTaxi || {};
-window.taxisMarkers = window.taxisMarkers || {};
 window.lineaTaxiPasajero = lineaTaxiPasajero;
 let taxisState = new Map();
 let cardsPorTaxi = {};
@@ -83,8 +82,7 @@ function moverTaxiPorRutaOSRM(taxiId, ruta, intervalo = 300) {
   if (!taxiId || !Array.isArray(ruta) || ruta.length === 0) return;
 
   const marker =
-    window.marcadoresPorTaxi?.[taxiId] ||
-    window.taxisMarkers?.[taxiId];
+  window.marcadoresPorTaxi?.[taxiId];
 
   if (!marker) {
     console.warn('No existe marker para mover taxi:', taxiId);
@@ -415,8 +413,7 @@ socket.on('taxi_posicion', (data) => {
   const nuevaLng = Number(data.lng ?? data.longitud);
 
   const marker =
-    window.marcadoresPorTaxi?.[taxiId] ||
-    window.taxisMarkers?.[taxiId];
+  window.marcadoresPorTaxi?.[taxiId];
 
   if (!taxiId || !marker) {
     return;

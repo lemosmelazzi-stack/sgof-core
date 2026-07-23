@@ -510,12 +510,10 @@ async function cargarTaxis() {
       return;
     }
 
-    // Ambos diccionarios apuntan a los mismos markers.
-    // Se mantienen por compatibilidad entre mapa.js y taxis.js.
-    window.marcadoresPorTaxi = window.marcadoresPorTaxi || {};
-    window.taxisMarkers = window.taxisMarkers || {};
-    window.posicionesTaxiSimuladas = window.posicionesTaxiSimuladas || {};
-
+    
+   window.marcadoresPorTaxi = window.marcadoresPorTaxi || {};
+   window.posicionesTaxiSimuladas = window.posicionesTaxiSimuladas || {};
+        
     const contenedor = document.getElementById('taxis');
 
 if (contenedor) {
@@ -548,8 +546,7 @@ const lng = tieneGPS
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
 let marker =
-  window.marcadoresPorTaxi[taxi.taxi_id] ||
-  window.taxisMarkers[taxi.taxi_id];
+  window.marcadoresPorTaxi[taxi.taxi_id];
 
  if (marker && marker._sgofTaxiId && marker._sgofTaxiId !== taxi.taxi_id) {
   console.warn('Marcador cruzado detectado. Se elimina:', {
@@ -596,8 +593,7 @@ if (!marker) {
   marker._sgofTaxiId = taxi.taxi_id;
 
   window.marcadoresPorTaxi[taxi.taxi_id] = marker;
-  window.taxisMarkers[taxi.taxi_id] = marker;
-
+  
   marker.on('click', () => {
     if (!taxiDisponibleParaAsignar(taxi)) {
       return;
@@ -619,8 +615,6 @@ if (!marker) {
   if (!marker._sgofAnimando) {
     const posActual = marker.getLatLng();
 
-    window.marcadoresPorTaxi[taxi.taxi_id] = marker;
-    window.taxisMarkers[taxi.taxi_id] = marker;
 
     const mismaPosicion =
       Math.abs(posActual.lat - latFinal) < 0.000001 &&
@@ -676,7 +670,7 @@ if (marker._sgofFirmaIcono !== firmaIcono) {
   marker._sgofFirmaIcono = firmaIcono;
 }
 
-      window.taxisMarkers[taxi.taxi_id] = marker;
+      
       window.marcadoresPorTaxi[taxi.taxi_id] = marker;
 
       if (contenedor) {
