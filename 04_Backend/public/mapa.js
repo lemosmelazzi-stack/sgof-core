@@ -2,7 +2,6 @@ let marcadorViaje = null;
 let mapaAjustado = false;
 let taxiSeleccionadoId = null;
 let seguirTaxiSeleccionado = true;
-let viajeSeleccionadoId = null;
 let lineaTaxiPasajero = null;
 window.rutaViajeOSRM = null;
 window.lineaRutaViaje = null;
@@ -126,15 +125,15 @@ if (usarGpsReal && tieneGpsReal) {
       window.posicionesTaxiSimuladas[taxiId] = {
         lat: latFinal,
         lng: lngFinal
-      };   
+      };
       return;
     }
 
     const [lat1, lng1] = ruta[i];
     const [lat2, lng2] = ruta[i + 1];
-    
+
     const rumbo = calcularRumboEntrePuntos(lat1, lng1, lat2, lng2);
-     
+
     marker._rumbo_grados = rumbo;
 
     marker.setIcon(iconoTaxi({
@@ -175,7 +174,7 @@ if (usarGpsReal && tieneGpsReal) {
 
 window.moverTaxiPorRutaOSRM = moverTaxiPorRutaOSRM;
 
-function calcularDistanciaKm(coords) {
+function animar(now) {
   let total = 0;
 
   for (let i = 1; i < coords.length; i++) {
@@ -315,7 +314,7 @@ for (let i = 1; i < data.puntos.length; i++) {
 
 window.tiempoMovimientoGps =
   Math.round(segundosMovimiento / 60);
- 
+
 const inicioMovimiento = new Date(
   data.puntos[0].fecha_hora_gps
 );
@@ -352,7 +351,7 @@ if (typeof cargarTaxis === 'function') {
 }
 
 document.getElementById('acciones-viaje')
-  .classList.add('oculto');  
+  .classList.add('oculto');
 
 
 
@@ -379,9 +378,10 @@ var marcadoresPendientes = window.marcadoresPendientes;
 
 const socket = io();
 socket.on('viaje-creado', async (viaje) => {
-  
+
   await cargarPendientes();
 });
+
 socket.on('viaje-actualizado', async (viaje) => {
   const estado = viaje?.estado;
 
@@ -411,14 +411,16 @@ socket.on('cola-operativa-actualizada', async () => {
 socket.on('taxi_posicion', (data) => {
   const taxiId = data.taxiId || data.taxi_id;
 
-  const marker =
-    window.taxisMarkers?.[taxiId] ||
-    window.marcadoresPorTaxi?.[taxiId];
-
-  if (!marker) return;
-
   const nuevaLat = Number(data.lat ?? data.latitud);
   const nuevaLng = Number(data.lng ?? data.longitud);
+
+  const marker =
+    window.marcadoresPorTaxi?.[taxiId] ||
+    window.taxisMarkers?.[taxiId];
+
+  if (!taxiId || !marker) {
+    return;
+  }
 
   if (!Number.isFinite(nuevaLat) || !Number.isFinite(nuevaLng)) return;
 
@@ -504,7 +506,7 @@ async function cargarColaOperativa() {
 
     const res = await fetch('/taxis/cola');
     const data = await res.json();
-    
+
     if (!data.ok || !Array.isArray(data.data)) {
       contenedor.innerHTML = 'No se pudo cargar la cola.';
       return;
@@ -540,7 +542,7 @@ async function cargarColaOperativa() {
         </div>
       `).join('')}
     `;
-    
+
       } catch (error) {
     const contenedor = document.getElementById('cola-operativa-contenido');
 
@@ -595,8 +597,6 @@ if (accionesViaje) {
    window.viajeSeleccionadoId = viaje.id;
 window.viajeSeleccionado = viaje;
 
-viajeSeleccionadoId = viaje.id;
-
 mostrarViajeSeleccionadoEnPanel(viaje);
 centrarMapa(viaje);
 
@@ -607,7 +607,8 @@ centrarMapa(viaje);
 }
 
 async function asignarTaxiSeleccionado() {
- 
+ console.log('ASIGNAR EJECUTADO DESDE mapa.js');
+
 if (!window.viajeSeleccionadoId && window.viajeSeleccionado?.id) {
   window.viajeSeleccionadoId = window.viajeSeleccionado.id;
 }
@@ -652,9 +653,6 @@ if (typeof window.dibujarLineaTaxiPasajero === 'function') {
 
     mostrarViajeOperativo(data.viaje);
     await cargarPendientes();
-    await cargarTaxis();
-    await cargarColaOperativa();
-
 
     mostrarMensaje('Taxi asignado correctamente');
 
@@ -701,7 +699,7 @@ disponibles.forEach(taxi => {
   }
 });
 
- 
+
 
   return mejorTaxi;
 }
@@ -709,13 +707,13 @@ disponibles.forEach(taxi => {
 window.seleccionarMejorTaxi = seleccionarMejorTaxi;
 
 async function asignacionAutomaticaPorCola() {
-  if (!viajeSeleccionadoId) {
+  if (!window.viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
     return;
   }
- 
+
   try {
-   const res = await fetch(`/viajes/${viajeSeleccionadoId}/asignar-automatico`, {
+   const res = await fetch(`/viajes/${window.viajeSeleccionadoId}/asignar-automatico`, {
   method: 'POST'
 });
 
@@ -728,9 +726,9 @@ async function asignacionAutomaticaPorCola() {
 
     alert(data.mensaje || 'Taxi inteligente asignado');
 
-await cargarViajePorId(viajeSeleccionadoId);
+await cargarViajePorId(window.viajeSeleccionadoId);
 await cargarPendientes();
-await cargarTaxis();
+
 
   } catch (error) {
     console.error(error);
@@ -809,45 +807,6 @@ function calcularAngulo(lat1, lng1, lat2, lng2) {
   return anguloDeg + 90;
 }
 
-async function marcarEnOrigen() {
-  if (!viajeSeleccionadoId) {
-    alert('Seleccioná un viaje primero');
-    return;
-  }
-
-  try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/en-origen`, {
-      method: 'PUT'
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      alert('Error al actualizar estado');
-      return;
-    }
-
-    window.viajeSeleccionado = data.viaje;
-window.viajeSeleccionadoId = data.viaje.id;
-viajeSeleccionadoId = data.viaje.id;
-
-mostrarViajeOperativo(data.viaje);
-
-if (typeof window.actualizarBotonesPorEstado === 'function') {
-  window.actualizarBotonesPorEstado(data.viaje);
-}
-
-await cargarPendientes();
-await cargarTaxis();
-
-    await mostrarViajeEnMapa();
-await cargarTaxis();
-
-  } catch (error) {
-    console.error(error);
-    alert('Error de conexión');
-  }
-}
 function crearIconoTaxi(angulo = 0, color = '#22c55e') {
 
   return L.divIcon({
@@ -937,7 +896,7 @@ function mostrarViajeSeleccionadoEnPanel(viaje) {
   viaje.estado &&
   viaje.estado !== 'pendiente'
 ) {
-  
+
   if (viaje.taxi_id) {
   window.establecerTaxiSeleccionado(viaje.taxi_id);
 }
@@ -968,9 +927,6 @@ window.viajeSeleccionadoId = null;
 
     return;
   }
-
-  viajeSeleccionadoId = viaje.id;
-  
 
   window.viajeSeleccionadoId = viaje.id;
   window.viajeSeleccionado = viaje;
@@ -1036,7 +992,7 @@ marcadorViaje = L.marker([lat, lng])
   .openPopup();
   marcadorViaje._sgofTipo = 'pasajero';
 }
-    
+
 const btnAsignarTaxi = document.getElementById('btn-asignar-taxi');
 const btnEnOrigen = document.getElementById('btn-en-origen');
 const btnIniciarViaje = document.getElementById('btn-iniciar-viaje');
@@ -1059,405 +1015,34 @@ if (btnAsignarAutoCola) {
 
 
 if (btnEnOrigen) {
-  btnEnOrigen.onclick = marcarEnOrigen;
+  btnEnOrigen.onclick = () => window.marcarEnOrigen();
 }
 
 if (btnIniciarViaje) {
-  btnIniciarViaje.onclick = iniciarViaje;
+  btnIniciarViaje.onclick = () => window.iniciarViaje();
 }
 
 if (btnFinalizarViaje) {
-  btnFinalizarViaje.onclick = finalizarViaje;
+  btnFinalizarViaje.onclick = () => window.finalizarViaje();
 }
 
 if (btnAceptarViaje) {
-  btnAceptarViaje.onclick = aceptarViaje;
+btnAceptarViaje.onclick = () => window.aceptarViaje();
 }
 
 if (btnRechazarViaje) {
-  btnRechazarViaje.onclick = rechazarViaje;
+  btnRechazarViaje.onclick = () => window.rechazarViaje();
 }
 
-async function aceptarViaje() {
-  
-
-  if (!viajeSeleccionadoId) {
-    alert('Seleccioná un viaje primero');
-    return;
-  }
-
-  try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/aceptar`, {
-      method: 'POST'
-    });
-
-    const data = await res.json();
-    
-    if (!data.ok) {
-      alert(data.mensaje || 'Error al aceptar viaje');
-      return;
-    }
-    window.limpiarTaxiSeleccionado();
-
-if (typeof window.limpiarPanelGpsTaxi === 'function') {
-  window.limpiarPanelGpsTaxi();
-}
-
-    window.viajeSeleccionado = data.viaje;
-    window.viajeSeleccionadoId = data.viaje.id;
-
-    mostrarViajeOperativo(data.viaje);
-
-    await cargarPendientes();
-    await cargarTaxis();
-
-    mostrarMensaje('Viaje aceptado');
-
-  } catch (error) {
-    console.error('ERROR ACEPTAR VIAJE:', error);
-    alert('Error de conexión al aceptar viaje');
-  }
-}
-async function rechazarViaje() {
-  if (!viajeSeleccionadoId) {
-    alert('Seleccioná un viaje primero');
-    return;
-  }
-
-  try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/rechazar`, {
-      method: 'POST'
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      alert(data.mensaje || 'Error al rechazar viaje');
-      return;
-    }
-    window.rutaActualOSRM = null;
-
-if (window.lineaTaxiPasajero && window.mapa) {
-  window.mapa.removeLayer(window.lineaTaxiPasajero);
-  window.lineaTaxiPasajero = null;
-}
-
-if (window.lineaRutaViaje && window.mapa) {
-  window.mapa.removeLayer(window.lineaRutaViaje);
-  window.lineaRutaViaje = null;
-}
-
-if (window.rutaTaxiPasajero && window.mapa) {
-  window.mapa.removeLayer(window.rutaTaxiPasajero);
-  window.rutaTaxiPasajero = null;
-}
-
-   await cargarPendientes();
-await cargarTaxis();
-
-await cargarViajePorId(viajeSeleccionadoId);
-
-    if (window.viajeSeleccionado?.taxi_id) {
-      taxiSeleccionadoId = window.viajeSeleccionado.taxi_id;
-      window.taxiSeleccionadoId = window.viajeSeleccionado.taxi_id;
-
-      if (typeof dibujarRutaTaxiAsignado === 'function') {
-  await dibujarRutaTaxiAsignado(window.viajeSeleccionado);
-}      
-    }
-
-    mostrarMensaje(data.mensaje || 'Viaje rechazado y reasignado');
-
-  } catch (error) {
-    console.error('ERROR RECHAZAR VIAJE:', error);
-    alert('Error de conexión al rechazar viaje');
-  }
-}
 
 // ==========================
 // INICIAR VIAJE
 
 let iniciandoViaje = false;
 
-async function iniciarViaje() {
-  if (iniciandoViaje) return;
-  iniciandoViaje = true;
-
-  if (!viajeSeleccionadoId) {
-    alert('Seleccioná un viaje primero');
-    iniciandoViaje = false;
-    return;
-  }
-
-  try {
-    const res = await fetch(`/viajes/${viajeSeleccionadoId}/iniciar`, {
-      method: 'POST'
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      if (data.mensaje && data.mensaje.includes('estado en_curso')) {
-        await cargarViajeActivo();
-        await cargarTaxis();
-
-        if (typeof window.dibujarRutaViajeEnCurso === 'function') {
-          await window.dibujarRutaViajeEnCurso(window.viajeSeleccionado);
-        }
-
-        iniciandoViaje = false;
-        return;
-      }
-
-      alert(data.mensaje || 'Error al iniciar viaje');
-      iniciandoViaje = false;
-      return;
-    }
-
-    dibujarPendientesEnMapa([]);
-
-    if (window.lineaTaxiPasajero && window.mapa) {
-      window.mapa.removeLayer(window.lineaTaxiPasajero);
-      window.lineaTaxiPasajero = null;
-    }
-
-    if (window.rutaTaxiPasajero && window.mapa) {
-      window.mapa.removeLayer(window.rutaTaxiPasajero);
-      window.rutaTaxiPasajero = null;
-    }
-
-    if (window.lineaRutaViaje && window.mapa) {
-      window.mapa.removeLayer(window.lineaRutaViaje);
-      window.lineaRutaViaje = null;
-    }
-
-    window.rutaActualOSRM = null;
-
-    if (window.marcadorViaje && window.mapa) {
-  window.mapa.removeLayer(window.marcadorViaje);
-  window.marcadorViaje = null;
-}
-
-if (typeof marcadorViaje !== 'undefined') {
-  marcadorViaje = null;
-}
-
-    if (typeof window.dibujarRutaViajeEnCurso === 'function') {
-      await window.dibujarRutaViajeEnCurso(
-        data.viaje || window.viajeSeleccionado
-      );
-    }
-
-    await cargarViajeActivo();
-    await cargarTaxis();
-
-    if (typeof window.actualizarBotonesPorEstado === 'function') {
-      window.actualizarBotonesPorEstado(data.viaje);
-    }
-
-    alert('Viaje iniciado');
-
-  } catch (error) {
-    console.error(error);
-    alert('Error de conexión');
-
-  } finally {
-    iniciandoViaje = false;
-  }
-}
 
 // ==========================
-//
-async function finalizarViaje() {
-  if (!window.viajeSeleccionadoId) {
-    alert('Seleccioná un viaje primero');
-    return;
-  }
 
-  try {
-
-const idFinalizar = window.viajeSeleccionadoId;
-
-const res = await fetch(`/viajes/${idFinalizar}/finalizar`, {
-  method: 'POST'
-});
-
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      alert(data.mensaje || 'Error al finalizar viaje');
-      return;
-    }
-
-   window.viajeSeleccionadoId = null;
-window.viajeSeleccionado = null;
-window.taxiSeleccionadoId = null;
-window.rutaActualOSRM = null;
-
-taxiSeleccionadoId = null;
-seguirTaxiSeleccionado = false;
-
-Object.values(window.marcadoresPorTaxi || {}).forEach(marker => {
-  marker._sgofSeleccionado = false;
-  marker._sgofAnimando = false;
-
-  const el = marker.getElement?.();
-
-  if (el) {
-    el.classList.remove('seleccionado');
-  }
-});
-
-document.querySelectorAll('.taxi-card.seleccionado').forEach(card => {
-  card.classList.remove('seleccionado');
-});
-
-
-    if (window.lineaTaxiPasajero && window.mapa) {
-      window.mapa.removeLayer(window.lineaTaxiPasajero);
-      window.lineaTaxiPasajero = null;
-    }
-
-    if (window.lineaRutaViaje && window.mapa) {
-  window.mapa.removeLayer(window.lineaRutaViaje);
-  window.lineaRutaViaje = null;
-}
-
-window.rutaViajeOSRM = null;
-
-    if (window.rutaTaxiPasajero && window.mapa) {
-      window.mapa.removeLayer(window.rutaTaxiPasajero);
-      window.rutaTaxiPasajero = null;
-    }
-
-    if (window.mapa) {
-  window.mapa.closePopup();
-}
-
-    if (window.lineaHistorialGps && window.mapa) {
-      window.mapa.removeLayer(window.lineaHistorialGps);
-      window.lineaHistorialGps = null;
-    }
-
-    if (window.markerOrigen && window.mapa) {
-      window.mapa.removeLayer(window.markerOrigen);
-      window.markerOrigen = null;
-    }
-
-    if (window.markersViajes && window.mapa) {
-      window.markersViajes.forEach(marker => {
-        window.mapa.removeLayer(marker);
-      });
-      window.markersViajes = [];
-    }
-
-    Object.values(window.marcadoresPorTaxi || {}).forEach(marker => {
-      marker._sgofAnimando = false;
-    });
- if (data.taxi && window.marcadoresPorTaxi?.[data.taxi.id]) {
-  const markerTaxiFinalizado = window.marcadoresPorTaxi[data.taxi.id];
-
-  markerTaxiFinalizado._sgofAnimando = false;
-
-  if (markerTaxiFinalizado._animacionMovimiento) {
-    cancelAnimationFrame(markerTaxiFinalizado._animacionMovimiento);
-    markerTaxiFinalizado._animacionMovimiento = null;
-  }
-
-  const taxiFinalizado = {
-    ...data.taxi,
-    taxi_id: data.taxi.id,
-    estado: 'disponible',
-    estado_operativo: 'disponible'
-  };
-
-  markerTaxiFinalizado.setIcon(iconoTaxi(taxiFinalizado));
-  markerTaxiFinalizado._sgofFirmaIcono = null;
-
-  if (markerTaxiFinalizado.getElement) {
-    const el = markerTaxiFinalizado.getElement();
-    if (el) {
-      el.classList.remove('seleccionado');
-    }
-  }
-}
-
-window.taxiSeleccionadoId = null;
-taxiSeleccionadoId = null;
-
-await cargarTaxis();
-
-if (typeof window.actualizarResumenOperativo === 'function') {
-  window.actualizarResumenOperativo();
-}
-
-setTimeout(() => {
-  cargarTaxis();
-}, 500);
-
-   mostrarViajeSeleccionadoEnPanel(null);
-
-   if (typeof window.actualizarBotonesPorEstado === 'function') {
-   window.actualizarBotonesPorEstado(null);
-}
-if (Array.isArray(window.marcadoresPendientes) && window.mapa) {
-  window.marcadoresPendientes.forEach(marker => {
-    window.mapa.removeLayer(marker);
-  });
-
-  window.marcadoresPendientes = [];
-  marcadoresPendientes = window.marcadoresPendientes;
-}
-
-if (window.mapa) {
-  window.mapa.eachLayer(layer => {
-
-    if (
-      layer._sgofTipo === 'pendiente' ||
-      layer._sgofTipo === 'pasajero'
-    ) {
-      window.mapa.removeLayer(layer);
-    }
-
-  });
-}
-
-
- dibujarPendientesEnMapa([]);
-  marcadorViaje = null;
-  window.marcadorViaje = null;
-
-   if (window.mapa) {
-   window.mapa.closePopup();
-   window.mapa.setView([-34.8879, -56.1403], 13);
-}
-
-   alert('Viaje finalizado');
-
-   if (window.lineaTaxiPasajero && window.mapa) {
-  window.mapa.removeLayer(window.lineaTaxiPasajero);
-  window.lineaTaxiPasajero = null;
-}
-
-if (window.lineaRutaViaje && window.mapa) {
-  window.mapa.removeLayer(window.lineaRutaViaje);
-  window.lineaRutaViaje = null;
-}
-
-if (window.rutaTaxiPasajero && window.mapa) {
-  window.mapa.removeLayer(window.rutaTaxiPasajero);
-  window.rutaTaxiPasajero = null;
-}
-
-window.rutaActualOSRM = null;
-window.rutaViajeOSRM = null;
-  
-  } catch (error) {
-    console.error(error);
-    alert('Error de conexión');
-  }
-}
 document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('btn-nuevo-pedido-test');
 
@@ -1470,11 +1055,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   cargarColaOperativa();
 
-  document.addEventListener('click', (event) => {
-    const btnAsignar = event.target.closest('#btn-asignar-taxi');
-
-    if (!btnAsignar) return;
-
-    window.asignarTaxiSeleccionado();
-  });
 });

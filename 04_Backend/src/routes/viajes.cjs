@@ -126,7 +126,6 @@ async function queryConReintento(pool, sql, params = [], intentos = 2) {
   }
 }
 
-
 router.get('/resumen', async (req, res) => {
   try {
     const { desde, hasta, estado } = req.query;

@@ -163,7 +163,19 @@ window.encontrarMejorTaxiParaViaje = encontrarMejorTaxiParaViaje;
 async function dibujarRutaTaxiAsignado(viaje) {
   if (!viaje || !viaje.taxi_id || !marcadorViaje) return;
 
+
+
+  if (!viaje || !viaje.taxi_id || !marcadorViaje) return;
+
+  const taxiIdRutaSolicitada = String(viaje.taxi_id);
+
+  window.solicitudRutaTaxiAsignado =
+    (window.solicitudRutaTaxiAsignado || 0) + 1;
+
+  const solicitudActual = window.solicitudRutaTaxiAsignado;
   // Solo dibujar la ruta de asignación antes de iniciar el viaje
+
+
   if (
     viaje.estado !== 'asignado' &&
     viaje.estado !== 'en_camino_origen' &&
@@ -174,56 +186,67 @@ async function dibujarRutaTaxiAsignado(viaje) {
       window.lineaTaxiPasajero = null;
     }
 
-    if (window.rutaTaxiPasajero && window.mapa) {
-      window.mapa.removeLayer(window.rutaTaxiPasajero);
-      window.rutaTaxiPasajero = null;
-    }
-
     return;
   }
 
   const markerTaxi =
     window.marcadoresPorTaxi?.[viaje.taxi_id];
 
-  if (!markerTaxi) return;
+    const taxiRuta = window.ultimosTaxis?.find(
+  taxi => String(taxi.taxi_id) === String(viaje.taxi_id)
+);
 
-  const posTaxi = markerTaxi.getLatLng();
-  const posViaje = marcadorViaje.getLatLng();
 
-  const resultado = await calcularETAEntrePuntos(
-    posTaxi,
-    posViaje
+if (!markerTaxi) return;
+
+const posTaxi = markerTaxi.getLatLng();
+const posViaje = marcadorViaje.getLatLng();
+
+const resultado = await calcularETAEntrePuntos(
+  posTaxi,
+  posViaje
+);
+
+if (
+  solicitudActual !== window.solicitudRutaTaxiAsignado ||
+  String(window.viajeSeleccionado?.taxi_id) !== taxiIdRutaSolicitada
+) {
+  console.log(
+    'Ruta descartada porque el taxi asignado cambió:',
+    taxiIdRutaSolicitada
   );
+  return;
+}
 
-  if (!resultado || !Array.isArray(resultado.coords)) return;
+if (!resultado || !Array.isArray(resultado.coords)) return;
 
-  const coordsRutaTaxi = [
-    [posTaxi.lat, posTaxi.lng],
-    ...resultado.coords,
-    [posViaje.lat, posViaje.lng]
-  ];
+const coordsRutaTaxi = [
+  [posTaxi.lat, posTaxi.lng],
+  ...resultado.coords,
+  [posViaje.lat, posViaje.lng]
+];
 
-  window.distanciaActualOSRM = resultado.distanciaKm;
-  window.etaActualOSRM = resultado.etaMin;
-  window.rutaActualOSRM = coordsRutaTaxi;
+window.distanciaActualOSRM = resultado.distanciaKm;
+window.etaActualOSRM = resultado.etaMin;
+window.rutaActualOSRM = coordsRutaTaxi;
 
-  if (window.lineaTaxiPasajero && window.mapa) {
-    window.mapa.removeLayer(window.lineaTaxiPasajero);
-    window.lineaTaxiPasajero = null;
-  }
+if (window.lineaTaxiPasajero && window.mapa) {
+  window.mapa.removeLayer(window.lineaTaxiPasajero);
+  window.lineaTaxiPasajero = null;
+}
 
-  if (window.lineaRutaViaje && window.mapa) {
-    window.mapa.removeLayer(window.lineaRutaViaje);
-    window.lineaRutaViaje = null;
-  }
+if (window.lineaRutaViaje && window.mapa) {
+  window.mapa.removeLayer(window.lineaRutaViaje);
+  window.lineaRutaViaje = null;
+}
 
-  window.rutaViajeOSRM = null;
+window.rutaViajeOSRM = null;
 
-  window.lineaTaxiPasajero = L.polyline(coordsRutaTaxi, {
-    color: '#2563eb',
-    weight: 5,
-    opacity: 0.9
-  }).addTo(window.mapa);
+window.lineaTaxiPasajero = L.polyline(coordsRutaTaxi, {
+  color: '#2563eb',
+  weight: 5,
+  opacity: 0.9
+}).addTo(window.mapa);
 
   window.lineaTaxiPasajero.bringToFront();
 
@@ -245,7 +268,13 @@ window.dibujarRutaTaxiAsignado =
 async function dibujarRutaViajeEnCurso(viaje) {
   if (!viaje || !window.mapa) return;
 
-  if (viaje.estado !== 'en_curso') {
+ if (viaje.estado !== 'en_curso') {
+  if (window.lineaRutaViaje) {
+    window.mapa.removeLayer(window.lineaRutaViaje);
+    window.lineaRutaViaje = null;
+  }
+
+  window.rutaViajeOSRM = null;
   return;
 }
 
@@ -264,12 +293,10 @@ async function dibujarRutaViajeEnCurso(viaje) {
     return;
   }
 
-//if (viaje.taxi_id && window.marcadoresPorTaxi?.[viaje.taxi_id]) {
- // const marker = window.marcadoresPorTaxi[viaje.taxi_id];
- // marker.setLatLng([origenLat, origenLng]);
-//}
+const posicionInicio = L.latLng(origenLat, origenLng);
+
 const resultado = await calcularETAEntrePuntos(
-  L.latLng(origenLat, origenLng),
+  posicionInicio,
   L.latLng(destinoLat, destinoLng)
 );
 
@@ -307,7 +334,7 @@ window.lineaRutaViaje.bringToFront();
 window.dibujarRutaViajeEnCurso = dibujarRutaViajeEnCurso;
 
 async function fetchTaxis() {
- 
+
   const res = await fetch('/taxis/positions');
 
   if (!res.ok) {
@@ -477,7 +504,7 @@ async function cargarTaxis() {
     try {
     const data = await fetchTaxis();
     window.ultimosTaxis = data.taxis || [];
-   
+
     if (!data.ok || !Array.isArray(data.taxis)) {
       console.error('Respuesta inválida de taxis:', data);
       return;
@@ -536,7 +563,7 @@ let marker =
 
   marker = null;
 }
-  
+
 const usarPosSimulada =
   posSimulada &&
   (
@@ -630,6 +657,7 @@ marker.bindPopup(`
   Velocidad: ${velocidad}<br>
   GPS: ${fechaGps}
 `);
+
 const firmaIcono = `${
   taxi.estado_operativo || taxi.estado || ''
 }|${
@@ -736,18 +764,18 @@ function seleccionarTaxi(taxiId, centrarMapa = true, abrirPopup = true, enfocarC
     marker.openPopup();
   }
 
-  if (typeof window.dibujarRutaTaxiAsignado === 'function' &&
-      window.viajeSeleccionado &&
-      window.viajeSeleccionado.taxi_id) {
-    window.dibujarRutaTaxiAsignado(window.viajeSeleccionado);
-  }
-
-  if (typeof window.dibujarLineaTaxiPasajero === 'function') {
-    window.dibujarLineaTaxiPasajero();
-  }
+ if (
+  typeof window.dibujarRutaTaxiAsignado === 'function' &&
+  window.viajeSeleccionado &&
+  window.viajeSeleccionado.taxi_id
+) {
+  window.dibujarRutaTaxiAsignado(window.viajeSeleccionado);
+} else if (
+  typeof window.dibujarLineaTaxiPasajero === 'function'
+) {
+  window.dibujarLineaTaxiPasajero();
 }
-
-
+}
 
 function obtenerTextoRumbo(grados) {
   const valor = Number(grados);
@@ -923,7 +951,7 @@ div.innerHTML = getTaxiCardHTML(taxi);
   }
 
   seleccionarTaxi(taxi.taxi_id, true, true, false);
-    
+
     if (typeof window.dibujarLineaTaxiPasajero === 'function') {
       window.dibujarLineaTaxiPasajero();
     }
@@ -1049,7 +1077,7 @@ ${window.tiempoDetenidoGps || 0} min
     ${taxi.latitud || '-'},
     ${taxi.longitud || '-'}
     <br><br>
-    
+
     <button
       onclick="verHistorialGpsTaxi('${taxi.taxi_id}')"
       style="
@@ -1079,10 +1107,8 @@ function limpiarPanelGpsTaxi() {
   if (panel) {
     panel.style.display = 'none';
   }
-window.limpiarPanelGpsTaxi = limpiarPanelGpsTaxi;
-
 }
-
+window.limpiarPanelGpsTaxi = limpiarPanelGpsTaxi;
 
 
 function calcularEstadoGps(fechaGps) {
