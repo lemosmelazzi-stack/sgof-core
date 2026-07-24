@@ -1,13 +1,11 @@
 let marcadorViaje = null;
 let mapaAjustado = false;
-let taxiSeleccionadoId = null;
-let seguirTaxiSeleccionado = true;
-let lineaTaxiPasajero = null;
+
+window.lineaTaxiPasajero = null;
 window.rutaViajeOSRM = null;
 window.lineaRutaViaje = null;
-// Mantener ambos sincronizados por compatibilidad.
 window.marcadoresPorTaxi = window.marcadoresPorTaxi || {};
-window.lineaTaxiPasajero = lineaTaxiPasajero;
+
 let taxisState = new Map();
 let cardsPorTaxi = {};
 
@@ -861,24 +859,6 @@ function mostrarMensaje(texto, tipo = 'ok') {
     box.style.display = 'none';
     box.textContent = '';
   }, 3000);
-}
-
-function seguirTaxiEnMapa(state) {
-  if (!seguirTaxiSeleccionado) return;
-  if (taxiSeleccionadoId !== state.id) return;
-
-  const centro = mapa.getCenter();
-  const distanciaLat = Math.abs(centro.lat - state.currentLat);
-  const distanciaLng = Math.abs(centro.lng - state.currentLng);
-
-  const UMBRAL = 0.0007;
-
-  if (distanciaLat > UMBRAL || distanciaLng > UMBRAL) {
-    mapa.panTo([state.currentLat, state.currentLng], {
-      animate: true,
-      duration: 0.6
-    });
-  }
 }
 
 //mostrarViajeEnMapa();
