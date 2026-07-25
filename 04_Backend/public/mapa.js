@@ -66,16 +66,6 @@ function calcularRumboEntrePuntos(lat1, lng1, lat2, lng2) {
   return angulo;
 }
 
-function aplicarRumboMarker(marker, rumbo) {
-  const el = marker.getElement?.();
-  if (!el) return;
-
-  const iconoInterno = el.querySelector('div');
-  if (!iconoInterno) return;
-
-  iconoInterno.style.transform = 'rotate(' + (rumbo - 90) + 'deg)';
-}
-
 function moverTaxiPorRutaOSRM(taxiId, ruta, intervalo = 300) {
   if (!taxiId || !Array.isArray(ruta) || ruta.length === 0) return;
 
@@ -115,7 +105,7 @@ if (usarGpsReal && tieneGpsReal) {
       marker.setLatLng([latFinal, lngFinal]);
       marker.update?.();
       marker._sgofAnimando = false;
-      //aplicarRumboMarker(marker, rumbo);
+      
 
       window.posicionesTaxiSimuladas = window.posicionesTaxiSimuladas || {};
       window.posicionesTaxiSimuladas[taxiId] = {
@@ -465,35 +455,6 @@ socket.on('taxi_posicion', (data) => {
 
 });
 
-
-function actualizarOrientacionTaxi(marker, latAnterior, lngAnterior, latNueva, lngNueva) {
-
-    if (
-        latAnterior == null ||
-        lngAnterior == null ||
-        latNueva == null ||
-        lngNueva == null
-    ) {
-        return;
-    }
-
-    const dy = latNueva - latAnterior;
-    const dx = lngNueva - lngAnterior;
-
-    if (Math.abs(dx) < 0.000001 && Math.abs(dy) < 0.000001) {
-        return;
-    }
-
-    const angulo = Math.atan2(dx, dy) * (180 / Math.PI);
-
-    const icono = marker.getElement?.();
-
-    if (!icono) return;
-
-    icono.style.transformOrigin = 'center center';
-    icono.style.transform += ` rotate(${angulo}deg)`;
-}
-
 async function cargarColaOperativa() {
   try {
     const contenedor = document.getElementById('cola-operativa-contenido');
@@ -602,7 +563,6 @@ centrarMapa(viaje);
 }
 
 async function asignarTaxiSeleccionado() {
- console.log('ASIGNAR EJECUTADO DESDE mapa.js');
 
 if (!window.viajeSeleccionadoId && window.viajeSeleccionado?.id) {
   window.viajeSeleccionadoId = window.viajeSeleccionado.id;
@@ -661,46 +621,6 @@ if (typeof window.dibujarLineaTaxiPasajero === 'function') {
 window.asignarTaxiSeleccionado = asignarTaxiSeleccionado;
 
 
-function seleccionarMejorTaxi(origen, taxis) {
-
-  // SIN FILTRO (temporal)
-  const disponibles = taxis;
-
-  if (disponibles.length === 0) return null;
-
-  disponibles.sort((a, b) => a.posicion_cola - b.posicion_cola);
-
-  const taxiBase = disponibles[0];
-
-const distBase = calcularDistancia(
-  origen.lat,
-  origen.lng,
-  parseFloat(taxiBase.latitud),
-  parseFloat(taxiBase.longitud)
-);
-
-let mejorTaxi = taxiBase;
-
-disponibles.forEach(taxi => {
-  const dist = calcularDistancia(
-    origen.lat,
-    origen.lng,
-    parseFloat(taxi.latitud),
-    parseFloat(taxi.longitud)
-  );
-
-  if ((distBase - dist) > 500) {
-    mejorTaxi = taxi;
-  }
-});
-
-
-
-  return mejorTaxi;
-}
-
-window.seleccionarMejorTaxi = seleccionarMejorTaxi;
-
 async function asignacionAutomaticaPorCola() {
   if (!window.viajeSeleccionadoId) {
     alert('Seleccioná un viaje primero');
@@ -730,52 +650,6 @@ await cargarPendientes();
     alert('Error de conexión');
   }
 }
-function obtenerColor(taxi) {
-  const estado = (
-    taxi?.estado_operativo ||
-    taxi?.estado ||
-    ''
-  ).toLowerCase();
-
-  if (
-    taxi?.taxi_id === window.taxiSeleccionadoId ||
-    taxi?.id === window.taxiSeleccionadoId
-  ) {
-    return '#ff8800';
-  }
-
-  if (
-    estado === 'asignado' ||
-    estado === 'en_camino_origen' ||
-    estado === 'en_origen'
-  ) {
-    return '#f59e0b';
-  }
-
-  if (
-    estado === 'ocupado' ||
-    estado === 'en_curso'
-  ) {
-    return '#ef4444';
-  }
-
-  if (
-    estado === 'disponible' ||
-    estado === ''
-  ) {
-    return '#22c55e';
-  }
-
-  return '#6b7280';
-}
-
-
-
-function easeInOutCubic(t) {
-  return t < 0.5
-    ? 4 * t * t * t
-    : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
 
 function calcularDistancia(lat1, lng1, lat2, lng2) {
   const R = 6371000; // metros
@@ -792,57 +666,6 @@ function calcularDistancia(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
-function calcularAngulo(lat1, lng1, lat2, lng2) {
-  const dy = lat2 - lat1;
-  const dx = lng2 - lng1;
-
-  const anguloRad = Math.atan2(dy, dx);
-  const anguloDeg = anguloRad * (180 / Math.PI);
-
-  return anguloDeg + 90;
-}
-
-function crearIconoTaxi(angulo = 0, color = '#22c55e') {
-
-  return L.divIcon({
-
-    className: 'taxi-icon-wrapper',
-
-    html: `
-      <div
-        class="taxi-icon"
-        style="
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          background: ${color};
-          border: 3px solid white;
-          box-shadow: 0 0 8px rgba(0,0,0,0.35);
-
-          display:flex;
-          align-items:center;
-          justify-content:center;
-
-          transform: rotate(${angulo}deg);
-          transition:
-            transform 0.8s linear,
-            background 0.3s ease;
-
-          font-size: 14px;
-          color: white;
-          font-weight: bold;
-        "
-      >
-        ▲
-      </div>
-    `,
-
-    iconSize: [26, 26],
-    iconAnchor: [13, 13]
-
-  });
-
-}
 function mostrarMensaje(texto, tipo = 'ok') {
   const box = document.getElementById('feedback');
   if (!box) return;
