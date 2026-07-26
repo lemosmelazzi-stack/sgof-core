@@ -55,7 +55,6 @@ centrarMapa(viaje);
 // Envía al backend la asignación de un taxi a un viaje
 
 async function asignarTaxiSeleccionado() {
-console.log('ASIGNAR EJECUTADO DESDE viajes.js');
 
   if (!window.viajeSeleccionadoId && window.viajeSeleccionado?.id) {
     window.viajeSeleccionadoId = window.viajeSeleccionado.id;
@@ -382,53 +381,6 @@ function estadoViajeTexto(estado) {
   });
 }
 
-async function asignarPendientesAutomaticamente() {
-  try {
-    const response = await fetch('/viajes?estado=pendiente');
-    const result = await response.json();
-
-    if (!result.ok || !result.data || result.data.length === 0) {
-      return;
-    }
-
-    const pendientes = result.data.filter((v) => v.estado === 'pendiente');
-
-    if (pendientes.length === 0) {
-      return;
-    }
-
-    for (const viaje of pendientes) {
-      const res = await fetch(`/viajes/${viajeSeleccionadoId}/asignar-taxi`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          taxi_id: taxiSeleccionadoId
-        })
-      });
-
-      const data = await res.json();
-    }
-
-    if (typeof marcadoresPendientes !== 'undefined') {
-      marcadoresPendientes.forEach((m) => {
-        if (mapa.hasLayer(m)) {
-          mapa.removeLayer(m);
-        }
-      });
-
-      marcadoresPendientes = [];
-    }
-
-    await cargarPendientes();
-
-
-  } catch (error) {
-    console.error('Error en asignación automática total:', error);
-  }
-}
-
 function parseFechaLocal(fecha) {
   if (!fecha) return null;
 
@@ -452,19 +404,6 @@ function parseFechaLocal(fecha) {
     Number(minuto),
     segundo
   );
-}
-
-function parseFechaBackend(fecha) {
-  if (!fecha) return null;
-
-  let f = fecha.replace(' ', 'T');
-
-  // si no trae Z ni -03:00, asumimos UTC
-  if (!f.endsWith('Z') && !/[+-]\d{2}:?\d{2}$/.test(f)) {
-    f += 'Z';
-  }
-
-  return new Date(f);
 }
 
 
@@ -714,15 +653,6 @@ function desactivarBotonesOperativos() {
     btn.style.cursor = 'not-allowed';
   });
 }
-
-function activarBotonesOperativos() {
-  document.querySelectorAll('#acciones-viaje .btn-operativo').forEach((btn) => {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
-  });
-}
-
 
 window.cargarPendientes = cargarPendientes;
 window.cargarTaxis = cargarTaxis;
