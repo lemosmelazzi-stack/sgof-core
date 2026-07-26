@@ -22,27 +22,6 @@ function taxiDisponibleParaAsignar(taxi) {
          gpsValido;
 }
 
-function mostrarResumenRuta(distanciaKm, etaMin) {
-  const resumen = document.getElementById('resumen');
-
-  if (!resumen) return;
-
-  resumen.innerHTML = `
-    <div style="
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e3a8a;
-      font-weight: 600;
-    ">
-      🚕 Ruta taxi → pasajero: ${distanciaKm} km / ${etaMin} min
-    </div>
-  `;
-}
-
-
-
 async function calcularETAEntrePuntos(posTaxi, posViaje) {
   const url = `https://router.project-osrm.org/route/v1/driving/${posTaxi.lng},${posTaxi.lat};${posViaje.lng},${posViaje.lat}?overview=full&geometries=geojson`;
 
@@ -73,92 +52,6 @@ async function calcularETAEntrePuntos(posTaxi, posViaje) {
     return null;
   }
 }
-async function encontrarMejorTaxiParaViaje() {
-  if (!marcadorViaje) return;
-
-  const posViaje = marcadorViaje.getLatLng();
-
-  let mejorTaxiId = null;
-  let mejorETA = Infinity;
-  let mejorRutaCoords = null;
-  let mejorDistanciaKm = null;
-
-  for (const taxiId in window.marcadoresPorTaxi) {
-    const markerTaxi = window.marcadoresPorTaxi[taxiId];
-
-    if (!markerTaxi) continue;
-
-    const taxi = window.ultimosTaxis?.find(
-      t => String(t.taxi_id) === String(taxiId)
-    );
-
-    if (!taxi || !taxiDisponibleParaAsignar(taxi)) {
-      continue;
-    }
-
-    const posTaxi = markerTaxi.getLatLng();
-    const resultado = await calcularETAEntrePuntos(posTaxi, posViaje);
-
-    if (!resultado || !Array.isArray(resultado.coords)) {
-      continue;
-    }
-
-    if (resultado.etaMin < mejorETA) {
-      mejorTaxiId = taxiId;
-      mejorETA = resultado.etaMin;
-      mejorDistanciaKm = resultado.distanciaKm;
-      mejorRutaCoords = [
-        [posTaxi.lat, posTaxi.lng],
-        ...resultado.coords,
-        [posViaje.lat, posViaje.lng]
-      ];
-    }
-  }
-
-  if (!mejorTaxiId || !mejorRutaCoords) {
-    mostrarMensaje('No hay taxis disponibles para asignar', 'warning');
-    return;
-  }
-
-  window.distanciaActualOSRM = mejorDistanciaKm;
-  window.etaActualOSRM = mejorETA;
-  window.rutaActualOSRM = mejorRutaCoords;
-
-  if (window.lineaTaxiPasajero && window.mapa) {
-    window.mapa.removeLayer(window.lineaTaxiPasajero);
-    window.lineaTaxiPasajero = null;
-  }
-
-  if (window.lineaRutaViaje && window.mapa) {
-    window.mapa.removeLayer(window.lineaRutaViaje);
-    window.lineaRutaViaje = null;
-  }
-
-  window.rutaViajeOSRM = null;
-
-  window.lineaTaxiPasajero = L.polyline(mejorRutaCoords, {
-    color: '#2563eb',
-    weight: 5,
-    opacity: 0.9
-  }).addTo(window.mapa);
-
-  window.lineaTaxiPasajero.bringToFront();
-
-  seleccionarTaxi(mejorTaxiId, false, false, true);
-
-  if (typeof mostrarViajeOperativo === 'function') {
-    mostrarViajeOperativo(window.viajeSeleccionado || null);
-  }
-
-  mostrarMensaje(
-    `🚕 Mejor taxi encontrado (${Math.round(mejorETA)} min)`,
-    'success'
-  );
-
-  return mejorTaxiId;
-}
-
-window.encontrarMejorTaxiParaViaje = encontrarMejorTaxiParaViaje;
 
 async function dibujarRutaTaxiAsignado(viaje) {
   if (!viaje || !viaje.taxi_id || !marcadorViaje) return;
@@ -573,17 +466,6 @@ const usarPosSimulada =
 const latFinal = usarPosSimulada ? posSimulada.lat : lat;
 const lngFinal = usarPosSimulada ? posSimulada.lng : lng;
 
-//console.log('--------------------------------');
-//console.log('Taxi:', taxi.codigo_movil);
-//console.log('taxi_id:', taxi.taxi_id);
-//console.log('GPS:', lat, lng);
-//console.log('SIMULADA:', posSimulada);
-//console.log('FINAL:', latFinal, lngFinal);
-
-//console.log('FUENTE:', taxi.fuente);
-//console.log('ESTADO:', taxi.estado);
-//console.log('OBJETO:', taxi);
-
 if (!marker) {
   marker = L.marker([latFinal, lngFinal], {
     icon: iconoTaxi(taxi)
@@ -664,12 +546,10 @@ const firmaIcono = `${
   colorTaxi(taxi)
 }`;
 
-
 if (marker._sgofFirmaIcono !== firmaIcono) {
   marker.setIcon(iconoTaxi(taxi));
   marker._sgofFirmaIcono = firmaIcono;
 }
-
       
       window.marcadoresPorTaxi[taxi.taxi_id] = marker;
 
@@ -1089,7 +969,7 @@ ${window.tiempoDetenidoGps || 0} min
   `;
 }
 
-//POSIBLEOBSOLETA- REVISAR ANTES DE BORRAR//
+
 function limpiarPanelGpsTaxi() {
   const panel = document.getElementById('panelGpsTaxi');
   const contenido = document.getElementById('contenidoGpsTaxi');
