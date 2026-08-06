@@ -1,0 +1,153 @@
+000_Metodologia_Algoritmos_SGOF_CORE_v1.0.txt
+=============================================
+
+1. Introducción
+---------------
+
+El presente documento establece los criterios generales para la documentación de los algoritmos implementados por el SGOF Core.
+
+Los principios de Arquitectura, Componentes y Procesos Operativos se consideran previamente documentados y constituyen el marco de referencia para la presente metodología.
+
+Su finalidad consiste en proporcionar un modelo uniforme para describir la lógica de decisión utilizada por los distintos algoritmos de la plataforma, preservando la claridad conceptual y evitando dependencias con la implementación específica del software.
+
+2. Objetivo
+-----------
+
+La metodología de documentación de algoritmos tiene como objetivo establecer una estructura homogénea para describir los mecanismos de decisión implementados por el SGOF Core.
+
+Cada algoritmo deberá documentarse desde una perspectiva funcional y arquitectónica, explicando la lógica utilizada para transformar información de entrada en una decisión operativa.
+
+La documentación no sustituye al código fuente ni pretende describir detalles de implementación, sino registrar los principios permanentes que gobiernan el comportamiento del algoritmo.
+
+3. Concepto de Algoritmo
+------------------------
+
+Dentro del SGOF Core, un algoritmo constituye una secuencia lógica de evaluación destinada a producir una decisión objetiva a partir de un conjunto de datos de entrada.
+
+Los algoritmos representan el nivel de decisión de la plataforma y complementan a los procesos operativos, proporcionando los criterios necesarios para resolver situaciones específicas de forma uniforme y reproducible.
+
+
+4. Principios de Documentación
+------------------------------
+
+Todo algoritmo documentado en la Biblioteca Técnica deberá cumplir los siguientes principios:
+
+describir la lógica de decisión y no la implementación;
+mantener independencia respecto del lenguaje de programación;
+utilizar terminología uniforme;
+documentar únicamente algoritmos implementados y validados;
+preservar la coherencia con la arquitectura general del SGOF Core;
+facilitar futuras auditorías y evoluciones del sistema.
+
+5. Estructura Estándar
+----------------------
+
+Todo documento correspondiente a un algoritmo seguirá la siguiente estructura:
+
+1. Introducción
+
+2. Objetivo
+
+3. Principios del Algoritmo
+
+4. Datos de Entrada
+
+5. Proceso de Evaluación
+
+6. Criterios de Decisión
+
+7. Resultado del Algoritmo
+
+8. Integración con el SGOF Core
+
+9. Observaciones de Arquitectura
+
+10. Conclusiones
+
+Dictamen Final de Auditoría
+
+Principio Rector
+
+6. Nivel de Abstracción
+-----------------------
+
+La documentación de algoritmos deberá explicar el razonamiento seguido por el sistema para adoptar una decisión.
+
+No deberán incorporarse:
+
+fragmentos de código fuente;
+nombres de variables;
+estructuras propias del lenguaje de programación;
+consultas SQL;
+detalles internos de implementación.
+
+Estos aspectos permanecerán documentados exclusivamente dentro del código fuente y de la documentación técnica correspondiente.
+
+======================================================
+
+7. Criterios Editoriales para Algoritmos
+
+La documentación de los algoritmos del SGOF Core deberá describir el razonamiento desarrollado por el sistema para alcanzar una decisión, priorizando la lógica de evaluación sobre los detalles de implementación.
+
+Con el fin de preservar la claridad y uniformidad de la Biblioteca Técnica, deberán respetarse los siguientes criterios editoriales:
+
+documentar el algoritmo en el orden en que el sistema desarrolla su razonamiento;
+describir la lógica de decisión y no el código fuente;
+evitar referencias a funciones, variables o estructuras propias del lenguaje de programación;
+mantener independencia respecto de la implementación técnica;
+utilizar terminología uniforme en toda la Biblioteca;
+explicar el propósito de cada etapa del algoritmo antes que sus detalles de ejecución;
+preservar la coherencia con la Arquitectura General y los Procesos Operativos del SGOF Core.
+
+La aplicación de estos criterios garantiza que la documentación permanezca vigente aun cuando la implementación técnica evolucione con el tiempo.
+
+========================================================
+
+8. Relación con los Procesos Operativos
+---------------------------------------
+
+Los procesos operativos describen qué hace el sistema.
+
+Los algoritmos describen cómo toma las decisiones necesarias para ejecutar dichos procesos.
+
+Ambos niveles son complementarios y mantienen responsabilidades claramente diferenciadas dentro de la Biblioteca Técnica.
+
+
+9. Observaciones de Arquitectura
+--------------------------------
+
+Los algoritmos constituyen el nivel de decisión del SGOF Core.
+
+Su diseño se basa en criterios objetivos, reproducibles y consistentes, permitiendo que la plataforma adopte decisiones operativas independientes de la intervención humana, respetando siempre las reglas definidas por la arquitectura del sistema.
+
+
+10. Conclusiones
+---------------
+
+La presente metodología establece un modelo uniforme para documentar los algoritmos del SGOF Core.
+
+Su aplicación garantiza consistencia documental, facilita las tareas de auditoría y permite comprender la lógica de decisión de la plataforma sin depender de los detalles de implementación.
+
+
+Dictamen Final de Auditoría
+---------------------------
+
+---------------------------------------------------------
+Documento: 000_Metodologia_Algoritmos_SGOF_CORE_v1.0.txt
+
+Estado: APROBADO
+
+---------------------------------------------------------
+
+Resultado del relevamiento
+--------------------------
+
+Se establece oficialmente la metodología para la documentación de algoritmos del SGOF Core, definiendo una estructura uniforme, un nivel de abstracción consistente y los principios generales que deberán seguir todos los documentos pertenecientes a la carpeta 06_Algoritmos.
+
+
+Principio Rector
+----------------
+
+Un algoritmo del SGOF Core transforma información objetiva en decisiones operativas consistentes, reproducibles y auditables.
+
+=======================================================

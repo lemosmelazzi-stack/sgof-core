@@ -1,0 +1,146 @@
+001_API_REST_SGOF_CORE_v1.0.txt
+===============================
+
+
+1. Introducción
+---------------
+
+El presente documento forma parte de la Biblioteca Técnica del SGOF Core.
+
+Los principios generales de Arquitectura, Backend, Frontend, Modelo Relacional, Sistema GPS y Socket.IO se consideran previamente documentados y constituyen el marco de referencia para el presente volumen.
+
+En consecuencia, este documento desarrolla exclusivamente la arquitectura y el funcionamiento de la API REST implementada por el SGOF Core.
+
+La API REST constituye la interfaz pública mediante la cual los distintos clientes interactúan con el Backend de la plataforma.
+
+A través de ella se reciben solicitudes, se ejecutan operaciones sobre los distintos subsistemas y se devuelven respuestas estructuradas que permiten mantener una comunicación uniforme entre la lógica de negocio y las aplicaciones consumidoras.
+
+Desde la perspectiva arquitectónica, la API REST representa el contrato de comunicación entre el Frontend y el Backend, definiendo los mecanismos mediante los cuales la información ingresa y sale del sistema.
+
+2. Objetivo
+-----------
+
+La API REST tiene como objetivo proporcionar un mecanismo estandarizado, consistente y escalable para el acceso a las funcionalidades del SGOF Core.
+
+Su implementación permite que distintos clientes —actuales o futuros— interactúen con la plataforma utilizando un conjunto uniforme de recursos y operaciones.
+
+Entre sus principales objetivos se encuentran:
+
+exponer los servicios del Backend mediante una interfaz homogénea;
+desacoplar la lógica de negocio de las aplicaciones cliente;
+facilitar la integración con nuevos sistemas;
+garantizar un intercambio consistente de información;
+proporcionar respuestas estructuradas y predecibles;
+servir como punto único de acceso a las funcionalidades del SGOF Core.
+
+La API constituye, por tanto, la puerta de entrada oficial a los servicios ofrecidos por la plataforma.
+
+3. Principios REST adoptados
+----------------------------
+
+La API del SGOF Core fue diseñada siguiendo los principios fundamentales de la arquitectura REST, adaptados a las necesidades operativas del sistema.
+
+Organización por recursos
+
+Los servicios se agrupan según las entidades funcionales que representan.
+
+Cada recurso dispone de un conjunto específico de operaciones relacionadas con su responsabilidad dentro del sistema.
+
+Entre los principales recursos se encuentran:
+
+Viajes
+Taxis
+Pedidos
+GPS
+Clientes
+Usuarios
+Dashboard
+
+Esta organización facilita la comprensión de la API y mejora su mantenibilidad.
+
+Utilización de métodos HTTP
+---------------------------
+
+Las operaciones expuestas utilizan los métodos HTTP apropiados según la naturaleza de cada acción.
+
+Entre ellos:
+
+GET para consultas;
+POST para creación de recursos y ejecución de determinadas operaciones;
+PUT para actualizaciones completas o cambios de estado;
+DELETE cuando corresponda a futuras operaciones de eliminación.
+
+La utilización consistente de estos métodos mantiene una interfaz uniforme para todos los consumidores de la API.
+
+Comunicación sin estado
+-----------------------
+
+Cada solicitud contiene toda la información necesaria para ser procesada por el Backend.
+
+La API no depende del estado interno de solicitudes anteriores para interpretar una operación determinada.
+
+Este principio favorece la escalabilidad y simplifica el procesamiento de las peticiones.
+
+Separación de responsabilidades
+
+La API REST no implementa reglas de negocio.
+
+Su función consiste en recibir solicitudes, direccionarlas hacia el Backend y devolver las respuestas generadas por la lógica operativa del sistema.
+
+Esta separación mantiene desacopladas la interfaz de comunicación y el procesamiento interno.
+
+Consistencia
+------------
+
+Todos los recursos siguen criterios homogéneos de organización, nomenclatura y estructura de respuesta.
+
+Esta uniformidad facilita el aprendizaje de la API y reduce la complejidad para quienes desarrollan aplicaciones consumidoras.
+
+Observaciones de arquitectura
+-----------------------------
+
+Desde la perspectiva arquitectónica, la API REST constituye la capa de acceso al Backend.
+
+Mientras el Frontend representa la interfaz para los usuarios y el Backend implementa la lógica de negocio, la API define el lenguaje común mediante el cual ambos componentes intercambian información.
+
+Su correcta definición resulta fundamental para garantizar la estabilidad y evolución de toda la plataforma.
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría del Backend se verificó que la API REST mantiene una organización coherente por recursos y que los principales endpoints siguen un patrón uniforme de procesamiento.
+
+Asimismo, se comprobó que la lógica de negocio permanece correctamente centralizada en el Backend, mientras que la API conserva su papel como mecanismo de acceso y comunicación.
+
+=====================================================
+
+
+Dictamen Final de Auditoría
+---------------------------
+
+--------------------------------------------
+Documento: 001_API_REST_SGOF_CORE_v1.0.txt
+
+Estado: APROBADO
+--------------------------------------------
+
+El documento 001_API_REST_SGOF_CORE_v1.0.txt queda oficialmente aprobado e incorporado a la Biblioteca Técnica del SGOF Core como referencia de la interfaz de comunicación entre los clientes de la plataforma y el Backend.
+
+=========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,2713 @@
+
+Modelo Funcional del SGOF Core
+───────────────────────
+
+
+7.1 Introducción
+----------------
+
+El presente capítulo describe el funcionamiento operativo del SGOF Core, explicando la interacción entre los distintos componentes que conforman la plataforma y la forma en que éstos colaboran para gestionar el ciclo completo de una operación.
+
+Mientras el capítulo anterior documentó la estructura permanente del sistema mediante el análisis del Modelo Relacional, este capítulo aborda el comportamiento dinámico de la aplicación, describiendo el flujo de información, las decisiones operativas y la secuencia de procesos que permiten transformar un pedido inicial en un servicio completamente gestionado.
+
+El Modelo Funcional representa la lógica de operación del sistema, definiendo la participación de cada módulo, la circulación de la información entre ellos y la evolución de las distintas entidades durante su ciclo de vida.
+
+A diferencia del Modelo Relacional, que describe la organización de los datos, el Modelo Funcional documenta la forma en que dichos datos son creados, modificados, consultados y utilizados por los distintos procesos que integran el SGOF Core.
+
+Este capítulo constituye el vínculo entre la arquitectura técnica y la operación diaria del sistema, proporcionando una visión integral del comportamiento funcional de la plataforma.
+
+=======================================================
+
+7.2 Visión General del Funcionamiento
+-------------------------------------
+
+El SGOF Core opera como un sistema integrado donde múltiples módulos especializados colaboran para administrar en tiempo real la totalidad del proceso operativo.
+
+Cada módulo posee responsabilidades claramente definidas y mantiene una comunicación permanente con los restantes componentes mediante el intercambio de información y la actualización de los estados de las distintas entidades.
+
+Desde una perspectiva funcional, el sistema puede dividirse en seis grandes subsistemas:
+
+Gestión Operativa.
+Gestión de Recursos.
+Gestión de Usuarios.
+Gestión Financiera.
+Gestión de Auditoría.
+Configuración General.
+
+Cada uno de estos subsistemas participa en distintas etapas del ciclo operativo, interviniendo únicamente cuando su función resulta necesaria.
+
+Esta separación de responsabilidades reduce el acoplamiento entre componentes y facilita tanto el mantenimiento como la evolución futura del sistema.
+
+Arquitectura funcional general
+                         SGOF CORE
+                              │
+     ┌────────────────────────┼────────────────────────┐
+     │                        │                        │
+     ▼                        ▼                        ▼
+Gestión Operativa      Gestión Recursos      Gestión Usuarios
+     │                        │                        │
+     │                        │                        │
+Pedidos                 Taxis                  Usuarios
+Asignaciones            Tablets               Operadoras
+Viajes                  GPS Logs              Turnos
+     │
+     ▼
+Gestión Financiera
+     │
+Clientes Crédito
+Movimientos Crédito
+Pagos
+     │
+     ▼
+Auditoría
+     │
+Eventos
+Principio de funcionamiento
+
+El funcionamiento del sistema se basa en una secuencia continua de eventos.
+
+Cada operación realizada genera modificaciones sobre una o varias entidades del Modelo Relacional, produciendo nuevos estados que son utilizados por los procesos siguientes.
+
+De esta forma, el SGOF Core mantiene sincronizados:
+
+el estado operativo de los pedidos;
+la disponibilidad de los taxis;
+la actividad de los choferes;
+la ubicación GPS de la flota;
+la información financiera;
+la bitácora de auditoría.
+
+Todos estos procesos funcionan sobre una única base de datos centralizada, evitando duplicidad de información y garantizando la consistencia de los datos.
+
+Principios arquitectónicos del Modelo Funcional
+
+Durante la auditoría funcional realizada sobre el sistema se identifican los siguientes principios de diseño:
+
+Responsabilidad única: cada módulo administra exclusivamente su propio dominio funcional.
+Actualización por estados: las operaciones evolucionan mediante cambios de estado claramente definidos.
+Trazabilidad completa: toda acción relevante puede ser reconstruida mediante la entidad eventos.
+Persistencia centralizada: toda la información reside en un único Modelo Relacional.
+Integración modular: los módulos colaboran entre sí sin perder independencia funcional.
+Escalabilidad: la arquitectura admite la incorporación de nuevos módulos sin modificar el funcionamiento de los existentes.
+
+Estos principios constituyen la base del comportamiento operativo del SGOF Core y explican la coherencia observada durante la auditoría técnica del sistema.
+
+Cierre de la sección
+
+Con la comprensión de la arquitectura funcional general, los apartados siguientes desarrollarán en detalle el comportamiento de cada uno de los procesos que intervienen en la operación diaria del SGOF Core.
+
+Se analizará el ciclo completo de un servicio, desde la recepción del pedido hasta su cierre administrativo y financiero, describiendo la participación de cada módulo, las transiciones de estado y la interacción entre las distintas entidades del sistema.
+
+========================================================
+
+7.3 Flujo Operativo General
+─────────────────────
+
+Introducción
+------------
+
+El funcionamiento del SGOF Core puede entenderse como una secuencia continua de procesos coordinados que transforman una solicitud de servicio en una operación completamente gestionada, controlada y registrada.
+
+Cada etapa del proceso produce información que sirve como entrada para la siguiente, permitiendo mantener sincronizados todos los módulos del sistema.
+
+Desde la recepción inicial del pedido hasta el cierre administrativo y financiero, cada componente interviene únicamente cuando su participación resulta necesaria, manteniendo una arquitectura modular basada en responsabilidades claramente definidas.
+
+El objetivo de este apartado es presentar una visión global del recorrido funcional del sistema antes de analizar detalladamente cada uno de sus procesos.
+
+Flujo General
+                CLIENTE
+                   │
+                   ▼
+          Recepción del Pedido
+                   │
+                   ▼
+          Registro del Pedido
+                   │
+                   ▼
+          Cola Operativa
+                   │
+                   ▼
+        Asignación Inteligente
+                   │
+                   ▼
+          Taxi Asignado
+                   │
+                   ▼
+      Confirmación del Chofer
+                   │
+                   ▼
+        Desplazamiento al Origen
+                   │
+                   ▼
+        Llegada al Cliente
+                   │
+                   ▼
+         Inicio del Viaje
+                   │
+                   ▼
+      Seguimiento GPS Continuo
+                   │
+                   ▼
+       Finalización del Viaje
+                   │
+                   ▼
+         Registro del Pago
+                   │
+                   ▼
+ Actualización Financiera
+                   │
+                   ▼
+ Registro de Eventos
+                   │
+                   ▼
+ Cierre Completo de la Operación
+Descripción General del Flujo
+
+El ciclo operativo comienza con la recepción de un pedido realizado por un cliente.
+
+Una vez registrada la solicitud, el sistema incorpora el pedido a la cola operativa, donde queda disponible para el proceso de asignación.
+
+La asignación inteligente analiza simultáneamente la disponibilidad de la flota, el orden de la cola, la ubicación GPS y las reglas de prioridad establecidas por la empresa, determinando el taxi más adecuado para atender la solicitud.
+
+Aceptada la asignación por el chofer, el sistema inicia el seguimiento operativo del servicio, registrando los cambios de estado del viaje y actualizando continuamente la posición del vehículo mediante el módulo GPS.
+
+Finalizado el traslado, la operación continúa con el registro del pago y, cuando corresponde, con la actualización de las cuentas corrientes administradas por el subsistema financiero.
+
+Durante todo este recorrido, cada acción relevante genera un evento registrado por el sistema de auditoría, permitiendo reconstruir posteriormente la historia completa de la operación.
+
+El ciclo concluye cuando todos los componentes involucrados han actualizado su estado y la información queda completamente persistida en el Modelo Relacional del SGOF Core.
+
+Participación de los módulos
+
+Durante este recorrido intervienen los siguientes módulos funcionales:
+
+Etapa	Módulo participante
+Recepción	Pedidos
+Organización	Cola Operativa
+Selección	Asignación Inteligente
+Recursos	Taxis
+Operación	Viajes
+Monitoreo	GPS
+Administración	Usuarios / Operadoras
+Finanzas	Pagos / Clientes Crédito / Movimientos Crédito
+Auditoría	Eventos
+
+Cada uno de estos módulos administra exclusivamente su propio dominio de información, comunicándose con los restantes mediante el intercambio de estados y referencias.
+
+Principios del flujo operativo
+
+El funcionamiento general del sistema responde a una serie de principios que fueron identificados durante la auditoría:
+
+El proceso avanza mediante transiciones de estado claramente definidas.
+Cada módulo interviene únicamente cuando su función resulta necesaria.
+La información se registra una única vez y luego es compartida por el resto de los componentes.
+Toda modificación relevante queda registrada en la bitácora de eventos.
+Las entidades mantienen relaciones de colaboración, pero conservan su independencia funcional.
+La base de datos actúa como repositorio único y consistente para toda la operación.
+Relación con los capítulos siguientes
+
+El flujo presentado constituye una visión de alto nivel del comportamiento del SGOF Core.
+
+Los apartados siguientes desarrollarán en profundidad cada una de las etapas aquí descritas, analizando sus reglas de funcionamiento, las entidades involucradas, las transiciones de estado y la interacción entre los distintos módulos que conforman la plataforma.
+
+===================================================
+
+7.4 Ciclo de Vida del Pedido
+----------------------------
+
+Introducción
+------------
+
+El pedido constituye el punto de inicio de toda operación gestionada por el SGOF Core.
+
+Toda prestación de servicio comienza con la recepción de una solicitud realizada por un cliente, la cual es registrada por el sistema y se convierte en el elemento que desencadena la totalidad del flujo operativo posterior.
+
+A partir de ese momento, el pedido evoluciona mediante una secuencia controlada de estados hasta transformarse en un viaje asignado y posteriormente finalizado.
+
+El objetivo de este apartado es describir el ciclo completo de vida del pedido, identificando las etapas que lo componen, las entidades involucradas y las reglas funcionales que gobiernan su evolución.
+
+====================================================
+
+7.4.1 Objetivo del proceso
+--------------------------
+
+El proceso de gestión de pedidos tiene como finalidad registrar, organizar y administrar todas las solicitudes de servicio recibidas por la empresa, asegurando que cada una de ellas pueda ser atendida de forma ordenada, trazable y eficiente.
+
+El pedido constituye la unidad básica de trabajo del sistema y actúa como punto de partida para los procesos de asignación, despacho, seguimiento operativo y control administrativo.
+
+Su correcta gestión garantiza que toda solicitud quede documentada desde su creación hasta la finalización del servicio correspondiente.
+
+=======================================================
+
+7.4.2 Participantes
+-------------------
+
+Durante el ciclo de vida del pedido intervienen distintos actores y componentes del sistema.
+
+Actores humanos
+Cliente.
+Operadora.
+Chofer.
+Componentes del sistema
+Módulo de Pedidos.
+Cola Operativa.
+Asignación Inteligente.
+Gestión de Viajes.
+Gestión GPS.
+Registro de Eventos.
+
+Cada uno participa únicamente durante las etapas donde su intervención resulta necesaria.
+
+========================================================
+
+7.4.3 Flujo General
+-------------------
+
+El ciclo operativo del pedido puede resumirse de la siguiente manera:
+
+Cliente
+    │
+    ▼
+Solicitud del servicio
+    │
+    ▼
+Registro del pedido
+    │
+    ▼
+Validación
+    │
+    ▼
+Ingreso a Cola Operativa
+    │
+    ▼
+Asignación Inteligente
+    │
+    ▼
+Taxi asignado
+    │
+    ▼
+Aceptación del chofer
+    │
+    ▼
+Conversión en viaje operativo
+
+A partir de este punto comienza el ciclo de vida del viaje, que será desarrollado en el apartado siguiente del presente capítulo.
+
+======================================================
+
+7.4.4 Descripción paso a paso
+-----------------------------
+
+	Paso 1 — Recepción del pedido
+
+La operación comienza cuando un cliente solicita un servicio.
+
+La solicitud puede ser recibida por la operadora o por cualquier otro canal de ingreso previsto por el sistema.
+
+En esta etapa aún no existe ninguna asignación ni intervención de la flota.
+
+	Paso 2 — Registro
+
+La operadora registra la información necesaria para identificar el servicio solicitado.
+
+Entre otros datos:
+
+cliente;
+origen;
+destino (cuando corresponda);
+observaciones;
+prioridad;
+fecha y hora.
+
+En este momento se crea la entidad Pedido dentro del Modelo Relacional.
+
+	Paso 3 — Validación
+
+El sistema verifica que la información mínima requerida se encuentre presente.
+
+Superada la validación, el pedido queda oficialmente incorporado a la operación.
+
+	Paso 4 — Cola Operativa
+
+El pedido ingresa automáticamente a la cola de pendientes.
+
+Desde este momento queda disponible para el proceso de asignación.
+
+Todavía no existe un taxi asociado.
+
+	Paso 5 — Asignación
+
+El módulo de Asignación Inteligente analiza:
+
+disponibilidad de taxis;
+posición GPS;
+orden de la cola;
+reglas de prioridad;
+estado operativo.
+
+Como resultado selecciona el recurso más adecuado.
+
+	Paso 6 — Confirmación
+
+Una vez aceptada la asignación por el chofer, el pedido deja de ser una simple solicitud pendiente y pasa a formar parte de una operación activa.
+
+A partir de ese instante comienza el ciclo operativo del viaje.
+
+	7.4.5 Estados involucrados
+
+Durante su ciclo de vida, el pedido atraviesa distintos estados funcionales que reflejan su evolución dentro del proceso operativo.
+
+Aunque la implementación específica puede variar según la lógica del sistema, conceptualmente el recorrido es el siguiente:
+
+Creado
+   │
+   ▼
+Validado
+   │
+   ▼
+Pendiente
+   │
+   ▼
+Asignado
+   │
+   ▼
+Convertido en Viaje
+
+Cada transición representa un cambio de responsabilidad dentro del sistema y habilita la intervención del módulo correspondiente.
+
+	7.4.6 Entidades involucradas
+
+Durante este proceso participan las siguientes entidades del Modelo Relacional:
+
+clientes
+pedidos
+asignaciones
+taxis
+choferes
+viajes
+gps_logs
+eventos
+
+Cada una aporta la información necesaria para que el pedido evolucione correctamente hasta convertirse en un viaje operativo.
+
+	7.4.7 Comunicación entre módulos
+
+El ciclo del pedido requiere la interacción coordinada de varios módulos del SGOF Core.
+
+El flujo principal de comunicación es el siguiente:
+
+Pedidos
+    │
+    ▼
+Cola Operativa
+    │
+    ▼
+Asignación Inteligente
+    │
+    ▼
+Viajes
+    │
+    ▼
+GPS
+    │
+    ▼
+Eventos
+
+Cada módulo recibe información del anterior, realiza su función específica y transmite el resultado al siguiente, manteniendo sincronizado el estado general de la operación.
+
+	7.4.8 Resultado del proceso
+
+Al finalizar este proceso:
+
+el pedido ha sido registrado y validado;
+se encuentra asociado a un taxi y a un chofer;
+la asignación ha sido aceptada;
+la operación deja la etapa de solicitud;
+se genera un viaje operativo listo para iniciar el servicio.
+
+El proceso concluye cuando la responsabilidad pasa al módulo de gestión de viajes, que continuará administrando la evolución del servicio hasta su finalización.
+
+	7.4.9 Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, el pedido representa el disparador de todo el flujo operativo del SGOF Core.
+
+A diferencia del viaje, que administra la ejecución del servicio, el pedido concentra exclusivamente la necesidad inicial del cliente. Esta separación evita mezclar la solicitud con la operación en curso y permite conservar una trazabilidad completa desde el primer contacto hasta el cierre del servicio.
+
+La transición del pedido hacia el viaje constituye uno de los principios fundamentales del diseño del sistema: una solicitud no es todavía una operación. Solo cuando la asignación es aceptada y existe un recurso operativo comprometido, el sistema transforma esa solicitud en un viaje activo.
+
+Esta diferenciación mantiene un bajo acoplamiento entre los módulos de recepción y ejecución, facilita el control operativo y permite que cada etapa del proceso evolucione de forma independiente, reforzando la arquitectura modular que caracteriza al SGOF Core.
+
+=======================================================
+
+7.5 Ciclo de Vida del Viaje
+─────────────────────
+
+Introducción
+------------
+
+El viaje constituye la unidad operativa principal del SGOF Core.
+
+Mientras el pedido representa la necesidad planteada por el cliente, el viaje representa la ejecución efectiva del servicio, administrando la interacción entre la empresa, la operadora, el chofer, el taxi y el cliente desde el momento de la asignación hasta la finalización del traslado.
+
+Durante su ciclo de vida, el viaje evoluciona mediante una secuencia de estados operativos que permiten conocer en todo momento la situación del servicio, facilitando la coordinación de la flota, el seguimiento en tiempo real y el control administrativo.
+
+El objetivo de este apartado es describir el recorrido completo del viaje, identificando las etapas que lo componen, los módulos que intervienen y las reglas funcionales que gobiernan su evolución.
+
+======================================================
+
+7.5.1 Objetivo del proceso
+--------------------------
+
+El proceso de gestión de viajes tiene como finalidad administrar la ejecución completa de cada servicio solicitado, asegurando el seguimiento operativo desde la asignación del recurso hasta la finalización del traslado.
+
+El viaje constituye el eje central de la operación diaria del SGOF Core, integrando la información proveniente del pedido, la asignación, la posición GPS, los estados del taxi y las acciones del chofer.
+
+Su correcta administración permite conocer en tiempo real el estado de cada servicio, optimizar la utilización de la flota y garantizar la trazabilidad completa de la operación.
+
+=====================================================
+
+7.5.2 Participantes
+-------------------
+
+Durante el ciclo de vida del viaje intervienen distintos actores y módulos especializados.
+
+Actores humanos
+Cliente.
+Operadora.
+Chofer.
+Recursos físicos
+Taxi.
+Componentes del sistema
+Gestión de Viajes.
+Gestión de Taxis.
+Gestión GPS.
+Cola Inteligente.
+Registro de Eventos.
+Gestión Financiera (al finalizar el servicio, cuando corresponda).
+
+Cada uno participa únicamente en las etapas donde su intervención resulta necesaria.
+
+=====================================================
+
+7.5.3 Flujo General
+-------------------
+
+El recorrido operativo del viaje puede resumirse de la siguiente manera:
+
+Pedido asignado
+        │
+        ▼
+Viaje creado
+        │
+        ▼
+Chofer acepta
+        │
+        ▼
+En camino al origen
+        │
+        ▼
+En origen
+        │
+        ▼
+Inicio del viaje
+        │
+        ▼
+Viaje en curso
+        │
+        ▼
+Finalización
+        │
+        ▼
+Liberación del taxi
+        │
+        ▼
+Actualización de cola
+        │
+        ▼
+Cierre operativo
+
+Este flujo representa el comportamiento normal de un servicio sin cancelaciones ni incidencias extraordinarias.
+
+=====================================================
+
+7.5.4 Descripción paso a paso
+-----------------------------
+
+	Paso 1 — Creación del viaje
+
+Una vez que el pedido ha sido asignado, el sistema genera el viaje correspondiente.
+
+En esta etapa quedan vinculados:
+
+pedido;
+cliente;
+chofer;
+taxi;
+empresa.
+
+El viaje pasa a ser la entidad principal de la operación.
+
+	Paso 2 — Aceptación
+
+El chofer confirma la asignación.
+
+A partir de este momento el recurso queda comprometido con la prestación del servicio.
+
+El taxi cambia su estado operativo y deja de estar disponible para nuevas asignaciones.
+
+	Paso 3 — Desplazamiento al origen
+
+El chofer inicia el recorrido hacia el punto donde se encuentra el cliente.
+
+Durante esta etapa el sistema recibe continuamente información GPS, permitiendo visualizar la ubicación del vehículo y estimar su tiempo de llegada.
+
+	Paso 4 — Llegada al origen
+
+Al arribar al punto de encuentro, el viaje cambia al estado En Origen.
+
+Este estado informa a la operadora que el vehículo ya se encuentra esperando al cliente.
+
+	Paso 5 — Inicio del servicio
+
+Cuando el cliente aborda el vehículo, el chofer inicia formalmente el viaje.
+
+Desde este momento comienza la prestación efectiva del servicio.
+
+	Paso 6 — Viaje en curso
+
+Durante todo el recorrido el sistema mantiene actualizado:
+
+estado del viaje;
+posición GPS;
+estado del taxi;
+eventos operativos.
+
+La operación permanece bajo seguimiento hasta su finalización.
+
+	Paso 7 — Finalización
+
+Al llegar al destino, el chofer finaliza el viaje.
+
+Esta acción produce múltiples efectos coordinados:
+
+cierre del viaje;
+actualización del taxi;
+liberación del recurso;
+actualización de la cola inteligente;
+generación de eventos;
+habilitación de los procesos administrativos y financieros posteriores.
+
+	7.5.5 Estados involucrados
+
+El viaje evoluciona mediante una secuencia de estados claramente definida.
+
+Asignado
+     │
+     ▼
+Aceptado
+     │
+     ▼
+En camino al origen
+     │
+     ▼
+En origen
+     │
+     ▼
+En curso
+     │
+     ▼
+Finalizado
+
+Cada transición representa un cambio operativo que modifica el comportamiento del sistema y habilita nuevas acciones por parte de los distintos módulos.
+
+	7.5.6 Entidades involucradas
+
+Durante el ciclo de vida del viaje participan principalmente las siguientes entidades:
+
+viajes
+pedidos
+asignaciones
+taxis
+choferes
+clientes
+gps_logs
+eventos
+pagos (cuando corresponde)
+movimientos_credito (cuando corresponde)
+clientes_credito (cuando corresponde)
+
+Estas entidades colaboran para administrar la operación completa y mantener la consistencia del sistema.
+
+	7.5.7 Comunicación entre módulos
+
+Durante la ejecución del viaje existe un intercambio continuo de información entre distintos componentes.
+
+Viajes
+    │
+    ▼
+GPS
+    │
+    ▼
+Estado del Taxi
+    │
+    ▼
+Cola Inteligente
+    │
+    ▼
+Eventos
+    │
+    ▼
+Finanzas
+
+Cada módulo recibe información actualizada, ejecuta su función específica y comunica el resultado al siguiente componente del proceso.
+
+	7.5.8 Resultado del proceso
+
+Al finalizar el ciclo del viaje:
+
+el servicio queda completamente ejecutado;
+el taxi recupera su disponibilidad operativa;
+la cola inteligente se actualiza;
+el historial GPS permanece registrado;
+los eventos quedan almacenados;
+el sistema queda preparado para iniciar una nueva operación.
+
+Cuando corresponde, se inicia además el proceso de registración financiera asociado al servicio prestado.
+
+	7.5.9 Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, el viaje constituye el núcleo operativo del SGOF Core.
+
+Es la entidad que concentra la ejecución del servicio y coordina la interacción entre los distintos subsistemas de la plataforma.
+
+A diferencia del pedido, cuya función es representar una solicitud, el viaje administra la realidad operativa del servicio. Durante su ejecución interactúa con la gestión de flota, el seguimiento GPS, la cola inteligente, el registro de eventos y, al finalizar, con el subsistema financiero.
+
+Esta posición central convierte al viaje en el principal punto de integración funcional del SGOF Core. La evolución mediante estados claramente definidos permite desacoplar los distintos módulos, manteniendo una arquitectura modular donde cada componente interviene únicamente cuando el estado de la operación lo requiere.
+
+======================================================
+
+Capitulo 7
+==========
+
+Modelo Funcional del SGOF Core
+───────────────────────
+
+
+7.1 Introducción
+----------------
+
+El presente capítulo describe el funcionamiento operativo del SGOF Core, explicando la interacción entre los distintos componentes que conforman la plataforma y la forma en que éstos colaboran para gestionar el ciclo completo de una operación.
+
+Mientras el capítulo anterior documentó la estructura permanente del sistema mediante el análisis del Modelo Relacional, este capítulo aborda el comportamiento dinámico de la aplicación, describiendo el flujo de información, las decisiones operativas y la secuencia de procesos que permiten transformar un pedido inicial en un servicio completamente gestionado.
+
+El Modelo Funcional representa la lógica de operación del sistema, definiendo la participación de cada módulo, la circulación de la información entre ellos y la evolución de las distintas entidades durante su ciclo de vida.
+
+A diferencia del Modelo Relacional, que describe la organización de los datos, el Modelo Funcional documenta la forma en que dichos datos son creados, modificados, consultados y utilizados por los distintos procesos que integran el SGOF Core.
+
+Este capítulo constituye el vínculo entre la arquitectura técnica y la operación diaria del sistema, proporcionando una visión integral del comportamiento funcional de la plataforma.
+
+=======================================================
+
+7.2 Visión General del Funcionamiento
+-------------------------------------
+
+El SGOF Core opera como un sistema integrado donde múltiples módulos especializados colaboran para administrar en tiempo real la totalidad del proceso operativo.
+
+Cada módulo posee responsabilidades claramente definidas y mantiene una comunicación permanente con los restantes componentes mediante el intercambio de información y la actualización de los estados de las distintas entidades.
+
+Desde una perspectiva funcional, el sistema puede dividirse en seis grandes subsistemas:
+
+Gestión Operativa.
+Gestión de Recursos.
+Gestión de Usuarios.
+Gestión Financiera.
+Gestión de Auditoría.
+Configuración General.
+
+Cada uno de estos subsistemas participa en distintas etapas del ciclo operativo, interviniendo únicamente cuando su función resulta necesaria.
+
+Esta separación de responsabilidades reduce el acoplamiento entre componentes y facilita tanto el mantenimiento como la evolución futura del sistema.
+
+Arquitectura funcional general
+                         SGOF CORE
+                              │
+     ┌────────────────────────┼────────────────────────┐
+     │                        │                        │
+     ▼                        ▼                        ▼
+Gestión Operativa      Gestión Recursos      Gestión Usuarios
+     │                        │                        │
+     │                        │                        │
+Pedidos                 Taxis                  Usuarios
+Asignaciones            Tablets               Operadoras
+Viajes                  GPS Logs              Turnos
+     │
+     ▼
+Gestión Financiera
+     │
+Clientes Crédito
+Movimientos Crédito
+Pagos
+     │
+     ▼
+Auditoría
+     │
+Eventos
+Principio de funcionamiento
+
+El funcionamiento del sistema se basa en una secuencia continua de eventos.
+
+Cada operación realizada genera modificaciones sobre una o varias entidades del Modelo Relacional, produciendo nuevos estados que son utilizados por los procesos siguientes.
+
+De esta forma, el SGOF Core mantiene sincronizados:
+
+el estado operativo de los pedidos;
+la disponibilidad de los taxis;
+la actividad de los choferes;
+la ubicación GPS de la flota;
+la información financiera;
+la bitácora de auditoría.
+
+Todos estos procesos funcionan sobre una única base de datos centralizada, evitando duplicidad de información y garantizando la consistencia de los datos.
+
+Principios arquitectónicos del Modelo Funcional
+
+Durante la auditoría funcional realizada sobre el sistema se identifican los siguientes principios de diseño:
+
+Responsabilidad única: cada módulo administra exclusivamente su propio dominio funcional.
+Actualización por estados: las operaciones evolucionan mediante cambios de estado claramente definidos.
+Trazabilidad completa: toda acción relevante puede ser reconstruida mediante la entidad eventos.
+Persistencia centralizada: toda la información reside en un único Modelo Relacional.
+Integración modular: los módulos colaboran entre sí sin perder independencia funcional.
+Escalabilidad: la arquitectura admite la incorporación de nuevos módulos sin modificar el funcionamiento de los existentes.
+
+Estos principios constituyen la base del comportamiento operativo del SGOF Core y explican la coherencia observada durante la auditoría técnica del sistema.
+
+Cierre de la sección
+
+Con la comprensión de la arquitectura funcional general, los apartados siguientes desarrollarán en detalle el comportamiento de cada uno de los procesos que intervienen en la operación diaria del SGOF Core.
+
+Se analizará el ciclo completo de un servicio, desde la recepción del pedido hasta su cierre administrativo y financiero, describiendo la participación de cada módulo, las transiciones de estado y la interacción entre las distintas entidades del sistema.
+
+========================================================
+
+7.3 Flujo Operativo General
+─────────────────────
+
+Introducción
+------------
+
+El funcionamiento del SGOF Core puede entenderse como una secuencia continua de procesos coordinados que transforman una solicitud de servicio en una operación completamente gestionada, controlada y registrada.
+
+Cada etapa del proceso produce información que sirve como entrada para la siguiente, permitiendo mantener sincronizados todos los módulos del sistema.
+
+Desde la recepción inicial del pedido hasta el cierre administrativo y financiero, cada componente interviene únicamente cuando su participación resulta necesaria, manteniendo una arquitectura modular basada en responsabilidades claramente definidas.
+
+El objetivo de este apartado es presentar una visión global del recorrido funcional del sistema antes de analizar detalladamente cada uno de sus procesos.
+
+Flujo General
+                CLIENTE
+                   │
+                   ▼
+          Recepción del Pedido
+                   │
+                   ▼
+          Registro del Pedido
+                   │
+                   ▼
+          Cola Operativa
+                   │
+                   ▼
+        Asignación Inteligente
+                   │
+                   ▼
+          Taxi Asignado
+                   │
+                   ▼
+      Confirmación del Chofer
+                   │
+                   ▼
+        Desplazamiento al Origen
+                   │
+                   ▼
+        Llegada al Cliente
+                   │
+                   ▼
+         Inicio del Viaje
+                   │
+                   ▼
+      Seguimiento GPS Continuo
+                   │
+                   ▼
+       Finalización del Viaje
+                   │
+                   ▼
+         Registro del Pago
+                   │
+                   ▼
+ Actualización Financiera
+                   │
+                   ▼
+ Registro de Eventos
+                   │
+                   ▼
+ Cierre Completo de la Operación
+Descripción General del Flujo
+
+El ciclo operativo comienza con la recepción de un pedido realizado por un cliente.
+
+Una vez registrada la solicitud, el sistema incorpora el pedido a la cola operativa, donde queda disponible para el proceso de asignación.
+
+La asignación inteligente analiza simultáneamente la disponibilidad de la flota, el orden de la cola, la ubicación GPS y las reglas de prioridad establecidas por la empresa, determinando el taxi más adecuado para atender la solicitud.
+
+Aceptada la asignación por el chofer, el sistema inicia el seguimiento operativo del servicio, registrando los cambios de estado del viaje y actualizando continuamente la posición del vehículo mediante el módulo GPS.
+
+Finalizado el traslado, la operación continúa con el registro del pago y, cuando corresponde, con la actualización de las cuentas corrientes administradas por el subsistema financiero.
+
+Durante todo este recorrido, cada acción relevante genera un evento registrado por el sistema de auditoría, permitiendo reconstruir posteriormente la historia completa de la operación.
+
+El ciclo concluye cuando todos los componentes involucrados han actualizado su estado y la información queda completamente persistida en el Modelo Relacional del SGOF Core.
+
+Participación de los módulos
+
+Durante este recorrido intervienen los siguientes módulos funcionales:
+
+Etapa	Módulo participante
+Recepción	Pedidos
+Organización	Cola Operativa
+Selección	Asignación Inteligente
+Recursos	Taxis
+Operación	Viajes
+Monitoreo	GPS
+Administración	Usuarios / Operadoras
+Finanzas	Pagos / Clientes Crédito / Movimientos Crédito
+Auditoría	Eventos
+
+Cada uno de estos módulos administra exclusivamente su propio dominio de información, comunicándose con los restantes mediante el intercambio de estados y referencias.
+
+Principios del flujo operativo
+
+El funcionamiento general del sistema responde a una serie de principios que fueron identificados durante la auditoría:
+
+El proceso avanza mediante transiciones de estado claramente definidas.
+Cada módulo interviene únicamente cuando su función resulta necesaria.
+La información se registra una única vez y luego es compartida por el resto de los componentes.
+Toda modificación relevante queda registrada en la bitácora de eventos.
+Las entidades mantienen relaciones de colaboración, pero conservan su independencia funcional.
+La base de datos actúa como repositorio único y consistente para toda la operación.
+Relación con los capítulos siguientes
+
+El flujo presentado constituye una visión de alto nivel del comportamiento del SGOF Core.
+
+Los apartados siguientes desarrollarán en profundidad cada una de las etapas aquí descritas, analizando sus reglas de funcionamiento, las entidades involucradas, las transiciones de estado y la interacción entre los distintos módulos que conforman la plataforma.
+
+===================================================
+
+7.4 Ciclo de Vida del Pedido
+----------------------------
+
+Introducción
+------------
+
+El pedido constituye el punto de inicio de toda operación gestionada por el SGOF Core.
+
+Toda prestación de servicio comienza con la recepción de una solicitud realizada por un cliente, la cual es registrada por el sistema y se convierte en el elemento que desencadena la totalidad del flujo operativo posterior.
+
+A partir de ese momento, el pedido evoluciona mediante una secuencia controlada de estados hasta transformarse en un viaje asignado y posteriormente finalizado.
+
+El objetivo de este apartado es describir el ciclo completo de vida del pedido, identificando las etapas que lo componen, las entidades involucradas y las reglas funcionales que gobiernan su evolución.
+
+====================================================
+
+7.4.1 Objetivo del proceso
+--------------------------
+
+El proceso de gestión de pedidos tiene como finalidad registrar, organizar y administrar todas las solicitudes de servicio recibidas por la empresa, asegurando que cada una de ellas pueda ser atendida de forma ordenada, trazable y eficiente.
+
+El pedido constituye la unidad básica de trabajo del sistema y actúa como punto de partida para los procesos de asignación, despacho, seguimiento operativo y control administrativo.
+
+Su correcta gestión garantiza que toda solicitud quede documentada desde su creación hasta la finalización del servicio correspondiente.
+
+=======================================================
+
+7.4.2 Participantes
+-------------------
+
+Durante el ciclo de vida del pedido intervienen distintos actores y componentes del sistema.
+
+Actores humanos
+Cliente.
+Operadora.
+Chofer.
+Componentes del sistema
+Módulo de Pedidos.
+Cola Operativa.
+Asignación Inteligente.
+Gestión de Viajes.
+Gestión GPS.
+Registro de Eventos.
+
+Cada uno participa únicamente durante las etapas donde su intervención resulta necesaria.
+
+========================================================
+
+7.4.3 Flujo General
+-------------------
+
+El ciclo operativo del pedido puede resumirse de la siguiente manera:
+
+Cliente
+    │
+    ▼
+Solicitud del servicio
+    │
+    ▼
+Registro del pedido
+    │
+    ▼
+Validación
+    │
+    ▼
+Ingreso a Cola Operativa
+    │
+    ▼
+Asignación Inteligente
+    │
+    ▼
+Taxi asignado
+    │
+    ▼
+Aceptación del chofer
+    │
+    ▼
+Conversión en viaje operativo
+
+A partir de este punto comienza el ciclo de vida del viaje, que será desarrollado en el apartado siguiente del presente capítulo.
+
+======================================================
+
+7.4.4 Descripción paso a paso
+-----------------------------
+
+	Paso 1 — Recepción del pedido
+
+La operación comienza cuando un cliente solicita un servicio.
+
+La solicitud puede ser recibida por la operadora o por cualquier otro canal de ingreso previsto por el sistema.
+
+En esta etapa aún no existe ninguna asignación ni intervención de la flota.
+
+	Paso 2 — Registro
+
+La operadora registra la información necesaria para identificar el servicio solicitado.
+
+Entre otros datos:
+
+cliente;
+origen;
+destino (cuando corresponda);
+observaciones;
+prioridad;
+fecha y hora.
+
+En este momento se crea la entidad Pedido dentro del Modelo Relacional.
+
+	Paso 3 — Validación
+
+El sistema verifica que la información mínima requerida se encuentre presente.
+
+Superada la validación, el pedido queda oficialmente incorporado a la operación.
+
+	Paso 4 — Cola Operativa
+
+El pedido ingresa automáticamente a la cola de pendientes.
+
+Desde este momento queda disponible para el proceso de asignación.
+
+Todavía no existe un taxi asociado.
+
+	Paso 5 — Asignación
+
+El módulo de Asignación Inteligente analiza:
+
+disponibilidad de taxis;
+posición GPS;
+orden de la cola;
+reglas de prioridad;
+estado operativo.
+
+Como resultado selecciona el recurso más adecuado.
+
+	Paso 6 — Confirmación
+
+Una vez aceptada la asignación por el chofer, el pedido deja de ser una simple solicitud pendiente y pasa a formar parte de una operación activa.
+
+A partir de ese instante comienza el ciclo operativo del viaje.
+
+	7.4.5 Estados involucrados
+
+Durante su ciclo de vida, el pedido atraviesa distintos estados funcionales que reflejan su evolución dentro del proceso operativo.
+
+Aunque la implementación específica puede variar según la lógica del sistema, conceptualmente el recorrido es el siguiente:
+
+Creado
+   │
+   ▼
+Validado
+   │
+   ▼
+Pendiente
+   │
+   ▼
+Asignado
+   │
+   ▼
+Convertido en Viaje
+
+Cada transición representa un cambio de responsabilidad dentro del sistema y habilita la intervención del módulo correspondiente.
+
+	7.4.6 Entidades involucradas
+
+Durante este proceso participan las siguientes entidades del Modelo Relacional:
+
+clientes
+pedidos
+asignaciones
+taxis
+choferes
+viajes
+gps_logs
+eventos
+
+Cada una aporta la información necesaria para que el pedido evolucione correctamente hasta convertirse en un viaje operativo.
+
+	7.4.7 Comunicación entre módulos
+
+El ciclo del pedido requiere la interacción coordinada de varios módulos del SGOF Core.
+
+El flujo principal de comunicación es el siguiente:
+
+Pedidos
+    │
+    ▼
+Cola Operativa
+    │
+    ▼
+Asignación Inteligente
+    │
+    ▼
+Viajes
+    │
+    ▼
+GPS
+    │
+    ▼
+Eventos
+
+Cada módulo recibe información del anterior, realiza su función específica y transmite el resultado al siguiente, manteniendo sincronizado el estado general de la operación.
+
+	7.4.8 Resultado del proceso
+
+Al finalizar este proceso:
+
+el pedido ha sido registrado y validado;
+se encuentra asociado a un taxi y a un chofer;
+la asignación ha sido aceptada;
+la operación deja la etapa de solicitud;
+se genera un viaje operativo listo para iniciar el servicio.
+
+El proceso concluye cuando la responsabilidad pasa al módulo de gestión de viajes, que continuará administrando la evolución del servicio hasta su finalización.
+
+	7.4.9 Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, el pedido representa el disparador de todo el flujo operativo del SGOF Core.
+
+A diferencia del viaje, que administra la ejecución del servicio, el pedido concentra exclusivamente la necesidad inicial del cliente. Esta separación evita mezclar la solicitud con la operación en curso y permite conservar una trazabilidad completa desde el primer contacto hasta el cierre del servicio.
+
+La transición del pedido hacia el viaje constituye uno de los principios fundamentales del diseño del sistema: una solicitud no es todavía una operación. Solo cuando la asignación es aceptada y existe un recurso operativo comprometido, el sistema transforma esa solicitud en un viaje activo.
+
+Esta diferenciación mantiene un bajo acoplamiento entre los módulos de recepción y ejecución, facilita el control operativo y permite que cada etapa del proceso evolucione de forma independiente, reforzando la arquitectura modular que caracteriza al SGOF Core.
+
+=======================================================
+
+7.5 Ciclo de Vida del Viaje
+─────────────────────
+
+Introducción
+------------
+
+El viaje constituye la unidad operativa principal del SGOF Core.
+
+Mientras el pedido representa la necesidad planteada por el cliente, el viaje representa la ejecución efectiva del servicio, administrando la interacción entre la empresa, la operadora, el chofer, el taxi y el cliente desde el momento de la asignación hasta la finalización del traslado.
+
+Durante su ciclo de vida, el viaje evoluciona mediante una secuencia de estados operativos que permiten conocer en todo momento la situación del servicio, facilitando la coordinación de la flota, el seguimiento en tiempo real y el control administrativo.
+
+El objetivo de este apartado es describir el recorrido completo del viaje, identificando las etapas que lo componen, los módulos que intervienen y las reglas funcionales que gobiernan su evolución.
+
+======================================================
+
+7.5.1 Objetivo del proceso
+--------------------------
+
+El proceso de gestión de viajes tiene como finalidad administrar la ejecución completa de cada servicio solicitado, asegurando el seguimiento operativo desde la asignación del recurso hasta la finalización del traslado.
+
+El viaje constituye el eje central de la operación diaria del SGOF Core, integrando la información proveniente del pedido, la asignación, la posición GPS, los estados del taxi y las acciones del chofer.
+
+Su correcta administración permite conocer en tiempo real el estado de cada servicio, optimizar la utilización de la flota y garantizar la trazabilidad completa de la operación.
+
+=====================================================
+
+7.5.2 Participantes
+-------------------
+
+Durante el ciclo de vida del viaje intervienen distintos actores y módulos especializados.
+
+Actores humanos
+Cliente.
+Operadora.
+Chofer.
+Recursos físicos
+Taxi.
+Componentes del sistema
+Gestión de Viajes.
+Gestión de Taxis.
+Gestión GPS.
+Cola Inteligente.
+Registro de Eventos.
+Gestión Financiera (al finalizar el servicio, cuando corresponda).
+
+Cada uno participa únicamente en las etapas donde su intervención resulta necesaria.
+
+=====================================================
+
+7.5.3 Flujo General
+-------------------
+
+El recorrido operativo del viaje puede resumirse de la siguiente manera:
+
+Pedido asignado
+        │
+        ▼
+Viaje creado
+        │
+        ▼
+Chofer acepta
+        │
+        ▼
+En camino al origen
+        │
+        ▼
+En origen
+        │
+        ▼
+Inicio del viaje
+        │
+        ▼
+Viaje en curso
+        │
+        ▼
+Finalización
+        │
+        ▼
+Liberación del taxi
+        │
+        ▼
+Actualización de cola
+        │
+        ▼
+Cierre operativo
+
+Este flujo representa el comportamiento normal de un servicio sin cancelaciones ni incidencias extraordinarias.
+
+=====================================================
+
+7.5.4 Descripción paso a paso
+-----------------------------
+
+	Paso 1 — Creación del viaje
+
+Una vez que el pedido ha sido asignado, el sistema genera el viaje correspondiente.
+
+En esta etapa quedan vinculados:
+
+pedido;
+cliente;
+chofer;
+taxi;
+empresa.
+
+El viaje pasa a ser la entidad principal de la operación.
+
+	Paso 2 — Aceptación
+
+El chofer confirma la asignación.
+
+A partir de este momento el recurso queda comprometido con la prestación del servicio.
+
+El taxi cambia su estado operativo y deja de estar disponible para nuevas asignaciones.
+
+	Paso 3 — Desplazamiento al origen
+
+El chofer inicia el recorrido hacia el punto donde se encuentra el cliente.
+
+Durante esta etapa el sistema recibe continuamente información GPS, permitiendo visualizar la ubicación del vehículo y estimar su tiempo de llegada.
+
+	Paso 4 — Llegada al origen
+
+Al arribar al punto de encuentro, el viaje cambia al estado En Origen.
+
+Este estado informa a la operadora que el vehículo ya se encuentra esperando al cliente.
+
+	Paso 5 — Inicio del servicio
+
+Cuando el cliente aborda el vehículo, el chofer inicia formalmente el viaje.
+
+Desde este momento comienza la prestación efectiva del servicio.
+
+	Paso 6 — Viaje en curso
+
+Durante todo el recorrido el sistema mantiene actualizado:
+
+estado del viaje;
+posición GPS;
+estado del taxi;
+eventos operativos.
+
+La operación permanece bajo seguimiento hasta su finalización.
+
+	Paso 7 — Finalización
+
+Al llegar al destino, el chofer finaliza el viaje.
+
+Esta acción produce múltiples efectos coordinados:
+
+cierre del viaje;
+actualización del taxi;
+liberación del recurso;
+actualización de la cola inteligente;
+generación de eventos;
+habilitación de los procesos administrativos y financieros posteriores.
+
+	7.5.5 Estados involucrados
+
+El viaje evoluciona mediante una secuencia de estados claramente definida.
+
+Asignado
+     │
+     ▼
+Aceptado
+     │
+     ▼
+En camino al origen
+     │
+     ▼
+En origen
+     │
+     ▼
+En curso
+     │
+     ▼
+Finalizado
+
+Cada transición representa un cambio operativo que modifica el comportamiento del sistema y habilita nuevas acciones por parte de los distintos módulos.
+
+	7.5.6 Entidades involucradas
+
+Durante el ciclo de vida del viaje participan principalmente las siguientes entidades:
+
+viajes
+pedidos
+asignaciones
+taxis
+choferes
+clientes
+gps_logs
+eventos
+pagos (cuando corresponde)
+movimientos_credito (cuando corresponde)
+clientes_credito (cuando corresponde)
+
+Estas entidades colaboran para administrar la operación completa y mantener la consistencia del sistema.
+
+	7.5.7 Comunicación entre módulos
+
+Durante la ejecución del viaje existe un intercambio continuo de información entre distintos componentes.
+
+Viajes
+    │
+    ▼
+GPS
+    │
+    ▼
+Estado del Taxi
+    │
+    ▼
+Cola Inteligente
+    │
+    ▼
+Eventos
+    │
+    ▼
+Finanzas
+
+Cada módulo recibe información actualizada, ejecuta su función específica y comunica el resultado al siguiente componente del proceso.
+
+	7.5.8 Resultado del proceso
+
+Al finalizar el ciclo del viaje:
+
+el servicio queda completamente ejecutado;
+el taxi recupera su disponibilidad operativa;
+la cola inteligente se actualiza;
+el historial GPS permanece registrado;
+los eventos quedan almacenados;
+el sistema queda preparado para iniciar una nueva operación.
+
+Cuando corresponde, se inicia además el proceso de registración financiera asociado al servicio prestado.
+
+	7.5.9 Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, el viaje constituye el núcleo operativo del SGOF Core.
+
+Es la entidad que concentra la ejecución del servicio y coordina la interacción entre los distintos subsistemas de la plataforma.
+
+A diferencia del pedido, cuya función es representar una solicitud, el viaje administra la realidad operativa del servicio. Durante su ejecución interactúa con la gestión de flota, el seguimiento GPS, la cola inteligente, el registro de eventos y, al finalizar, con el subsistema financiero.
+
+Esta posición central convierte al viaje en el principal punto de integración funcional del SGOF Core. La evolución mediante estados claramente definidos permite desacoplar los distintos módulos, manteniendo una arquitectura modular donde cada componente interviene únicamente cuando el estado de la operación lo requiere.
+
+======================================================
+
+Modelo Funcional del SGOF Core
+───────────────────────
+
+
+7.1 Introducción
+----------------
+
+El presente capítulo describe el funcionamiento operativo del SGOF Core, explicando la interacción entre los distintos componentes que conforman la plataforma y la forma en que éstos colaboran para gestionar el ciclo completo de una operación.
+
+Mientras el capítulo anterior documentó la estructura permanente del sistema mediante el análisis del Modelo Relacional, este capítulo aborda el comportamiento dinámico de la aplicación, describiendo el flujo de información, las decisiones operativas y la secuencia de procesos que permiten transformar un pedido inicial en un servicio completamente gestionado.
+
+El Modelo Funcional representa la lógica de operación del sistema, definiendo la participación de cada módulo, la circulación de la información entre ellos y la evolución de las distintas entidades durante su ciclo de vida.
+
+A diferencia del Modelo Relacional, que describe la organización de los datos, el Modelo Funcional documenta la forma en que dichos datos son creados, modificados, consultados y utilizados por los distintos procesos que integran el SGOF Core.
+
+Este capítulo constituye el vínculo entre la arquitectura técnica y la operación diaria del sistema, proporcionando una visión integral del comportamiento funcional de la plataforma.
+
+=======================================================
+
+7.2 Visión General del Funcionamiento
+-------------------------------------
+
+El SGOF Core opera como un sistema integrado donde múltiples módulos especializados colaboran para administrar en tiempo real la totalidad del proceso operativo.
+
+Cada módulo posee responsabilidades claramente definidas y mantiene una comunicación permanente con los restantes componentes mediante el intercambio de información y la actualización de los estados de las distintas entidades.
+
+Desde una perspectiva funcional, el sistema puede dividirse en seis grandes subsistemas:
+
+Gestión Operativa.
+Gestión de Recursos.
+Gestión de Usuarios.
+Gestión Financiera.
+Gestión de Auditoría.
+Configuración General.
+
+Cada uno de estos subsistemas participa en distintas etapas del ciclo operativo, interviniendo únicamente cuando su función resulta necesaria.
+
+Esta separación de responsabilidades reduce el acoplamiento entre componentes y facilita tanto el mantenimiento como la evolución futura del sistema.
+
+Arquitectura funcional general
+                         SGOF CORE
+                              │
+     ┌────────────────────────┼────────────────────────┐
+     │                        │                        │
+     ▼                        ▼                        ▼
+Gestión Operativa      Gestión Recursos      Gestión Usuarios
+     │                        │                        │
+     │                        │                        │
+Pedidos                 Taxis                  Usuarios
+Asignaciones            Tablets               Operadoras
+Viajes                  GPS Logs              Turnos
+     │
+     ▼
+Gestión Financiera
+     │
+Clientes Crédito
+Movimientos Crédito
+Pagos
+     │
+     ▼
+Auditoría
+     │
+Eventos
+Principio de funcionamiento
+
+El funcionamiento del sistema se basa en una secuencia continua de eventos.
+
+Cada operación realizada genera modificaciones sobre una o varias entidades del Modelo Relacional, produciendo nuevos estados que son utilizados por los procesos siguientes.
+
+De esta forma, el SGOF Core mantiene sincronizados:
+
+el estado operativo de los pedidos;
+la disponibilidad de los taxis;
+la actividad de los choferes;
+la ubicación GPS de la flota;
+la información financiera;
+la bitácora de auditoría.
+
+Todos estos procesos funcionan sobre una única base de datos centralizada, evitando duplicidad de información y garantizando la consistencia de los datos.
+
+Principios arquitectónicos del Modelo Funcional
+
+Durante la auditoría funcional realizada sobre el sistema se identifican los siguientes principios de diseño:
+
+Responsabilidad única: cada módulo administra exclusivamente su propio dominio funcional.
+Actualización por estados: las operaciones evolucionan mediante cambios de estado claramente definidos.
+Trazabilidad completa: toda acción relevante puede ser reconstruida mediante la entidad eventos.
+Persistencia centralizada: toda la información reside en un único Modelo Relacional.
+Integración modular: los módulos colaboran entre sí sin perder independencia funcional.
+Escalabilidad: la arquitectura admite la incorporación de nuevos módulos sin modificar el funcionamiento de los existentes.
+
+Estos principios constituyen la base del comportamiento operativo del SGOF Core y explican la coherencia observada durante la auditoría técnica del sistema.
+
+Cierre de la sección
+
+Con la comprensión de la arquitectura funcional general, los apartados siguientes desarrollarán en detalle el comportamiento de cada uno de los procesos que intervienen en la operación diaria del SGOF Core.
+
+Se analizará el ciclo completo de un servicio, desde la recepción del pedido hasta su cierre administrativo y financiero, describiendo la participación de cada módulo, las transiciones de estado y la interacción entre las distintas entidades del sistema.
+
+========================================================
+
+7.3 Flujo Operativo General
+─────────────────────
+
+Introducción
+------------
+
+El funcionamiento del SGOF Core puede entenderse como una secuencia continua de procesos coordinados que transforman una solicitud de servicio en una operación completamente gestionada, controlada y registrada.
+
+Cada etapa del proceso produce información que sirve como entrada para la siguiente, permitiendo mantener sincronizados todos los módulos del sistema.
+
+Desde la recepción inicial del pedido hasta el cierre administrativo y financiero, cada componente interviene únicamente cuando su participación resulta necesaria, manteniendo una arquitectura modular basada en responsabilidades claramente definidas.
+
+El objetivo de este apartado es presentar una visión global del recorrido funcional del sistema antes de analizar detalladamente cada uno de sus procesos.
+
+Flujo General
+                CLIENTE
+                   │
+                   ▼
+          Recepción del Pedido
+                   │
+                   ▼
+          Registro del Pedido
+                   │
+                   ▼
+          Cola Operativa
+                   │
+                   ▼
+        Asignación Inteligente
+                   │
+                   ▼
+          Taxi Asignado
+                   │
+                   ▼
+      Confirmación del Chofer
+                   │
+                   ▼
+        Desplazamiento al Origen
+                   │
+                   ▼
+        Llegada al Cliente
+                   │
+                   ▼
+         Inicio del Viaje
+                   │
+                   ▼
+      Seguimiento GPS Continuo
+                   │
+                   ▼
+       Finalización del Viaje
+                   │
+                   ▼
+         Registro del Pago
+                   │
+                   ▼
+ Actualización Financiera
+                   │
+                   ▼
+ Registro de Eventos
+                   │
+                   ▼
+ Cierre Completo de la Operación
+Descripción General del Flujo
+
+El ciclo operativo comienza con la recepción de un pedido realizado por un cliente.
+
+Una vez registrada la solicitud, el sistema incorpora el pedido a la cola operativa, donde queda disponible para el proceso de asignación.
+
+La asignación inteligente analiza simultáneamente la disponibilidad de la flota, el orden de la cola, la ubicación GPS y las reglas de prioridad establecidas por la empresa, determinando el taxi más adecuado para atender la solicitud.
+
+Aceptada la asignación por el chofer, el sistema inicia el seguimiento operativo del servicio, registrando los cambios de estado del viaje y actualizando continuamente la posición del vehículo mediante el módulo GPS.
+
+Finalizado el traslado, la operación continúa con el registro del pago y, cuando corresponde, con la actualización de las cuentas corrientes administradas por el subsistema financiero.
+
+Durante todo este recorrido, cada acción relevante genera un evento registrado por el sistema de auditoría, permitiendo reconstruir posteriormente la historia completa de la operación.
+
+El ciclo concluye cuando todos los componentes involucrados han actualizado su estado y la información queda completamente persistida en el Modelo Relacional del SGOF Core.
+
+Participación de los módulos
+
+Durante este recorrido intervienen los siguientes módulos funcionales:
+
+Etapa	Módulo participante
+Recepción	Pedidos
+Organización	Cola Operativa
+Selección	Asignación Inteligente
+Recursos	Taxis
+Operación	Viajes
+Monitoreo	GPS
+Administración	Usuarios / Operadoras
+Finanzas	Pagos / Clientes Crédito / Movimientos Crédito
+Auditoría	Eventos
+
+Cada uno de estos módulos administra exclusivamente su propio dominio de información, comunicándose con los restantes mediante el intercambio de estados y referencias.
+
+Principios del flujo operativo
+
+El funcionamiento general del sistema responde a una serie de principios que fueron identificados durante la auditoría:
+
+El proceso avanza mediante transiciones de estado claramente definidas.
+Cada módulo interviene únicamente cuando su función resulta necesaria.
+La información se registra una única vez y luego es compartida por el resto de los componentes.
+Toda modificación relevante queda registrada en la bitácora de eventos.
+Las entidades mantienen relaciones de colaboración, pero conservan su independencia funcional.
+La base de datos actúa como repositorio único y consistente para toda la operación.
+Relación con los capítulos siguientes
+
+El flujo presentado constituye una visión de alto nivel del comportamiento del SGOF Core.
+
+Los apartados siguientes desarrollarán en profundidad cada una de las etapas aquí descritas, analizando sus reglas de funcionamiento, las entidades involucradas, las transiciones de estado y la interacción entre los distintos módulos que conforman la plataforma.
+
+===================================================
+
+7.4 Ciclo de Vida del Pedido
+----------------------------
+
+Introducción
+------------
+
+El pedido constituye el punto de inicio de toda operación gestionada por el SGOF Core.
+
+Toda prestación de servicio comienza con la recepción de una solicitud realizada por un cliente, la cual es registrada por el sistema y se convierte en el elemento que desencadena la totalidad del flujo operativo posterior.
+
+A partir de ese momento, el pedido evoluciona mediante una secuencia controlada de estados hasta transformarse en un viaje asignado y posteriormente finalizado.
+
+El objetivo de este apartado es describir el ciclo completo de vida del pedido, identificando las etapas que lo componen, las entidades involucradas y las reglas funcionales que gobiernan su evolución.
+
+====================================================
+
+7.4.1 Objetivo del proceso
+--------------------------
+
+El proceso de gestión de pedidos tiene como finalidad registrar, organizar y administrar todas las solicitudes de servicio recibidas por la empresa, asegurando que cada una de ellas pueda ser atendida de forma ordenada, trazable y eficiente.
+
+El pedido constituye la unidad básica de trabajo del sistema y actúa como punto de partida para los procesos de asignación, despacho, seguimiento operativo y control administrativo.
+
+Su correcta gestión garantiza que toda solicitud quede documentada desde su creación hasta la finalización del servicio correspondiente.
+
+=======================================================
+
+7.4.2 Participantes
+-------------------
+
+Durante el ciclo de vida del pedido intervienen distintos actores y componentes del sistema.
+
+Actores humanos
+Cliente.
+Operadora.
+Chofer.
+Componentes del sistema
+Módulo de Pedidos.
+Cola Operativa.
+Asignación Inteligente.
+Gestión de Viajes.
+Gestión GPS.
+Registro de Eventos.
+
+Cada uno participa únicamente durante las etapas donde su intervención resulta necesaria.
+
+========================================================
+
+7.4.3 Flujo General
+-------------------
+
+El ciclo operativo del pedido puede resumirse de la siguiente manera:
+
+Cliente
+    │
+    ▼
+Solicitud del servicio
+    │
+    ▼
+Registro del pedido
+    │
+    ▼
+Validación
+    │
+    ▼
+Ingreso a Cola Operativa
+    │
+    ▼
+Asignación Inteligente
+    │
+    ▼
+Taxi asignado
+    │
+    ▼
+Aceptación del chofer
+    │
+    ▼
+Conversión en viaje operativo
+
+A partir de este punto comienza el ciclo de vida del viaje, que será desarrollado en el apartado siguiente del presente capítulo.
+
+======================================================
+
+7.4.4 Descripción paso a paso
+-----------------------------
+
+	Paso 1 — Recepción del pedido
+
+La operación comienza cuando un cliente solicita un servicio.
+
+La solicitud puede ser recibida por la operadora o por cualquier otro canal de ingreso previsto por el sistema.
+
+En esta etapa aún no existe ninguna asignación ni intervención de la flota.
+
+	Paso 2 — Registro
+
+La operadora registra la información necesaria para identificar el servicio solicitado.
+
+Entre otros datos:
+
+cliente;
+origen;
+destino (cuando corresponda);
+observaciones;
+prioridad;
+fecha y hora.
+
+En este momento se crea la entidad Pedido dentro del Modelo Relacional.
+
+	Paso 3 — Validación
+
+El sistema verifica que la información mínima requerida se encuentre presente.
+
+Superada la validación, el pedido queda oficialmente incorporado a la operación.
+
+	Paso 4 — Cola Operativa
+
+El pedido ingresa automáticamente a la cola de pendientes.
+
+Desde este momento queda disponible para el proceso de asignación.
+
+Todavía no existe un taxi asociado.
+
+	Paso 5 — Asignación
+
+El módulo de Asignación Inteligente analiza:
+
+disponibilidad de taxis;
+posición GPS;
+orden de la cola;
+reglas de prioridad;
+estado operativo.
+
+Como resultado selecciona el recurso más adecuado.
+
+	Paso 6 — Confirmación
+
+Una vez aceptada la asignación por el chofer, el pedido deja de ser una simple solicitud pendiente y pasa a formar parte de una operación activa.
+
+A partir de ese instante comienza el ciclo operativo del viaje.
+
+	7.4.5 Estados involucrados
+
+Durante su ciclo de vida, el pedido atraviesa distintos estados funcionales que reflejan su evolución dentro del proceso operativo.
+
+Aunque la implementación específica puede variar según la lógica del sistema, conceptualmente el recorrido es el siguiente:
+
+Creado
+   │
+   ▼
+Validado
+   │
+   ▼
+Pendiente
+   │
+   ▼
+Asignado
+   │
+   ▼
+Convertido en Viaje
+
+Cada transición representa un cambio de responsabilidad dentro del sistema y habilita la intervención del módulo correspondiente.
+
+	7.4.6 Entidades involucradas
+
+Durante este proceso participan las siguientes entidades del Modelo Relacional:
+
+clientes
+pedidos
+asignaciones
+taxis
+choferes
+viajes
+gps_logs
+eventos
+
+Cada una aporta la información necesaria para que el pedido evolucione correctamente hasta convertirse en un viaje operativo.
+
+	7.4.7 Comunicación entre módulos
+
+El ciclo del pedido requiere la interacción coordinada de varios módulos del SGOF Core.
+
+El flujo principal de comunicación es el siguiente:
+
+Pedidos
+    │
+    ▼
+Cola Operativa
+    │
+    ▼
+Asignación Inteligente
+    │
+    ▼
+Viajes
+    │
+    ▼
+GPS
+    │
+    ▼
+Eventos
+
+Cada módulo recibe información del anterior, realiza su función específica y transmite el resultado al siguiente, manteniendo sincronizado el estado general de la operación.
+
+	7.4.8 Resultado del proceso
+
+Al finalizar este proceso:
+
+el pedido ha sido registrado y validado;
+se encuentra asociado a un taxi y a un chofer;
+la asignación ha sido aceptada;
+la operación deja la etapa de solicitud;
+se genera un viaje operativo listo para iniciar el servicio.
+
+El proceso concluye cuando la responsabilidad pasa al módulo de gestión de viajes, que continuará administrando la evolución del servicio hasta su finalización.
+
+	7.4.9 Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, el pedido representa el disparador de todo el flujo operativo del SGOF Core.
+
+A diferencia del viaje, que administra la ejecución del servicio, el pedido concentra exclusivamente la necesidad inicial del cliente. Esta separación evita mezclar la solicitud con la operación en curso y permite conservar una trazabilidad completa desde el primer contacto hasta el cierre del servicio.
+
+La transición del pedido hacia el viaje constituye uno de los principios fundamentales del diseño del sistema: una solicitud no es todavía una operación. Solo cuando la asignación es aceptada y existe un recurso operativo comprometido, el sistema transforma esa solicitud en un viaje activo.
+
+Esta diferenciación mantiene un bajo acoplamiento entre los módulos de recepción y ejecución, facilita el control operativo y permite que cada etapa del proceso evolucione de forma independiente, reforzando la arquitectura modular que caracteriza al SGOF Core.
+
+=======================================================
+
+7.5 Ciclo de Vida del Viaje
+─────────────────────
+
+Introducción
+------------
+
+El viaje constituye la unidad operativa principal del SGOF Core.
+
+Mientras el pedido representa la necesidad planteada por el cliente, el viaje representa la ejecución efectiva del servicio, administrando la interacción entre la empresa, la operadora, el chofer, el taxi y el cliente desde el momento de la asignación hasta la finalización del traslado.
+
+Durante su ciclo de vida, el viaje evoluciona mediante una secuencia de estados operativos que permiten conocer en todo momento la situación del servicio, facilitando la coordinación de la flota, el seguimiento en tiempo real y el control administrativo.
+
+El objetivo de este apartado es describir el recorrido completo del viaje, identificando las etapas que lo componen, los módulos que intervienen y las reglas funcionales que gobiernan su evolución.
+
+======================================================
+
+7.5.1 Objetivo del proceso
+--------------------------
+
+El proceso de gestión de viajes tiene como finalidad administrar la ejecución completa de cada servicio solicitado, asegurando el seguimiento operativo desde la asignación del recurso hasta la finalización del traslado.
+
+El viaje constituye el eje central de la operación diaria del SGOF Core, integrando la información proveniente del pedido, la asignación, la posición GPS, los estados del taxi y las acciones del chofer.
+
+Su correcta administración permite conocer en tiempo real el estado de cada servicio, optimizar la utilización de la flota y garantizar la trazabilidad completa de la operación.
+
+=====================================================
+
+7.5.2 Participantes
+-------------------
+
+Durante el ciclo de vida del viaje intervienen distintos actores y módulos especializados.
+
+Actores humanos
+Cliente.
+Operadora.
+Chofer.
+Recursos físicos
+Taxi.
+Componentes del sistema
+Gestión de Viajes.
+Gestión de Taxis.
+Gestión GPS.
+Cola Inteligente.
+Registro de Eventos.
+Gestión Financiera (al finalizar el servicio, cuando corresponda).
+
+Cada uno participa únicamente en las etapas donde su intervención resulta necesaria.
+
+=====================================================
+
+7.5.3 Flujo General
+-------------------
+
+El recorrido operativo del viaje puede resumirse de la siguiente manera:
+
+Pedido asignado
+        │
+        ▼
+Viaje creado
+        │
+        ▼
+Chofer acepta
+        │
+        ▼
+En camino al origen
+        │
+        ▼
+En origen
+        │
+        ▼
+Inicio del viaje
+        │
+        ▼
+Viaje en curso
+        │
+        ▼
+Finalización
+        │
+        ▼
+Liberación del taxi
+        │
+        ▼
+Actualización de cola
+        │
+        ▼
+Cierre operativo
+
+Este flujo representa el comportamiento normal de un servicio sin cancelaciones ni incidencias extraordinarias.
+
+=====================================================
+
+7.5.4 Descripción paso a paso
+-----------------------------
+
+	Paso 1 — Creación del viaje
+        ---------------------------
+
+Una vez que el pedido ha sido asignado, el sistema genera el viaje correspondiente.
+
+En esta etapa quedan vinculados:
+
+pedido;
+cliente;
+chofer;
+taxi;
+empresa.
+
+El viaje pasa a ser la entidad principal de la operación.
+
+	Paso 2 — Aceptación
+        -------------------
+
+El chofer confirma la asignación.
+
+A partir de este momento el recurso queda comprometido con la prestación del servicio.
+
+El taxi cambia su estado operativo y deja de estar disponible para nuevas asignaciones.
+
+	Paso 3 — Desplazamiento al origen
+        ---------------------------------
+
+El chofer inicia el recorrido hacia el punto donde se encuentra el cliente.
+
+Durante esta etapa el sistema recibe continuamente información GPS, permitiendo visualizar la ubicación del vehículo y estimar su tiempo de llegada.
+
+	Paso 4 — Llegada al origen
+        --------------------------
+
+Al arribar al punto de encuentro, el viaje cambia al estado En Origen.
+
+Este estado informa a la operadora que el vehículo ya se encuentra esperando al cliente.
+
+	Paso 5 — Inicio del servicio
+        ----------------------------
+
+Cuando el cliente aborda el vehículo, el chofer inicia formalmente el viaje.
+
+Desde este momento comienza la prestación efectiva del servicio.
+
+	Paso 6 — Viaje en curso
+        -----------------------
+
+Durante todo el recorrido el sistema mantiene actualizado:
+
+estado del viaje;
+posición GPS;
+estado del taxi;
+eventos operativos.
+
+La operación permanece bajo seguimiento hasta su finalización.
+
+	Paso 7 — Finalización
+        ---------------------
+
+Al llegar al destino, el chofer finaliza el viaje.
+
+Esta acción produce múltiples efectos coordinados:
+
+cierre del viaje;
+actualización del taxi;
+liberación del recurso;
+actualización de la cola inteligente;
+generación de eventos;
+habilitación de los procesos administrativos y financieros posteriores.
+
+7.5.5 Estados involucrados
+--------------------------
+
+El viaje evoluciona mediante una secuencia de estados claramente definida.
+
+Asignado
+     │
+     ▼
+Aceptado
+     │
+     ▼
+En camino al origen
+     │
+     ▼
+En origen
+     │
+     ▼
+En curso
+     │
+     ▼
+Finalizado
+
+Cada transición representa un cambio operativo que modifica el comportamiento del sistema y habilita nuevas acciones por parte de los distintos módulos.
+
+7.5.6 Entidades involucradas
+----------------------------
+
+Durante el ciclo de vida del viaje participan principalmente las siguientes entidades:
+
+viajes
+pedidos
+asignaciones
+taxis
+choferes
+clientes
+gps_logs
+eventos
+pagos (cuando corresponde)
+movimientos_credito (cuando corresponde)
+clientes_credito (cuando corresponde)
+
+Estas entidades colaboran para administrar la operación completa y mantener la consistencia del sistema.
+
+7.5.7 Comunicación entre módulos
+--------------------------------
+
+Durante la ejecución del viaje existe un intercambio continuo de información entre distintos componentes.
+
+Viajes
+    │
+    ▼
+GPS
+    │
+    ▼
+Estado del Taxi
+    │
+    ▼
+Cola Inteligente
+    │
+    ▼
+Eventos
+    │
+    ▼
+Finanzas
+
+Cada módulo recibe información actualizada, ejecuta su función específica y comunica el resultado al siguiente componente del proceso.
+
+7.5.8 Resultado del proceso
+---------------------------
+
+Al finalizar el ciclo del viaje:
+
+el servicio queda completamente ejecutado;
+el taxi recupera su disponibilidad operativa;
+la cola inteligente se actualiza;
+el historial GPS permanece registrado;
+los eventos quedan almacenados;
+el sistema queda preparado para iniciar una nueva operación.
+
+Cuando corresponde, se inicia además el proceso de registración financiera asociado al servicio prestado.
+
+7.5.9 Observaciones de arquitectura
+-----------------------------------
+
+Desde el punto de vista arquitectónico, el viaje constituye el núcleo operativo del SGOF Core.
+
+Es la entidad que concentra la ejecución del servicio y coordina la interacción entre los distintos subsistemas de la plataforma.
+
+A diferencia del pedido, cuya función es representar una solicitud, el viaje administra la realidad operativa del servicio. Durante su ejecución interactúa con la gestión de flota, el seguimiento GPS, la cola inteligente, el registro de eventos y, al finalizar, con el subsistema financiero.
+
+Esta posición central convierte al viaje en el principal punto de integración funcional del SGOF Core. La evolución mediante estados claramente definidos permite desacoplar los distintos módulos, manteniendo una arquitectura modular donde cada componente interviene únicamente cuando el estado de la operación lo requiere.
+
+======================================================
+
+7.6 Gestión de la Cola Inteligente
+──────────────────────────
+
+7.6.1 Introducción
+------------------
+
+La Cola Inteligente constituye uno de los componentes centrales del SGOF Core, siendo responsable de administrar el orden operativo de la flota disponible para la asignación de nuevos servicios.
+
+A diferencia de una cola tradicional basada únicamente en el criterio "primero en entrar, primero en salir", la Cola Inteligente incorpora reglas de negocio que permiten equilibrar la eficiencia operativa con la distribución equitativa del trabajo entre los choferes.
+
+Para ello, el sistema considera simultáneamente el orden de la cola, la disponibilidad de los taxis, la información de posicionamiento GPS y un conjunto de reglas operativas definidas por la empresa.
+
+El resultado es un mecanismo de asignación dinámico, capaz de adaptarse a las condiciones reales de la operación sin perder la trazabilidad ni la transparencia de las decisiones adoptadas.
+
+7.6.2 Objetivo del proceso
+
+El objetivo de la Cola Inteligente es administrar el orden de disponibilidad de los taxis, garantizando que la asignación de servicios se realice de forma organizada, eficiente y justa.
+
+Para cumplir este propósito, el sistema mantiene permanentemente actualizada la posición relativa de cada taxi dentro de la cola operativa, aplicando automáticamente las reglas de negocio correspondientes a cada evento que modifica el estado de la flota.
+
+Este mecanismo permite optimizar los tiempos de respuesta al cliente, evitar asignaciones arbitrarias y mantener un criterio uniforme de distribución del trabajo entre los recursos disponibles.
+
+7.6.3 Principios de funcionamiento
+
+El diseño de la Cola Inteligente se basa en un conjunto de principios que orientan todas las decisiones del algoritmo de asignación.
+
+Orden operativo
+
+Cada taxi disponible ocupa una posición determinada dentro de la cola.
+
+Dicha posición representa su prioridad para recibir el próximo servicio.
+
+Actualización dinámica
+
+La cola no permanece estática.
+
+Cada cambio operativo puede modificar automáticamente el orden de los recursos disponibles.
+
+Entre estos cambios se encuentran:
+
+asignación de un viaje;
+finalización del servicio;
+incorporación de un taxi;
+retiro temporal de la operación;
+cambio de disponibilidad.
+Equidad operativa
+
+El sistema procura distribuir los servicios entre los distintos choferes evitando concentrar las asignaciones sobre un mismo recurso cuando existen alternativas equivalentes.
+
+Este principio constituye uno de los fundamentos del algoritmo.
+
+Flexibilidad controlada
+
+Aunque la cola establece un orden de prioridad, dicho orden puede modificarse cuando existen razones operativas suficientemente justificadas.
+
+Estas excepciones se encuentran reguladas por reglas previamente definidas y documentadas.
+
+Trazabilidad
+
+Toda modificación significativa del orden de la cola puede ser registrada por el sistema, permitiendo reconstruir posteriormente la secuencia de decisiones adoptadas durante la operación.
+
+Observación de arquitectura
+
+La Cola Inteligente no reemplaza el criterio operativo de la empresa.
+
+Por el contrario, constituye un mecanismo que automatiza y aplica de forma consistente las reglas operativas definidas por la organización, reduciendo decisiones manuales, evitando inconsistencias y manteniendo un comportamiento uniforme durante toda la operación.
+
+=======================================================
+
+7.6.4 Flujo Operativo
+---------------------
+
+La Cola Inteligente permanece activa durante toda la jornada operativa, reaccionando automáticamente ante cada evento que modifica la disponibilidad de la flota.
+
+Su funcionamiento puede entenderse como un ciclo continuo de actualización, donde cada cambio de estado produce una nueva evaluación del orden operativo de los taxis.
+
+El flujo general puede representarse de la siguiente manera:
+
+                Inicio de la Jornada
+                        │
+                        ▼
+          Taxis disponibles en cola
+                        │
+                        ▼
+            Recepción de un pedido
+                        │
+                        ▼
+      Evaluación de disponibilidad
+                        │
+                        ▼
+      Aplicación de reglas operativas
+                        │
+                        ▼
+      Selección del taxi candidato
+                        │
+                        ▼
+          Asignación del servicio
+                        │
+                        ▼
+      Actualización de la cola
+                        │
+                        ▼
+        Espera del siguiente pedido
+                        │
+                        └──────────────┐
+                                       │
+                                       ▼
+                              Ciclo continuo
+
+Este proceso se ejecuta de forma repetitiva mientras existan taxis operativos y solicitudes pendientes.
+
+Evaluación permanente
+
+Cada vez que se genera un nuevo pedido, el sistema realiza una evaluación del estado actual de la flota.
+
+Entre otros aspectos analiza:
+
+taxis disponibles;
+posición dentro de la cola;
+estado operativo;
+información GPS disponible;
+reglas de prioridad vigentes.
+
+Esta evaluación determina qué recursos son candidatos para recibir la nueva asignación.
+
+Selección del candidato
+
+Finalizada la evaluación, el sistema identifica el taxi que mejor satisface las condiciones establecidas por el algoritmo.
+
+En condiciones normales, el candidato será el primer taxi disponible de la cola.
+
+No obstante, determinadas situaciones operativas podrán justificar la selección de otro recurso, conforme a las reglas que serán desarrolladas en los apartados siguientes.
+
+Actualización automática
+
+Una vez realizada la asignación, la Cola Inteligente actualiza automáticamente su estructura.
+
+Entre otras acciones puede:
+
+retirar temporalmente al taxi asignado de la cola de disponibles;
+reorganizar el orden relativo del resto de los recursos;
+registrar la nueva posición de cada taxi;
+preparar el sistema para la siguiente evaluación.
+
+Estas operaciones se realizan sin intervención manual.
+
+Funcionamiento continuo
+
+La Cola Inteligente no ejecuta un proceso único al inicio del día.
+
+Por el contrario, mantiene un funcionamiento permanente, reaccionando a cada cambio producido durante la operación.
+
+Entre los eventos que pueden generar una actualización se encuentran:
+
+creación de un nuevo pedido;
+asignación de un viaje;
+rechazo de una asignación;
+cancelación de un servicio;
+finalización de un viaje;
+incorporación de un taxi disponible;
+retiro temporal de un recurso;
+recuperación de un taxi previamente fuera de servicio.
+
+De esta manera, el orden operativo permanece permanentemente sincronizado con la realidad de la flota.
+
+Resultado del proceso
+
+Como consecuencia del flujo operativo, el sistema garantiza que, ante cada nueva solicitud de servicio, exista siempre una cola actualizada que refleje la situación real de los recursos disponibles.
+
+Esta actualización permanente constituye la base sobre la cual actúa posteriormente el algoritmo de asignación inteligente.
+
+Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, la Cola Inteligente funciona como un servicio transversal del SGOF Core.
+
+No genera pedidos, no administra viajes y no controla los taxis. Su responsabilidad consiste exclusivamente en mantener actualizado el orden operativo de los recursos disponibles.
+
+Esta separación de responsabilidades permite que el algoritmo evolucione independientemente del resto de los módulos, favoreciendo el mantenimiento y la incorporación de nuevas reglas de negocio sin afectar el funcionamiento general del sistema.
+
+===========================================================
+
+7.6.5 Criterios de Priorización
+-------------------------------
+
+La Cola Inteligente no realiza la asignación de recursos mediante un único criterio. Su funcionamiento se basa en la evaluación combinada de diversos factores operativos que permiten seleccionar el taxi más adecuado para cada solicitud.
+
+Estos criterios se aplican de forma secuencial y coordinada, procurando mantener el equilibrio entre eficiencia operativa, rapidez de respuesta y distribución equitativa del trabajo.
+
+Orden de la cola
+
+El criterio principal de priorización es la posición que ocupa cada taxi dentro de la Cola Inteligente.
+
+En condiciones normales, el sistema selecciona el primer taxi disponible, respetando el orden operativo previamente establecido.
+
+Este mecanismo garantiza una distribución equilibrada de los servicios entre los distintos choferes y constituye la regla general del algoritmo.
+
+Disponibilidad operativa
+
+Solo participan en el proceso de selección aquellos taxis cuyo estado operativo permite recibir una nueva asignación.
+
+Los recursos que se encuentran ocupados, fuera de servicio o temporalmente inactivos quedan automáticamente excluidos hasta recuperar su disponibilidad.
+
+De esta manera, el algoritmo trabaja siempre sobre la situación real de la flota.
+
+Estado de la información GPS
+
+Cuando el sistema dispone de información de posicionamiento válida, ésta puede utilizarse como criterio complementario para optimizar la asignación.
+
+La calidad y actualidad de la señal GPS forman parte de la evaluación previa a la selección del recurso.
+
+No obstante, la existencia de información GPS por sí sola no modifica automáticamente el orden de la cola, sino que actúa en combinación con las restantes reglas del algoritmo.
+
+Proximidad al origen del servicio
+
+La distancia entre el taxi y el punto de origen del pedido constituye un criterio de optimización operativa.
+
+Cuando la diferencia de proximidad resulta suficientemente significativa y cumple las condiciones definidas por la empresa, el sistema podrá priorizar un recurso distinto al primero de la cola.
+
+Este mecanismo busca reducir los tiempos de espera del cliente sin comprometer el equilibrio general de la distribución de servicios.
+
+Reglas de excepción
+
+Existen determinadas situaciones operativas que justifican apartarse del orden normal de la cola.
+
+Estas excepciones responden exclusivamente a reglas previamente establecidas y nunca a decisiones arbitrarias.
+
+Entre ellas pueden encontrarse:
+
+mejoras significativas en el tiempo estimado de llegada;
+condiciones especiales definidas por la empresa;
+situaciones operativas extraordinarias;
+mecanismos automáticos de recuperación del servicio.
+
+Las reglas específicas serán desarrolladas en el apartado dedicado a la ruptura controlada de la cola.
+
+Priorización dinámica
+
+La evaluación de los criterios anteriores no se realiza una única vez.
+
+Cada nuevo pedido inicia nuevamente el proceso de análisis utilizando la información más reciente disponible.
+
+De esta forma, la decisión adoptada refleja siempre la situación operativa existente en el instante de la asignación.
+
+Resultado del proceso
+
+La aplicación coordinada de estos criterios permite que cada asignación responda a una evaluación objetiva de las condiciones operativas del momento.
+
+El algoritmo evita decisiones manuales, mantiene la coherencia del sistema y asegura que todas las asignaciones puedan ser justificadas mediante reglas previamente definidas.
+
+Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, los criterios de priorización constituyen la capa de decisión de la Cola Inteligente.
+
+La cola determina el orden inicial de los recursos, mientras que los criterios de priorización permiten adaptar dicho orden a las condiciones reales de la operación cuando ello produce una mejora objetiva del servicio.
+
+Esta separación entre orden operativo y reglas de decisión proporciona flexibilidad al algoritmo y facilita su evolución futura mediante la incorporación de nuevos criterios sin modificar la estructura general del sistema.
+
+======================================================
+
+7.6.6 Integración con GPS
+-------------------------
+
+Introducción
+------------
+
+La Cola Inteligente utiliza la información de posicionamiento GPS como un criterio complementario dentro del proceso de asignación de recursos.
+
+El objetivo no es reemplazar el orden operativo de la cola, sino incorporar información en tiempo real que permita mejorar la eficiencia de las asignaciones cuando las condiciones de la operación así lo justifiquen.
+
+La integración entre la Cola Inteligente y el módulo GPS permite que las decisiones se basen no solo en la prioridad establecida, sino también en la ubicación efectiva de los taxis y en la calidad de la información disponible.
+
+Objetivo de la integración
+
+La incorporación del GPS tiene como finalidad reducir los tiempos de respuesta al cliente, optimizando la selección del recurso más conveniente sin perder el principio de equidad que caracteriza al algoritmo de asignación.
+
+El posicionamiento constituye un elemento de apoyo para la toma de decisiones y no un criterio absoluto de selección.
+
+Información utilizada
+
+Durante el proceso de evaluación, el sistema puede considerar la información registrada por el módulo GPS.
+
+Entre los datos disponibles se encuentran:
+
+posición geográfica del taxi;
+fecha y hora de la última actualización;
+estado de la señal;
+antigüedad de la información;
+velocidad registrada (cuando resulte pertinente);
+rumbo del vehículo (cuando corresponda).
+
+Estos datos permiten conocer la situación operativa real de cada recurso.
+
+Validación de la información
+
+No toda la información GPS posee el mismo valor operativo.
+
+Antes de ser utilizada, el sistema verifica aspectos como:
+
+existencia de datos válidos;
+actualidad de la posición registrada;
+calidad de la señal recibida;
+consistencia temporal de la información.
+
+Cuando el posicionamiento no reúne las condiciones mínimas de confiabilidad, el algoritmo continúa funcionando utilizando exclusivamente el orden operativo de la cola.
+
+De esta manera, el sistema mantiene un comportamiento predecible aun ante fallas o interrupciones del servicio de geolocalización.
+
+Evaluación de proximidad
+
+Cuando la información GPS es considerada válida, el sistema puede estimar la proximidad entre cada taxi disponible y el punto de origen del nuevo servicio.
+
+Esta evaluación permite identificar situaciones donde un recurso ubicado fuera del primer lugar de la cola pueda representar una mejora significativa en el tiempo estimado de llegada al cliente.
+
+La proximidad constituye un criterio complementario cuya aplicación siempre se encuentra subordinada a las reglas generales del algoritmo.
+
+Sincronización permanente
+
+La integración con el módulo GPS se mantiene activa durante toda la jornada operativa.
+
+Cada nueva posición recibida actualiza la información disponible para futuras asignaciones, permitiendo que el algoritmo tome decisiones utilizando el estado más reciente de la flota.
+
+Esta sincronización continua mejora la capacidad de respuesta del sistema frente a cambios dinámicos en la ubicación de los vehículos.
+
+Beneficios operativos
+
+La utilización del GPS aporta múltiples ventajas al proceso de asignación:
+
+reducción de los tiempos de espera del cliente;
+mejor aprovechamiento de la distribución geográfica de la flota;
+disminución de recorridos innecesarios;
+utilización de información objetiva durante la toma de decisiones;
+mayor capacidad de adaptación a las condiciones reales de la operación.
+
+Estos beneficios se obtienen sin alterar la estructura general de la Cola Inteligente.
+
+Integración con los demás módulos
+
+El módulo GPS no realiza asignaciones ni modifica directamente el orden de la cola.
+
+Su función consiste en suministrar información de contexto al algoritmo de asignación, el cual decide posteriormente cómo utilizar dichos datos conforme a las reglas de negocio definidas por la empresa.
+
+Esta separación de responsabilidades mantiene desacoplados ambos componentes y facilita la evolución independiente de cada uno.
+
+Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, el GPS constituye un proveedor de información, no un motor de decisión.
+
+La responsabilidad del módulo GPS finaliza al proporcionar datos confiables sobre la posición y el estado de los recursos.
+
+La interpretación de esa información corresponde exclusivamente al algoritmo de la Cola Inteligente.
+
+Esta decisión de diseño mantiene claramente separadas las funciones de adquisición de datos y de toma de decisiones, reduciendo el acoplamiento entre componentes y facilitando la incorporación futura de nuevas fuentes de información, como sistemas de tráfico, condiciones meteorológicas o sensores embarcados.
+
+======================================================
+
+7.6.7 Ruptura Controlada de la Cola
+-----------------------------------
+
+Introducción
+------------
+
+La Cola Inteligente del SGOF Core establece como regla general el respeto al orden operativo de los taxis disponibles.
+
+No obstante, determinadas situaciones pueden justificar una modificación excepcional de dicho orden cuando ello representa una mejora objetiva para la operación.
+
+Este mecanismo recibe el nombre de Ruptura Controlada de la Cola y constituye una decisión arquitectónica destinada a equilibrar dos objetivos fundamentales:
+
+mantener la equidad en la distribución de los servicios;
+optimizar el tiempo de respuesta al cliente.
+
+La ruptura de la cola no constituye una excepción arbitraria, sino una decisión basada en criterios previamente definidos y aplicados automáticamente por el sistema.
+
+Objetivo del mecanismo
+
+El objetivo de la Ruptura Controlada es permitir que el algoritmo seleccione un recurso distinto al primero de la cola cuando exista evidencia suficiente de que dicha decisión mejora significativamente la eficiencia operativa sin comprometer la equidad general del sistema.
+
+Este mecanismo evita que el respeto absoluto al orden de la cola genere situaciones operativamente ineficientes.
+
+Principio de funcionamiento
+
+En condiciones normales, la asignación sigue estrictamente el orden de la Cola Inteligente.
+
+Sin embargo, antes de confirmar la selección definitiva, el algoritmo evalúa si otro taxi disponible presenta una ventaja operativa suficientemente significativa.
+
+Cuando esa mejora supera los parámetros definidos por la empresa y la información utilizada resulta confiable, el sistema autoriza excepcionalmente la ruptura del orden normal.
+
+En caso contrario, la asignación continúa respetando la prioridad establecida por la cola.
+
+Condiciones para la ruptura
+
+La ruptura solo puede producirse cuando concurren simultáneamente determinadas condiciones.
+
+Entre ellas:
+
+existencia de información GPS válida;
+disponibilidad operativa del recurso alternativo;
+mejora significativa respecto al primer taxi de la cola;
+cumplimiento de los parámetros definidos por la empresa.
+
+Si cualquiera de estas condiciones no se verifica, el sistema mantiene el orden original.
+
+Protección del principio de equidad
+
+La ruptura constituye una excepción y no una nueva regla de asignación.
+
+Por esta razón, el algoritmo continúa considerando el orden de la cola como el criterio principal de priorización.
+
+Solo cuando la mejora operativa resulta objetivamente relevante se autoriza la utilización de un recurso distinto.
+
+Este enfoque evita favorecer sistemáticamente a los taxis mejor ubicados y mantiene un reparto equilibrado del trabajo a lo largo de la jornada.
+
+Ejemplo conceptual
+
+Supóngase la siguiente situación:
+
+Cola Operativa
+
+1° Taxi A
+2° Taxi B
+3° Taxi C
+
+El Taxi A ocupa el primer lugar y, por tanto, debería recibir el siguiente servicio.
+
+Sin embargo, el sistema detecta que:
+
+el Taxi A se encuentra a 2,8 km del cliente;
+el Taxi B se encuentra a 250 metros;
+ambos poseen GPS válido y se encuentran disponibles.
+
+Si la diferencia supera el umbral operativo configurado por la empresa, el algoritmo podrá asignar el servicio al Taxi B.
+
+Una vez concluida la operación, la cola se actualizará automáticamente para preservar el equilibrio general del sistema.
+
+Beneficios operativos
+
+La Ruptura Controlada aporta múltiples ventajas:
+
+disminuye el tiempo de espera del cliente;
+reduce recorridos innecesarios;
+optimiza la utilización de la flota;
+mejora la eficiencia del servicio;
+mantiene la transparencia de las decisiones.
+
+Al mismo tiempo, evita que la proximidad se transforme en el único criterio de asignación.
+
+Integración con el algoritmo
+
+La ruptura constituye una etapa específica dentro del proceso general de asignación.
+
+Su ubicación puede representarse de la siguiente forma:
+
+Cola Operativa
+        │
+        ▼
+Primer Taxi Disponible
+        │
+        ▼
+Evaluación GPS
+        │
+        ▼
+¿Existe una mejora significativa?
+        │
+     ┌──┴──┐
+     │     │
+    NO    SÍ
+     │     │
+     ▼     ▼
+Respeta   Autoriza
+la cola   ruptura
+     │     │
+     └──┬──┘
+        ▼
+Asignación definitiva
+
+Esta secuencia garantiza que la excepción siempre se encuentre subordinada a la regla general.
+
+Observaciones de arquitectura
+
+La Ruptura Controlada representa uno de los elementos diferenciadores del SGOF Core.
+
+En lugar de elegir entre un modelo completamente rígido o un modelo exclusivamente basado en proximidad, el sistema adopta una estrategia híbrida.
+
+El orden de la cola proporciona estabilidad y equidad.
+
+La información GPS introduce eficiencia operativa.
+
+El algoritmo combina ambos principios mediante reglas objetivas y verificables, evitando decisiones arbitrarias y manteniendo un comportamiento consistente durante toda la operación.
+
+Esta solución permite adaptar el sistema a la realidad dinámica de la flota sin renunciar a un criterio de distribución equilibrado entre los distintos recursos disponibles.
+
+Conclusión técnica
+
+Desde la perspectiva de esta Biblioteca Técnica, la Ruptura Controlada de la Cola constituye una de las decisiones arquitectónicas más relevantes del SGOF Core.
+
+No se trata simplemente de una optimización del proceso de asignación, sino de un mecanismo diseñado para resolver el conflicto natural entre equidad y eficiencia.
+
+La arquitectura no privilegia uno de estos principios sobre el otro. En cambio, establece una jerarquía clara:
+
+La equidad es la regla general, materializada en el orden de la Cola Inteligente.
+La eficiencia es la excepción controlada, aplicada únicamente cuando una mejora objetiva y verificable justifica apartarse temporalmente de ese orden.
+
+Este equilibrio convierte a la Cola Inteligente en un algoritmo adaptable, transparente y técnicamente justificable, capaz de responder a las condiciones reales de la operación sin perder coherencia ni previsibilidad. Desde el punto de vista de la arquitectura del SGOF Core, esta decisión es uno de los pilares que distingue al sistema y explica gran parte de su comportamiento operativo.
+
+	Reflexión de Arquitectura
+        -------------------------
+
+Durante el desarrollo de este capítulo se observa que el objetivo de la Cola Inteligente nunca fue construir el algoritmo "más rápido" ni el "más justo" de forma aislada.
+
+El verdadero objetivo fue construir un algoritmo equilibrado.
+
+Ese equilibrio se sostiene sobre tres principios fundamentales:
+
+Equidad, para distribuir el trabajo entre los recursos disponibles.
+Eficiencia, para reducir el tiempo de respuesta al cliente.
+Trazabilidad, para que toda decisión pueda ser explicada y reconstruida posteriormente.
+
+La convivencia de estos tres principios convierte a la Cola Inteligente en un componente de decisión y no simplemente en una estructura de ordenamiento.
+
+=======================================================
+
+7.6.8 Actualización Automática de la Cola
+-----------------------------------------
+
+Introducción
+------------
+
+La Cola Inteligente mantiene una representación permanente del orden operativo de los taxis disponibles.
+
+Dicho orden no permanece fijo durante la jornada, sino que evoluciona automáticamente como consecuencia de las distintas operaciones realizadas por el sistema.
+
+Cada cambio de estado que afecta la disponibilidad de un recurso puede generar una reorganización de la cola, garantizando que ésta refleje en todo momento la situación operativa real de la flota.
+
+La actualización se realiza de forma automática, transparente y sin intervención manual por parte de los operadores.
+
+Eventos que producen una actualización
+
+La Cola Inteligente puede actualizarse como consecuencia de distintos eventos operativos.
+
+Entre los más relevantes se encuentran:
+
+creación de un nuevo viaje;
+asignación de un taxi;
+aceptación del servicio por el chofer;
+rechazo de una asignación;
+cancelación del viaje;
+finalización del servicio;
+incorporación de un taxi disponible;
+retiro temporal de un recurso;
+recuperación de un taxi previamente fuera de servicio.
+
+Cada uno de estos eventos modifica el conjunto de recursos disponibles y obliga al sistema a recalcular el orden operativo.
+
+Reorganización de la cola
+
+Una vez producido un evento, el algoritmo evalúa nuevamente la situación de la flota.
+
+Cuando corresponde:
+
+elimina temporalmente los recursos ocupados;
+reincorpora los taxis que recuperan su disponibilidad;
+actualiza las posiciones relativas;
+normaliza el orden de la cola.
+
+Este procedimiento garantiza que la estructura permanezca consistente durante toda la operación.
+
+Reincorporación de recursos
+
+Cuando un taxi finaliza un viaje y vuelve a encontrarse disponible, el sistema determina automáticamente su nueva posición dentro de la Cola Inteligente conforme a las reglas operativas vigentes.
+
+Este proceso evita intervenciones manuales y mantiene un criterio uniforme para todos los recursos de la flota.
+
+Normalización
+
+Después de cada actualización, la Cola Inteligente verifica que el orden operativo conserve una numeración continua y consistente.
+
+La normalización elimina posibles discontinuidades producidas por altas, bajas o cambios temporales de disponibilidad, asegurando que la cola represente correctamente el estado actual de la operación.
+
+Funcionamiento permanente
+
+La actualización automática no constituye un proceso aislado.
+
+Forma parte del funcionamiento continuo del sistema y se ejecuta cada vez que un evento modifica la disponibilidad de los recursos.
+
+Gracias a este mecanismo, la Cola Inteligente permanece permanentemente sincronizada con la realidad operativa de la flota.
+
+Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, la actualización automática constituye el mecanismo que mantiene viva la Cola Inteligente.
+
+Mientras las reglas de asignación determinan cómo seleccionar un recurso, la actualización automática garantiza que el orden operativo utilizado por dichas reglas permanezca siempre consistente con la realidad del sistema.
+
+La separación entre ambos procesos reduce la complejidad del algoritmo y favorece su mantenimiento evolutivo.
+
+===========================================================
+
+7.6.9 Entidades involucradas
+----------------------------
+
+El funcionamiento de la Cola Inteligente requiere la interacción coordinada de diversas entidades del Modelo Relacional.
+
+Las principales son:
+
+Entidad	Función
+taxis	Administra la disponibilidad y el orden operativo de cada recurso.
+choferes	Identifica al conductor asociado al taxi.
+pedidos	Origina la necesidad de una nueva asignación.
+asignaciones	Registra la selección del recurso para atender el pedido.
+viajes	Gestiona la operación resultante de la asignación.
+gps_logs	Proporciona la información de posicionamiento utilizada por el algoritmo.
+eventos	Registra las decisiones relevantes adoptadas durante la operación.
+
+La interacción entre estas entidades permite mantener sincronizados los distintos componentes del sistema sin duplicar información ni responsabilidades.
+
+======================================================
+
+7.6.10 Observaciones de Arquitectura
+------------------------------------
+
+La Cola Inteligente constituye uno de los componentes estratégicos del SGOF Core.
+
+Su función trasciende el simple ordenamiento de recursos disponibles y se orienta a la aplicación consistente de las reglas operativas definidas por la organización.
+
+El algoritmo integra criterios de prioridad, disponibilidad, posicionamiento GPS y excepciones controladas dentro de un único mecanismo de decisión, preservando simultáneamente la equidad en la distribución del trabajo y la eficiencia del servicio prestado.
+
+Desde la perspectiva arquitectónica, este diseño presenta varias ventajas fundamentales:
+
+mantiene separadas las responsabilidades entre los distintos módulos;
+permite incorporar nuevas reglas de negocio sin modificar la estructura general del sistema;
+garantiza decisiones objetivas, repetibles y auditables;
+facilita la evolución futura del algoritmo conforme cambien las necesidades operativas.
+
+La combinación de un orden operativo estable con mecanismos de optimización controlados convierte a la Cola Inteligente en un componente adaptable, transparente y escalable.
+
+En consecuencia, la Cola Inteligente no debe entenderse únicamente como una estructura de asignación, sino como el motor de decisión operativa del SGOF Core, encargado de transformar las políticas de trabajo de la organización en reglas automáticas, verificables y consistentes.
+
+======================================================

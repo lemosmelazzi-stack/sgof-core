@@ -1,0 +1,119 @@
+04_Base_de_Datos
+
+003_Modelo_Relacional_SGOF_CORE_v1.0
+
+disciplina:
+	Auditar.
+	Comprender.
+	Consolidar.
+	Documentar.
+
+"El SGOF ya no se está construyendo solamente para funcionar; se está construyendo para ser comprendido, mantenido y evolucionado."
+
+Paso corto, evidencia sólida y documentación que preserve el conocimiento.
+
+El 002 explicó qué representa el negocio; el 003 explicará cómo ese negocio se implementa en el modelo relacional.
+
+Listo. Punto 1 definido. Ahora comenzamos a construir el 003_Modelo_Relacional_SGOF_CORE_v1.0.
+
+Ayer terminamos el documento que explica:
+
+"Qué representa el negocio."
+
+Hoy comenzamos el documento que explicará:
+
+"Cómo ese negocio fue implementado en una Base de Datos Relacional."
+
+Son dos documentos distintos pero complementarios.
+
+De hecho, me gustaría que el comienzo del 003 deje esa relación perfectamente establecida.
+
+Por ejemplo, la Introducción podría decir algo como:
+
+"El presente documento constituye la continuación natural del documento 002_Modelo_de_Datos_SGOF_CORE_v1.0, en el cual se definió el Modelo Conceptual del SGOF. Mientras dicho documento describe las entidades y relaciones desde la perspectiva del negocio, el presente desarrolla el Modelo Relacional, detallando la organización lógica de la base de datos que materializa esos conceptos."
+
+
+
+
+
+PRINCIPIOS (Borrador)
+
+✓ Correspondencia (ya consolidado)
+
+Pendientes de consolidación
+
+• Evidencia
+• Unicidad
+• Trazabilidad
+• Comprender antes de documentar
+• Auditar antes de concluir
+
+
+
+=======================================================
+
+a idea merece quedar como una sección formal, posiblemente antes del capítulo de tablas:
+
+5. Mapa funcional del Modelo Relacional
+
+5.1 Resumen de entidades
+5.2 Flujo operativo principal
+5.3 Guía rápida de consulta
+
+6. Descripción y auditoría de las tablas
+
+Y queda confirmado también el otro documento:
+
+SGOF-ARQ-010
+Filosofía de Diseño del Modelo Relacional
+
+Ese lo hacemos sí o sí. La guía rápida permitirá encontrar, mientras que el documento de filosofía permitirá comprender. Son dos piezas distintas y complementarias.
+
+-----------------------------------------------------
+
+El SGOF no administra viajes; administra decisiones que culminan en un viaje.
+
+"En el SGOF, cada etapa del proceso operativo posee su propia entidad especializada, evitando concentrar responsabilidades diferentes en una única estructura de datos."
+
+"Filosofía de Diseño del Modelo Relacional", porque expresa uno de los principios más fuertes que hemos encontrado durante toda esta auditoría.
+
+una decisión de diseño muy importante:
+
+Las relaciones de una entidad deben reflejar exclusivamente la responsabilidad funcional que esa entidad desempeña dentro del proceso de negocio.
+
+Eso explica por qué asignaciones se relaciona con los recursos necesarios para decidir, pero no con la ejecución del servicio.
+
+
+Principio de Especialización Funcional
+
+Cada etapa del proceso operativo del SGOF se encuentra representada por una entidad especializada, responsable exclusivamente de administrar la información correspondiente a esa etapa, evitando la concentración de responsabilidades en una única estructura de datos.
+
+---------------------------------------------------
+SGOF-ARQ-010
+Filosofía de Diseño del Modelo Relacional
+
+1. Introducción
+
+2. Principios de Diseño
+
+   2.1 Especialización funcional
+   2.2 Separación de responsabilidades
+   2.3 Trazabilidad transversal
+   2.4 Integridad progresiva
+   2.5 Arquitectura orientada al proceso
+   2.6 Modelo físico alineado con el negocio
+   2.7 Evolución del flujo operativo
+
+3. Conclusiones
+
+
+-----------------------
+
+Pedidos → entendimos el origen de la necesidad.
+Viajes → descubrimos el núcleo operativo del sistema.
+Asignaciones → identificamos el motor de decisión operativa.
+
+Eso ya es un nivel de abstracción superior.
+
+
+

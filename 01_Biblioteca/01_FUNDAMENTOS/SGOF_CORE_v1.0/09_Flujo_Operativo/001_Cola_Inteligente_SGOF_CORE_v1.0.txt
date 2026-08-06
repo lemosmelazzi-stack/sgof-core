@@ -1,0 +1,368 @@
+001_Cola_Inteligente_SGOF_CORE_v1.0.txt
+=======================================
+
+1. Introducción
+---------------
+
+El presente documento forma parte de la Biblioteca Técnica del SGOF Core.
+
+Los principios generales de Arquitectura, Backend, Frontend, Modelo Funcional, API REST, Sistema GPS y Socket.IO se consideran previamente documentados y constituyen el marco de referencia para el presente volumen.
+
+En consecuencia, este documento desarrolla exclusivamente el funcionamiento de la Cola Operativa, uno de los mecanismos fundamentales para la administración de los recursos móviles del sistema.
+
+La Cola Operativa determina el orden en que los vehículos disponibles participan en la asignación de nuevos servicios, garantizando una distribución organizada, transparente y consistente de la carga de trabajo.
+
+===================================================
+
+
+2. Objetivo
+-----------
+
+La Cola Operativa tiene como objetivo administrar el orden de disponibilidad de los recursos operativos del SGOF Core, proporcionando un mecanismo uniforme para la asignación de servicios.
+
+Su finalidad es mantener un equilibrio operativo entre los vehículos disponibles, respetando las reglas de funcionamiento definidas por la plataforma y permitiendo, cuando corresponda, aplicar criterios inteligentes de asignación basados en la situación real de la operación.
+
+La Cola Operativa constituye el punto de partida del proceso de asignación automática de viajes.
+
+
+3. Concepto de Cola Operativa
+-----------------------------
+
+La Cola Operativa representa una lista ordenada de los recursos habilitados para recibir nuevas asignaciones.
+
+Cada vehículo ocupa una posición dentro de la cola y dicha posición evoluciona a medida que se desarrollan las operaciones del sistema.
+
+El orden de la cola no constituye una prioridad fija, sino una referencia dinámica que puede modificarse según las reglas operativas establecidas por el SGOF Core.
+
+Este mecanismo permite mantener un criterio uniforme de distribución de servicios sin perder la capacidad de adaptación frente a situaciones particulares.
+
+=================================================
+
+4. Formación de la Cola Operativa
+---------------------------------
+
+Introducción
+------------
+
+La Cola Operativa se construye a partir del conjunto de vehículos que se encuentran habilitados para participar en la prestación de servicios.
+
+Cada recurso ocupa una posición determinada dentro de la cola, la cual representa el orden inicial considerado por el sistema durante el proceso de asignación de nuevos viajes.
+
+La posición de cada vehículo no es permanente. Evoluciona dinámicamente conforme se desarrollan las distintas operaciones de la plataforma y de acuerdo con las reglas definidas por el SGOF Core.
+
+
+Incorporación de recursos
+-------------------------
+
+Un vehículo podrá integrar la Cola Operativa cuando cumpla las condiciones establecidas para participar en la operación.
+
+Entre ellas se encuentran:
+
+encontrarse operativo;
+estar disponible para recibir servicios;
+formar parte de la flota habilitada;
+cumplir las condiciones definidas por la administración del sistema.
+
+Una vez incorporado, el recurso pasa a formar parte del orden general de asignación.
+
+Orden inicial
+-------------
+
+La Cola Operativa mantiene un orden interno que sirve como referencia para la distribución de los servicios.
+
+Este orden constituye el criterio base utilizado por el sistema antes de considerar otros factores operativos.
+
+De esta manera, la cola proporciona un mecanismo transparente y predecible para la asignación de recursos.
+
+Actualización permanente
+
+La Cola Operativa no permanece estática.
+
+Cada modificación relevante producida durante la operación puede generar una reorganización del orden interno.
+
+Entre las situaciones que pueden provocar una actualización se encuentran:
+
+asignación de un servicio;
+finalización de un viaje;
+incorporación de un nuevo recurso;
+salida temporal de un vehículo;
+cambios en el estado operativo.
+
+Estas modificaciones garantizan que la cola refleje permanentemente la situación real de la flota.
+
+Relación con el proceso de asignación
+
+La Cola Operativa constituye el punto de partida del proceso de asignación automática.
+
+Sin embargo, la posición ocupada por un vehículo dentro de la cola no implica necesariamente que será el recurso finalmente seleccionado.
+
+La decisión definitiva puede incorporar otros criterios operativos documentados en capítulos posteriores.
+
+De esta forma, la cola proporciona un orden de referencia, mientras que el proceso de asignación determina la solución más adecuada para cada situación.
+
+----------------------------------------------------
+
+Observaciones de arquitectura
+-----------------------------
+
+Desde el punto de vista arquitectónico, la Cola Operativa representa un mecanismo de organización de recursos y no un algoritmo de decisión.
+
+Su función consiste en mantener un orden dinámico de disponibilidad sobre el cual posteriormente actúan los criterios de asignación implementados por el SGOF Core.
+
+Esta separación permite que el sistema evolucione incorporando nuevos mecanismos de selección sin alterar la estructura básica de la cola.
+
+-----------------------------------------------------
+
+La Cola Operativa organiza.
+
+La Asignación Inteligente decide.
+
+Puede parecer una diferencia sutil, pero conceptualmente es enorme. Gracias a esa separación, si en el futuro cambiamos la lógica de selección (por ejemplo, incorporando nuevos criterios o algoritmos), la documentación de la Cola Operativa seguirá siendo válida porque su responsabilidad no habrá cambiado: mantener organizado el orden de los recursos disponibles. Esa claridad conceptual hará que ambos documentos sean más fáciles de mantener y comprender.
+
+------------------------------------------------------
+
+
+5. Reglas de Funcionamiento
+---------------------------
+
+Introducción
+------------
+
+La Cola Operativa se rige por un conjunto de reglas destinadas a mantener un orden coherente entre los recursos disponibles para la prestación de servicios.
+
+Estas reglas determinan cómo evoluciona la posición de cada vehículo dentro de la cola a medida que se desarrollan las distintas operaciones del sistema.
+
+Su aplicación uniforme garantiza una administración ordenada de los recursos y constituye la base sobre la cual posteriormente actúan los mecanismos de asignación.
+
+
+Permanencia en la cola
+----------------------
+
+Un vehículo conserva su posición dentro de la Cola Operativa mientras mantenga las condiciones necesarias para participar en la operación y no ocurra ningún evento que justifique una modificación de su orden.
+
+La permanencia en la cola refleja únicamente su disponibilidad relativa y no implica prioridad absoluta para recibir el siguiente servicio.
+
+
+Modificación del orden
+----------------------
+
+La posición de un recurso puede modificarse cuando determinadas operaciones alteran el estado operativo de la flota.
+
+Entre las situaciones habituales se encuentran:
+
+asignación de un nuevo servicio;
+finalización de un viaje;
+incorporación de un recurso disponible;
+salida temporal de la operación;
+cambios en el estado operativo del vehículo.
+
+Cada una de estas situaciones produce la reorganización necesaria para mantener la consistencia de la cola.
+
+Reordenamiento
+--------------
+
+Toda modificación del orden interno debe preservar la continuidad de la Cola Operativa.
+
+El sistema reorganiza automáticamente las posiciones de los recursos afectados, evitando duplicidades, posiciones vacías o inconsistencias.
+
+De esta forma, la cola mantiene siempre una secuencia válida para la operación.
+
+
+Recursos no disponibles
+-----------------------
+
+Los vehículos que no se encuentran en condiciones de recibir nuevos servicios dejan de participar temporalmente en la Cola Operativa.
+
+Mientras permanezcan en dicha condición, no intervienen en el proceso normal de asignación.
+
+Una vez recuperadas las condiciones operativas, podrán reincorporarse conforme a las reglas definidas por el sistema.
+
+
+Consistencia operativa
+----------------------
+
+La Cola Operativa representa en todo momento el estado vigente de los recursos disponibles.
+
+Las modificaciones producidas durante la operación son procesadas de manera inmediata, garantizando que el orden interno permanezca sincronizado con la situación real de la flota.
+
+Este comportamiento permite que la cola sea una referencia confiable para los procesos posteriores de asignación.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+Las reglas de funcionamiento de la Cola Operativa tienen como finalidad mantener un orden dinámico y consistente de los recursos disponibles.
+
+Estas reglas no determinan qué vehículo será finalmente asignado a un servicio, sino que administran el estado organizativo sobre el cual actuarán posteriormente los criterios de selección implementados por el SGOF Core.
+
+La separación entre organización y decisión constituye uno de los principios fundamentales de la arquitectura operativa del sistema.
+
+------------------------------------------------------
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría funcional se verificó que la Cola Operativa mantiene un comportamiento consistente frente a las distintas situaciones observadas durante la operación.
+
+Las modificaciones de estado producen la reorganización correspondiente de los recursos, preservando un orden válido y evitando inconsistencias que puedan afectar el proceso de asignación.
+
+Esta organización constituye la base operativa sobre la cual el SGOF Core desarrolla posteriormente sus mecanismos de selección y despacho de servicios.
+
+--------------------------------------------------------
+
+Integración con el SGOF Core
+----------------------------
+
+Introducción
+------------
+
+La Cola Operativa no constituye un componente aislado dentro de la plataforma.
+
+Su funcionamiento se encuentra integrado con los distintos procesos del SGOF Core, proporcionando la organización necesaria para la administración de los recursos móviles y sirviendo como referencia para los mecanismos de asignación implementados por el sistema.
+
+Esta integración permite mantener una operación coordinada entre los distintos subsistemas.
+
+
+Relación con la Gestión de Taxis
+--------------------------------
+
+La Cola Operativa administra el orden de participación de los vehículos disponibles.
+
+Los cambios en el estado operativo de un taxi pueden producir su incorporación, permanencia o salida temporal de la cola, manteniendo siempre actualizada la disponibilidad de la flota.
+
+
+Relación con la Gestión de Viajes
+---------------------------------
+
+Cada nuevo viaje que requiere asignación utiliza la Cola Operativa como punto de partida para identificar los recursos disponibles.
+
+Una vez concluido el proceso de asignación, la cola actualiza su organización conforme a las reglas establecidas por el sistema.
+
+
+Relación con la Asignación Inteligente
+--------------------------------------
+
+La Cola Operativa proporciona el orden inicial de los recursos disponibles.
+
+La Asignación Inteligente utiliza esa información como base para aplicar los criterios de selección definidos por el SGOF Core.
+
+Ambos procesos son complementarios y desarrollan responsabilidades diferentes dentro de la arquitectura operativa.
+
+
+Relación con PostgreSQL
+-----------------------
+
+El estado de la Cola Operativa se mantiene sincronizado con la información almacenada en la Base de Datos.
+
+Esto garantiza la persistencia del orden operativo y permite recuperar la consistencia del sistema ante reinicios o interrupciones del servicio.
+
+
+Relación con Socket.IO
+----------------------
+
+Las modificaciones relevantes de la Cola Operativa pueden ser comunicadas mediante Socket.IO, permitiendo que los clientes conectados actualicen automáticamente la información presentada al operador.
+
+De esta forma, la representación visual permanece sincronizada con el estado operativo del sistema.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+La Cola Operativa constituye un mecanismo transversal dentro del SGOF Core.
+
+Aunque interactúa con múltiples subsistemas, mantiene una responsabilidad claramente definida: organizar los recursos disponibles para que los procesos de asignación puedan operar sobre una base consistente y permanentemente actualizada.
+
+======================================================
+
+7. Beneficios Operativos
+------------------------
+
+La implementación de la Cola Operativa aporta múltiples beneficios al funcionamiento general del SGOF Core.
+
+Entre los principales se destacan:
+
+organización permanente de los recursos disponibles;
+distribución ordenada de la carga operativa;
+consistencia en el proceso de asignación;
+facilidad para incorporar criterios inteligentes de selección;
+adaptación dinámica a los cambios de estado de la flota;
+integración uniforme con el resto de la plataforma.
+
+Estos beneficios convierten a la Cola Operativa en uno de los pilares del funcionamiento operativo del sistema.
+
+
+8. Observaciones de Arquitectura
+--------------------------------
+
+Desde el punto de vista arquitectónico, la Cola Operativa constituye un mecanismo de organización y no un mecanismo de decisión.
+
+Su función consiste en mantener un orden dinámico de los recursos disponibles, preservando la consistencia operativa de la flota y proporcionando una base estable para los procesos de asignación.
+
+Esta separación entre organización y selección favorece la modularidad del sistema y permite evolucionar los algoritmos de asignación sin modificar la estructura de la Cola Operativa.
+
+
+9. Conclusiones
+---------------
+
+La Cola Operativa constituye el mecanismo encargado de organizar los recursos disponibles dentro del SGOF Core.
+
+A lo largo del presente documento se describieron su objetivo, principios de funcionamiento, reglas operativas e integración con los distintos componentes de la plataforma.
+
+La auditoría realizada permitió comprobar que este mecanismo mantiene un orden consistente de los recursos móviles y proporciona la base necesaria para el funcionamiento de los procesos de asignación implementados por el sistema.
+
+La separación entre la organización de la cola y la lógica de selección representa uno de los principios arquitectónicos más relevantes del SGOF Core, favoreciendo la claridad del diseño, la mantenibilidad y la evolución futura de la plataforma.
+
+-------------------------------------------------------
+
+Dictamen Final de Auditoría
+---------------------------
+
+--------------------------------------------------
+Documento: 001_Cola_Operativa_SGOF_CORE_v1.0.txt
+
+Estado: APROBADO
+--------------------------------------------------
+
+
+Resultado del relevamiento
+--------------------------
+
+Durante la auditoría técnica se verificó el funcionamiento de la Cola Operativa como mecanismo de organización de los recursos disponibles.
+
+Se comprobó su integración con la Gestión de Taxis, la Gestión de Viajes, la Base de Datos y Socket.IO, así como su papel como base organizativa para los procesos de Asignación Inteligente.
+
+La documentación desarrollada refleja los principios permanentes de funcionamiento de este subsistema, manteniendo una clara separación respecto de los algoritmos de selección utilizados durante la asignación de servicios.
+
+
+Observaciones
+-------------
+
+No se detectaron inconsistencias entre la arquitectura documentada y el comportamiento observado durante la auditoría.
+
+El documento mantiene un nivel de abstracción adecuado y se limita a describir la responsabilidad propia de la Cola Operativa, evitando incorporar aspectos que corresponden a otros procesos operativos.
+
+
+Conclusión
+----------
+
+El documento 001_Cola_Operativa_SGOF_CORE_v1.0.txt queda oficialmente aprobado e incorporado a la Biblioteca Técnica del SGOF Core como referencia del mecanismo responsable de la organización de los recursos operativos de la plataforma.
+
+
+=========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

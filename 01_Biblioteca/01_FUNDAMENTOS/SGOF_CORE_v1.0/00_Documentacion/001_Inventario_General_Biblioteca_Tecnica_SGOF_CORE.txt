@@ -1,0 +1,250 @@
+001_Inventario_General_Biblioteca_Tecnica_SGOF_CORE.txt
+=======================================================
+
+==============================================================
+SGOF-DOC-001
+
+INVENTARIO GENERAL DE LA
+BIBLIOTECA TÉCNICA DEL SGOF CORE
+
+Versión 1.0
+==============================================================
+
+1. Objetivo
+-----------
+
+El presente documento constituye el inventario oficial de la Biblioteca Técnica del SGOF Core.
+
+Su finalidad es presentar la estructura documental vigente, identificar los documentos que integran cada área de conocimiento y reflejar el estado general de la documentación técnica del proyecto.
+
+Este documento sirve como referencia para las tareas de consulta, auditoría, mantenimiento y evolución de la Biblioteca Técnica.
+
+
+2. Estado General de la Biblioteca
+----------------------------------
+==============================================================
+ESTADO GENERAL
+==============================================================
+
+Carpetas documentales : 11
+
+Carpetas cerradas     : 10
+
+Carpetas reservadas   : 1
+
+Estado general        : EN DESARROLLO
+
+Versión documental    : SGOF Core v1.0
+
+Nota: La carpeta 10_Historial permanece reservada y comenzará a documentarse cuando el SGOF Core alcance oficialmente la Fase Beta.
+
+
+3. Inventario General
+---------------------
+
+==============================================================
+00_DOCUMENTACION
+==============================================================
+
+000_Biblioteca_Tecnica_SGOF.txt
+Estado : APROBADO
+
+001_Inventario_General_Biblioteca_Tecnica_SGOF_CORE.txt
+Estado : EN DESARROLLO
+==============================================================
+01_ARQUITECTURA
+==============================================================
+
+001_Arquitectura_General_SGOF_CORE_v1.0
+Estado : CERRADO
+==============================================================
+02_BACKEND
+==============================================================
+
+001_Backend_SGOF_CORE_v1.0
+Estado : CERRADO
+==============================================================
+03_FRONTEND
+==============================================================
+
+001_Frontend_SGOF_CORE_v1.0
+Estado : CERRADO
+==============================================================
+04_BASE_DE_DATOS
+==============================================================
+
+001_Modelo_Conceptual
+
+002_Modelo_Relacional
+
+Estado : CERRADO
+==============================================================
+05_SOCKETIO
+==============================================================
+
+001_SocketIO_SGOF_CORE_v1.0
+
+Estado : CERRADO
+==============================================================
+06_ALGORITMOS
+==============================================================
+
+000_Metodologia_Algoritmos
+
+001_Algoritmo_Asignacion_Inteligente
+
+002_Algoritmo_Cola_Operativa
+
+003_Algoritmo_Calidad_GPS
+
+ACTA_Cierre_Carpeta_06_Algoritmos
+
+Estado : CERRADO
+==============================================================
+07_GPS
+==============================================================
+
+001_GPS_SGOF_CORE_v1.0
+
+Estado : CERRADO
+==============================================================
+08_API
+==============================================================
+
+001_API_REST_SGOF_CORE_v1.0
+
+Estado : CERRADO
+==============================================================
+09_FLUJO_OPERATIVO
+==============================================================
+
+001_Gestion_de_Pedidos
+
+002_Asignacion_Inteligente
+
+003_Gestion_de_Viajes
+
+Estado : CERRADO
+==============================================================
+10_HISTORIAL
+==============================================================
+
+Carpeta reservada.
+-----------------
+
+Su documentación comenzará con la declaración
+oficial de la primera versión Beta del SGOF Core.
+
+Estado : RESERVADA
+
+==============================================================
+
+4. Resumen Ejecutivo
+--------------------
+Documentación metodológica        : Completa
+
+Arquitectura                      : Completa
+
+Modelo de Datos                   : Completo
+
+Backend                           : Completo
+
+Frontend                          : Completo
+
+GPS                               : Completo
+
+Socket.IO                         : Completo
+
+API REST                          : Completa
+
+Procesos Operativos               : Completos
+
+Algoritmos                        : Completos
+
+Historial                         : Reservado
+
+
+5. Observaciones Generales
+--------------------------
+
+La Biblioteca Técnica documenta exclusivamente componentes y funcionalidades implementadas y verificadas durante la auditoría del SGOF Core.
+
+Las propuestas de evolución futura se documentarán únicamente cuando formen parte de una versión oficial del sistema.
+
+La carpeta 10_Historial permanecerá reservada hasta la declaración oficial de la primera versión Beta.
+
+
+6. Conclusión
+-------------
+
+La Biblioteca Técnica del SGOF Core constituye la referencia oficial para la arquitectura, funcionamiento y documentación del sistema.
+
+El presente inventario refleja el estado actualizado de la documentación correspondiente a la versión 1.0 del proyecto y permite identificar de manera inmediata el nivel de avance de cada una de sus áreas.
+
+La actualización de este documento deberá acompañar la incorporación de nuevos documentos, el cierre de nuevas carpetas documentales y la evolución oficial del SGOF Core.
+
+
+============================================================
+
+
+
+==============================================================
+CONTROL DEL INVENTARIO
+==============================================================
+
+Código del documento :
+
+SGOF-DOC-001
+
+Versión del documento :
+
+1.0
+
+Versión de la Biblioteca :
+
+SGOF Core v1.0
+
+Estado del documento :
+
+APROBADO
+
+Última actualización :
+
+04 / 08 / 2026
+
+Responsable de la actualización : Equipo SGOF
+
+_______________________________
+
+Próxima revisión :
+
+A demanda, cada vez que se produzca alguno de los
+siguientes eventos:
+
+• Incorporación de un nuevo documento.
+• Cierre de una carpeta documental.
+• Modificación del estado de un documento.
+• Incorporación de una nueva versión del SGOF Core.
+• Reorganización de la Biblioteca Técnica.
+
+Observaciones :
+-------------
+Este inventario constituye la referencia oficial del
+estado documental de la Biblioteca Técnica del
+SGOF Core y deberá mantenerse permanentemente
+actualizado.
+
+==============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+

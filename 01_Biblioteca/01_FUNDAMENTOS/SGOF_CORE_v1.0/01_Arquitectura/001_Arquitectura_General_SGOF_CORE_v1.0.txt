@@ -1,0 +1,434 @@
+SGOF CORE v1.0
+
+DOCUMENTO 001
+
+ARQUITECTURA GENERAL DEL SISTEMA
+
+--------------------------------------------
+
+Versión:
+1.0
+
+Estado:
+En elaboración
+
+Fecha:
+29/07/2026
+
+--------------------------------------------
+
+Proyecto:
+SGOF – Sistema de Gestión Operativa de Flota
+
+Autor:
+Pedro Lemos Melazzi
+
+Documento:
+Oficial de Ingeniería
+
+--------------------------------------------
+
+
+ÍNDICE
+
+1. Introducción
+
+2. Objetivo del sistema
+
+3. Alcance
+
+4. Arquitectura General
+
+5. Componentes principales
+
+6. Flujo general
+
+7. Filosofía de diseño
+
+8. Estado actual
+
+9. Próximos pasos
+
+=============================================
+
+SGOF-ARQ-001
+ARQUITECTURA GENERAL
+
+=============================================
+
+
+1. Introducción
+
+
+SGOF (Sistema de Gestión Operativa de Flota) es una plataforma modular destinada a la administración, coordinación y supervisión de flotas de transporte y servicios móviles.
+
+Su objetivo es integrar, en un único sistema, la gestión de pedidos, la asignación inteligente de vehículos, el seguimiento mediante GPS, la comunicación operativa y el control del estado de la flota, proporcionando información en tiempo real para la toma de decisiones.
+
+La primera implementación operativa del SGOF fue desarrollada para empresas de taxis urbanos, constituyendo el núcleo funcional sobre el cual se diseñó, desarrolló y consolidó la arquitectura del sistema.
+
+A partir de esta base, la plataforma fue concebida para evolucionar e incorporar otras modalidades de operación, tales como remises, servicios de delivery, traslados especiales, logística urbana y cualquier otro servicio que requiera la gestión coordinada de una flota de vehículos, preservando siempre la integridad del núcleo operativo.
+
+El proyecto nació con un objetivo muy claro: reemplazar los procesos manuales tradicionales —basados en planillas, radio VHF y decisiones individuales— por una plataforma informática capaz de centralizar toda la operación diaria de forma ordenada, segura y escalable.
+
+Durante su desarrollo se priorizó la simplicidad operativa, la estabilidad del sistema y la facilidad de mantenimiento. Cada componente fue diseñado para cumplir una función específica dentro de una arquitectura modular, permitiendo que el sistema evolucione sin comprometer el funcionamiento del núcleo operativo.
+
+En la actualidad, el SGOF constituye una plataforma funcional y consolidada, preparada para incorporar nuevas capacidades sin alterar los procesos ya validados. La arquitectura implementada permite integrar futuros módulos, aplicaciones para choferes, administración de clientes, facturación, estadísticas operativas y futuras integraciones tecnológicas, preservando siempre la integridad del núcleo del sistema.
+
+El presente documento describe la arquitectura general del SGOF Core v1.0, estableciendo los principios técnicos sobre los cuales se apoya el resto de la documentación de ingeniería del proyecto.
+
+===================================================
+
+2. Objetivo del Sistema
+
+El Sistema de Gestión Operativa de Flota (SGOF) tiene como objetivo central proporcionar una plataforma única para administrar, coordinar y supervisar en tiempo real
+la operación integral de empresas dedicadas a la gestión de flotas de transporte y servicios móviles.
+
+Su finalidad es integrar en un único entorno operativo la recepción de pedidos, la asignación inteligente de vehículos, el seguimiento mediante GPS, el control del estado de la flota y la gestión completa del ciclo de vida de cada viaje, permitiendo que toda la información relevante se encuentre disponible de forma inmediata para la operadora.
+
+El SGOF fue concebido para sustituir procesos manuales y dispersos por un sistema informatizado capaz de mejorar la eficiencia operativa, reducir los tiempos de respuesta, optimizar la utilización de los recursos disponibles y proporcionar información confiable para la toma de decisiones.
+
+La arquitectura del sistema prioriza la estabilidad, la simplicidad operativa y la escalabilidad. Cada componente fue diseñado para cumplir una responsabilidad específica dentro de una estructura modular, permitiendo incorporar nuevas funcionalidades sin afectar el funcionamiento del núcleo operativo ya validado.
+
+Como objetivo estratégico, el SGOF establece las bases para la evolución futura de la empresa, posibilitando la integración de nuevas tecnologías, aplicaciones móviles, sistemas de pago, herramientas de análisis, inteligencia operativa y futuras modalidades de transporte, preservando siempre la continuidad y la integridad del sistema.
+
+====================================================
+
+3. Alcance
+===========
+
+El Sistema de Gestión Operativa de Flota (SGOF) comprende el conjunto de componentes, procesos y herramientas necesarios para administrar, coordinar y supervisar la operación de flotas de transporte y servicios móviles desde un entorno centralizado.
+
+En su versión actual, el sistema permite gestionar de forma integrada la recepción de pedidos, la administración de viajes, la asignación inteligente de vehículos, el seguimiento mediante GPS, el control del estado operativo de la flota y la comunicación en tiempo real entre los distintos componentes del sistema.
+
+La arquitectura del SGOF integra una base de datos relacional, un servidor de aplicaciones, una interfaz web de operación, servicios de comunicación en tiempo real y algoritmos específicos para la gestión operativa, conformando una plataforma única para el control integral de la operación.
+
+El alcance funcional del sistema comprende exclusivamente aquellas funcionalidades implementadas, verificadas, consolidadas y documentadas dentro de la presente Biblioteca Técnica.
+
+Quedan fuera del alcance de la versión actual del SGOF las funcionalidades correspondientes a administración contable, facturación, gestión financiera, recursos humanos, liquidación de haberes, mantenimiento mecánico de vehículos y cualquier otro módulo empresarial que no forme parte del núcleo operativo del sistema.
+
+La arquitectura ha sido concebida para permitir la incorporación futura de nuevos módulos especializados, manteniendo la estabilidad, la integridad y la independencia del núcleo operativo que constituye la base del SGOF.
+
+======================================================---
+
+4. Arquitectura General
+=======================
+
+La arquitectura del Sistema de Gestión Operativa de Flota (SGOF) se
+encuentra organizada en componentes independientes, cada uno con una
+responsabilidad específica, que interactúan entre sí para conformar una
+plataforma única de gestión operativa en tiempo real.
+
+La separación de responsabilidades entre los distintos componentes
+permite facilitar el mantenimiento, la evolución del sistema y la
+incorporación de nuevas funcionalidades sin comprometer la estabilidad
+del núcleo operativo.
+
+
+Figura 1.
+Arquitectura General del SGOF Core
+
+                        SGOF CORE
+                             │
+      ┌──────────────┬──────────────┬──────────────┐
+      │              │              │
+   Frontend       Backend      Base de Datos
+      │              │              │
+      └────────── Socket.IO ────────┘
+                     │
+              GPS - Algoritmos
+                     │
+             Operación en Tiempo Real
+
+============================================================
+
+La arquitectura del SGOF se basa en un modelo modular, donde cada
+componente cumple una responsabilidad específica dentro del sistema.
+
+El Backend concentra la lógica de negocio y coordina la operación
+general del sistema.
+
+El Frontend proporciona la interfaz utilizada por la operadora para
+administrar la flota y supervisar la operación en tiempo real.
+
+La Base de Datos almacena de forma persistente toda la información
+operativa necesaria para el funcionamiento del sistema.
+
+Socket.IO actúa como mecanismo de comunicación en tiempo real entre los
+componentes, permitiendo la sincronización inmediata de los eventos
+operativos.
+
+Los módulos de GPS y Algoritmos procesan la información de posición,
+asignación y control operativo, proporcionando los datos necesarios para
+la gestión inteligente de la flota.
+
+La interacción coordinada entre todos estos componentes constituye el
+núcleo operativo del SGOF Core.
+
+======================================================
+
+5. Componentes Principales
+==========================
+
+La arquitectura del Sistema de Gestión Operativa de Flota (SGOF) se encuentra organizada en componentes independientes y especializados, cada uno con una responsabilidad claramente definida.
+
+La separación funcional entre los distintos componentes permite mantener una arquitectura modular, facilitando el mantenimiento, la evolución del sistema y la incorporación de nuevas funcionalidades sin afectar la estabilidad del núcleo operativo.
+
+Los principales componentes que integran el SGOF se describen a continuación.
+
+
+=======================================================
+
+5.1 Frontend
+------------
+
+El Frontend constituye la interfaz de operación del SGOF y representa el punto de interacción entre el sistema y la operadora.
+
+Su responsabilidad consiste en presentar la información operativa en tiempo real, permitir la administración de los pedidos, viajes y vehículos, visualizar la ubicación de la flota mediante mapas y proporcionar acceso a las distintas funciones de control del sistema.
+
+El Frontend recibe la información procesada por el Backend y refleja de forma inmediata las actualizaciones generadas durante la operación, garantizando una visión unificada del estado de la flota.
+
+========================================================
+
+5.2 Backend
+-----------
+
+El Backend constituye el núcleo lógico del SGOF.
+
+Su responsabilidad consiste en ejecutar las reglas de negocio, administrar el ciclo de vida de los viajes, procesar las solicitudes recibidas desde el Frontend, coordinar la comunicación con la Base de Datos y distribuir los eventos operativos mediante los servicios de comunicación en tiempo real.
+
+Todas las decisiones operativas del sistema son gestionadas por este componente, garantizando la integridad y consistencia de la información.
+
+==========================================================
+
+5.3 Base de Datos
+-----------------
+
+La Base de Datos constituye el repositorio central de información del SGOF.
+
+Su función consiste en almacenar de forma persistente toda la información relacionada con la operación del sistema, incluyendo pedidos, viajes, vehículos, operadores, registros GPS y demás datos necesarios para el funcionamiento de la plataforma.
+
+Este componente garantiza la disponibilidad, integridad y consistencia de la información utilizada por el resto de la arquitectura.
+
+=============================================================
+
+5.4 Socket.IO
+-------------
+
+Socket.IO constituye el mecanismo de comunicación en tiempo real entre los distintos componentes del SGOF.
+
+Su función consiste en distribuir de forma inmediata los eventos operativos generados por el sistema, permitiendo que todas las interfaces conectadas permanezcan sincronizadas sin necesidad de realizar actualizaciones manuales.
+
+Este componente garantiza que los cambios producidos durante la operación —como la creación de pedidos, asignación de vehículos, cambios de estado de los viajes y actualización de posiciones— sean reflejados instantáneamente en el entorno operativo.
+
+=============================================================
+
+5.5 GPS y Algoritmos
+--------------------
+
+Los módulos de GPS y Algoritmos proporcionan la inteligencia operativa del SGOF.
+
+El sistema procesa continuamente la información de posicionamiento de los vehículos, permitiendo conocer su ubicación, disponibilidad y estado operativo.
+
+Sobre esta información actúan los algoritmos de gestión, responsables de ejecutar las reglas de asignación, priorización, control de estados y demás procesos que intervienen en la administración de la flota.
+
+La integración entre el posicionamiento geográfico y los algoritmos operativos permite optimizar la toma de decisiones y mejorar la eficiencia general del sistema.
+
+============================================================-
+
+5.6 Integración de Componentes
+------------------------------
+
+La arquitectura del SGOF ha sido diseñada bajo un modelo de integración modular, donde cada componente cumple una función específica y colabora con el resto mediante interfaces claramente definidas.
+
+El Frontend interactúa con el Backend para solicitar y presentar información operativa. El Backend procesa las reglas de negocio, consulta y actualiza la Base de Datos, y utiliza Socket.IO para comunicar en tiempo real los eventos generados durante la operación.
+
+Los módulos de GPS y Algoritmos aportan la información y las decisiones necesarias para la gestión inteligente de la flota, integrándose de forma transparente con el resto de la plataforma.
+
+Esta organización permite que cada componente pueda evolucionar de manera independiente, preservando la estabilidad, escalabilidad y mantenibilidad del núcleo operativo del Sistema de Gestión Operativa de Flota.
+
+==============================================================
+
+
+6. Flujo General de Operación
+=============================
+
+El funcionamiento del Sistema de Gestión Operativa de Flota (SGOF) se desarrolla mediante una secuencia ordenada de procesos que integran todos los componentes de la arquitectura.
+
+Cada operación realizada dentro del sistema sigue un flujo controlado que garantiza la consistencia de la información, la sincronización entre los distintos módulos y la actualización inmediata del estado operativo de la flota.
+
+De forma general, el ciclo operativo del SGOF puede representarse mediante la siguiente secuencia:
+
+Figura 2.
+---------
+Flujo General de Operación del SGOF
+===================================
+
+Solicitud del Cliente
+          │
+          ▼
+Creación del Pedido
+          │
+          ▼
+Registro del Pedido
+          │
+          ▼
+Generación del Viaje
+          │
+          ▼
+Asignación Inteligente
+          │
+          ▼
+Aceptación del Viaje
+          │
+          ▼
+En Camino al Origen
+          │
+          ▼
+Llegada al Origen
+          │
+          ▼
+Inicio del Viaje
+          │
+          ▼
+Seguimiento GPS
+          │
+          ▼
+Finalización del Viaje
+          │
+          ▼
+Actualización de la Flota
+          │
+          ▼
+Registro Histórico
+
+El flujo operativo del SGOF comienza con la recepción de una solicitud de servicio por parte de un cliente. Esta solicitud da origen a un pedido, el cual es registrado en el sistema como punto de partida del proceso operativo.
+
+A partir del pedido se genera el viaje correspondiente, iniciándose el proceso de asignación del vehículo mediante las reglas de negocio y los algoritmos operativos definidos por el sistema.
+
+Una vez asignado el viaje, el sistema coordina las distintas etapas de la operación, manteniendo sincronizados todos los componentes mediante los mecanismos de comunicación en tiempo real y supervisando continuamente la posición y el estado de la flota.
+
+Al finalizar el servicio, el sistema actualiza el estado de los recursos involucrados, reorganiza la operación de la flota cuando corresponde y registra toda la información necesaria para la trazabilidad y el análisis histórico de la actividad.
+
+========================================================
+
+7. Filosofía de Diseño
+======================
+
+El Sistema de Gestión Operativa de Flota (SGOF) fue concebido bajo un conjunto de principios de diseño destinados a garantizar la claridad arquitectónica, la estabilidad operativa y la capacidad de evolución del sistema.
+
+Estos principios orientan tanto el desarrollo inicial como las futuras ampliaciones de la plataforma, procurando que cada incorporación preserve la coherencia del conjunto.
+
+=========================================================
+
+7.1 Separación de responsabilidades
+-----------------------------------
+
+Cada componente del SGOF cumple una función claramente definida dentro de la arquitectura.
+
+La distribución de responsabilidades entre Frontend, Backend, Base de Datos, servicios de comunicación y módulos especializados evita duplicaciones funcionales, facilita el mantenimiento y reduce el impacto de futuras modificaciones.
+
+Cada componente debe resolver exclusivamente las responsabilidades que le son propias.
+
+============================================================
+
+7.2 Único origen de la información
+----------------------------------
+
+Toda la información operativa debe poseer un único origen de verdad.
+
+Cada dato es administrado por un único componente responsable, evitando inconsistencias derivadas de duplicaciones o actualizaciones independientes.
+
+Los restantes componentes consumen dicha información mediante los mecanismos de integración definidos por la arquitectura.
+
+=============================================================
+
+7.3 Modularidad
+---------------
+
+La arquitectura del SGOF se encuentra organizada en módulos independientes, permitiendo que cada componente pueda evolucionar sin comprometer el funcionamiento del resto del sistema.
+
+La modularidad facilita el mantenimiento, simplifica la incorporación de nuevas funcionalidades y favorece la reutilización de componentes.
+
+============================================================
+
+7.4 Operación en tiempo real
+----------------------------
+
+La actualización inmediata de la información constituye un principio fundamental del diseño del SGOF.
+
+Los cambios producidos durante la operación deben ser reflejados simultáneamente en todas las interfaces conectadas, garantizando que los distintos actores del sistema compartan una visión consistente del estado operativo de la flota.
+
+============================================================
+
+7.5 Escalabilidad
+-----------------
+
+La arquitectura ha sido diseñada para admitir el crecimiento funcional del sistema sin requerir modificaciones sustanciales en su núcleo operativo.
+
+La incorporación de nuevos módulos, servicios o funcionalidades deberá respetar los principios arquitectónicos establecidos en este documento, preservando la estabilidad y coherencia de la plataforma.
+
+==========================================================
+
+7.6 Representación fiel de la operación
+---------------------------------------
+
+El diseño del SGOF procura representar con precisión los procesos reales de gestión de una flota de transporte.
+
+Los estados operativos, el flujo de los viajes, la administración de los recursos y las reglas de negocio implementadas responden a situaciones reales de operación, procurando que el sistema refleje el comportamiento de la actividad que administra y no una simplificación teórica de la misma.
+
+==========================================================
+
+Los principios aquí definidos constituyen la base conceptual del SGOF y deberán ser considerados como referencia para toda evolución futura del sistema.
+
+Toda modificación arquitectónica o incorporación funcional deberá preservar estos principios, garantizando la continuidad técnica y la coherencia global de la plataforma.
+
+=============================================================
+
+8. Estado Actual
+================
+
+La presente versión del Sistema de Gestión Operativa de Flota (SGOF) constituye una plataforma operativa funcional, desarrollada bajo una arquitectura modular y orientada a la gestión integral de flotas de transporte.
+
+El sistema implementa un flujo operativo completo que comprende la recepción de pedidos, la generación y administración de viajes, la asignación inteligente de vehículos, el seguimiento mediante información de posicionamiento, la sincronización en tiempo real entre los distintos componentes y el registro histórico de la operación.
+
+La arquitectura actualmente implementada integra de forma coordinada el Frontend, el Backend, la Base de Datos, los servicios de comunicación en tiempo real y los módulos de apoyo a la operación, proporcionando una base estable para el mantenimiento, la evolución y la incorporación de nuevas funcionalidades.
+
+La presente especificación documenta el estado funcional y arquitectónico correspondiente a la versión SGOF Core v1.0, constituyendo la referencia oficial para la documentación técnica de los distintos componentes del sistema.
+
+======================================================
+
+9. Próximos Pasos
+=================
+
+La arquitectura del SGOF ha sido concebida para admitir una evolución progresiva, preservando la estabilidad de su núcleo operativo y los principios de diseño definidos en el presente documento.
+
+La incorporación de nuevos módulos, servicios o capacidades deberá realizarse respetando la organización modular de la plataforma, garantizando la compatibilidad con los componentes existentes y la coherencia de la arquitectura general.
+
+Las futuras versiones podrán ampliar las capacidades del sistema mediante la incorporación de nuevas funcionalidades operativas, mecanismos de integración, herramientas de análisis, interfaces especializadas y soporte para distintos tipos de flotas, sin alterar los fundamentos arquitectónicos establecidos en esta especificación.
+
+Toda evolución del sistema deberá quedar reflejada en la Biblioteca Técnica del SGOF, manteniendo la trazabilidad documental y asegurando la correspondencia entre la implementación y su documentación oficial.
+
+====================================================
+
+==============================================
+METADATOS DEL DOCUMENTO
+==============================================
+
+Título             :Arquitectura General del SGOF Core
+Código             :SGOF-ARQ-001
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  :
+Última revisión    :
+
+Documento padre    :
+Documentos relacionados :
+
+Próxima revisión   : Según evolución de la arquitectura

@@ -1,0 +1,336 @@
+004_Gestion_de_Pedidos_SGOF_CORE_v1.0.txt
+=========================================
+
+1. Introducción
+---------------
+
+El presente documento forma parte de la Biblioteca Técnica del SGOF Core.
+
+Los principios generales de Arquitectura, Backend, Frontend, Modelo Funcional, API REST, Sistema GPS, Socket.IO y los procesos de Cola Operativa, Asignación Inteligente y Gestión de Viajes se consideran previamente documentados y constituyen el marco de referencia para el presente volumen.
+
+En consecuencia, este documento desarrolla exclusivamente el proceso de Gestión de Pedidos, responsable de administrar el ingreso de las solicitudes de servicio al sistema.
+
+La Gestión de Pedidos representa el punto de inicio del flujo operativo del SGOF Core, registrando la necesidad del cliente y proporcionando la información necesaria para que los procesos posteriores puedan organizar, asignar y ejecutar el servicio solicitado.
+
+
+2. Objetivo
+-----------
+
+La Gestión de Pedidos tiene como objetivo registrar, organizar y administrar las solicitudes de servicio recibidas por la plataforma.
+
+Su finalidad consiste en transformar una necesidad operativa en un pedido estructurado, proporcionando la información necesaria para iniciar el proceso de asignación y posterior ejecución del servicio.
+
+La correcta administración de los pedidos garantiza que todas las solicitudes ingresen al sistema de forma uniforme, trazable y consistente.
+
+
+3. Concepto de Gestión de Pedidos
+---------------------------------
+
+La Gestión de Pedidos constituye el proceso encargado de administrar el ingreso de las solicitudes de servicio al SGOF Core.
+
+Cada pedido representa una necesidad planteada por un cliente y contiene la información necesaria para que el sistema pueda iniciar el proceso operativo correspondiente.
+
+El pedido no constituye un viaje ni implica la asignación inmediata de un recurso.
+
+Su responsabilidad consiste exclusivamente en registrar y administrar la solicitud, permitiendo que los procesos posteriores continúen con la organización, asignación y ejecución del servicio.
+
+
+4. Principios de Funcionamiento
+-------------------------------
+
+La Gestión de Pedidos desarrolla su actividad conforme a un conjunto de principios destinados a garantizar la consistencia del ingreso de solicitudes.
+
+Entre ellos se destacan:
+
+cada solicitud origina un pedido independiente;
+el pedido representa una necesidad, no un servicio ejecutado;
+la información registrada debe ser suficiente para iniciar el proceso operativo;
+los pedidos permanecen trazables durante todo su ciclo de vida;
+la administración de pedidos se mantiene separada de la ejecución de los viajes.
+
+Estos principios permiten desacoplar el ingreso de solicitudes del resto de la operación y favorecen la escalabilidad del sistema.
+
+
+Principio Rector
+----------------
+
+Todo servicio comienza con un pedido; ningún viaje puede existir sin una necesidad previamente registrada.
+
+
+=======================================================
+
+5. Ciclo de Vida del Pedido
+---------------------------
+
+Introducción
+------------
+
+Todo pedido administrado por el SGOF Core atraviesa un ciclo de vida que comienza con el registro de la solicitud y concluye cuando dicha necesidad ha sido atendida o deja de formar parte de la operación.
+
+Este ciclo permite administrar cada solicitud de forma ordenada, manteniendo su trazabilidad y proporcionando la información necesaria para los procesos posteriores.
+
+
+Registro de la solicitud
+------------------------
+
+El ciclo comienza cuando el sistema registra una nueva necesidad de servicio.
+
+A partir de este momento el pedido pasa a formar parte de la operación y queda disponible para su tratamiento por los procesos correspondientes.
+
+
+Administración del pedido
+-------------------------
+
+Una vez registrado, el pedido permanece bajo control del sistema mientras se desarrollan las etapas necesarias para responder a la solicitud del cliente.
+
+Durante este período el pedido constituye la referencia operativa para el inicio del proceso de asignación.
+
+
+Vinculación con el viaje
+------------------------
+
+Cuando la operación requiere la prestación efectiva del servicio, el pedido origina el correspondiente viaje.
+
+A partir de ese momento ambos procesos mantienen una relación funcional, aunque conservan responsabilidades claramente diferenciadas.
+
+El pedido continúa representando la necesidad original, mientras que el viaje administra la ejecución del servicio.
+
+
+Finalización del ciclo
+----------------------
+
+El ciclo del pedido concluye cuando la solicitud ha sido resuelta conforme a las reglas operativas del sistema o cuando deja de requerir tratamiento por cualquier causa prevista dentro de la operación.
+
+La información correspondiente permanece registrada para fines de trazabilidad y auditoría.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+El pedido constituye el origen documental del servicio.
+
+Su ciclo de vida representa la administración de la necesidad del cliente y no la ejecución del viaje.
+
+Esta separación permite mantener claramente diferenciadas las responsabilidades de ambos procesos y favorece la trazabilidad completa de la operación.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría funcional se verificó que el ciclo de vida del pedido constituye una etapa independiente del ciclo de vida del viaje.
+
+Esta separación permitió organizar con mayor claridad el modelo operativo del SGOF Core y preservar la relación entre la necesidad planteada por el cliente y el servicio finalmente ejecutado.
+
+
+Principio Rector
+----------------
+
+El pedido registra la necesidad; el viaje ejecuta la solución.
+
+=====================================================
+
+6. Integración con el SGOF Core
+-------------------------------
+
+Introducción
+------------
+
+La Gestión de Pedidos constituye el punto de entrada del flujo operativo del SGOF Core.
+
+Su función consiste en registrar y administrar las solicitudes de servicio, proporcionando la información necesaria para que los procesos posteriores puedan organizar los recursos, realizar la asignación correspondiente y administrar la ejecución del servicio.
+
+Esta integración garantiza que toda operación tenga su origen en una necesidad correctamente registrada.
+
+
+Relación con la Cola Operativa
+------------------------------
+
+Una vez registrado el pedido, la información necesaria queda disponible para los procesos responsables de organizar los recursos operativos.
+
+La Gestión de Pedidos no participa en la organización de la flota, pero proporciona la información que permite iniciar dicho proceso.
+
+
+Relación con la Asignación Inteligente
+--------------------------------------
+
+La Gestión de Pedidos suministra la información básica necesaria para que el proceso de Asignación Inteligente pueda seleccionar el recurso más adecuado para atender la solicitud.
+
+La decisión de asignación permanece completamente separada de la administración del pedido.
+
+
+Relación con la Gestión de Viajes
+---------------------------------
+
+La Gestión de Pedidos constituye el origen funcional de la Gestión de Viajes.
+
+Cuando la solicitud pasa a la etapa de ejecución, el sistema genera el viaje correspondiente y transfiere el control operativo al proceso responsable de administrar el servicio.
+
+Desde ese momento ambas entidades mantienen una relación funcional, conservando responsabilidades claramente diferenciadas.
+
+
+Relación con PostgreSQL
+-----------------------
+
+Toda la información correspondiente al pedido queda registrada en la Base de Datos, garantizando su persistencia y permitiendo mantener la trazabilidad entre la solicitud original y el servicio finalmente ejecutado.
+
+
+Relación con Socket.IO
+----------------------
+
+Cuando la incorporación de un nuevo pedido produce cambios relevantes en la operación, dichos cambios pueden comunicarse mediante Socket.IO a los clientes conectados.
+
+Esto permite mantener sincronizada la información presentada por el sistema durante la gestión operativa.
+
+
+Relación con el Frontend
+------------------------
+
+El Frontend permite registrar, consultar y administrar los pedidos mediante la interfaz de usuario.
+
+Su responsabilidad consiste en representar la información administrada por el Backend sin intervenir en las reglas propias del proceso.
+
+=======================================================
+
+7. Beneficios Operativos
+------------------------
+
+La Gestión de Pedidos aporta múltiples beneficios al funcionamiento general del SGOF Core.
+
+Entre los principales se destacan:
+
+registro uniforme de las solicitudes de servicio;
+separación entre la necesidad del cliente y la ejecución del servicio;
+trazabilidad completa desde el origen de la operación;
+integración consistente con los procesos posteriores;
+administración ordenada de la información operativa;
+base documental para la auditoría de los servicios.
+
+Estos beneficios permiten que toda operación tenga un origen claramente identificado y correctamente documentado.
+
+======================================================
+
+8. Observaciones de Arquitectura
+--------------------------------
+Desde la perspectiva arquitectónica, la Gestión de Pedidos representa el punto de ingreso de la información operativa al SGOF Core.
+
+Su responsabilidad consiste en administrar la necesidad planteada por el cliente, manteniendo una clara separación respecto de los procesos encargados de organizar los recursos, realizar la asignación y administrar la ejecución del servicio.
+
+Esta organización favorece la modularidad del sistema y facilita la evolución independiente de cada uno de los procesos operativos.
+
+9. Conclusiones
+---------------
+
+La Gestión de Pedidos constituye el proceso responsable de registrar y administrar las solicitudes de servicio que ingresan al SGOF Core.
+
+A lo largo del presente documento se describieron sus objetivos, principios de funcionamiento, ciclo de vida e integración con los distintos componentes de la plataforma.
+
+La auditoría permitió comprobar que este proceso mantiene una clara separación entre la necesidad del cliente y la ejecución del servicio, proporcionando el punto de partida para el resto de la operación.
+
+Su diseño favorece la trazabilidad, la organización de la información y la evolución modular de la arquitectura del sistema.
+
+====================================================
+
+Dictamen Final de Auditoría
+---------------------------
+
+----------------------------------------------------
+
+Documento: 004_Gestion_de_Pedidos_SGOF_CORE_v1.0.txt
+
+Estado: APROBADO
+
+----------------------------------------------------
+
+Resultado del relevamiento
+--------------------------
+
+Durante la auditoría técnica se verificó que la Gestión de Pedidos constituye el proceso responsable de registrar las solicitudes de servicio y proporcionar la información necesaria para iniciar el flujo operativo del SGOF Core.
+
+Se comprobó que este proceso mantiene una clara separación respecto de la Cola Operativa, la Asignación Inteligente y la Gestión de Viajes, preservando la trazabilidad entre la necesidad del cliente y el servicio finalmente ejecutado.
+
+La documentación desarrollada refleja adecuadamente la responsabilidad del proceso y mantiene el nivel de abstracción definido para la Biblioteca Técnica.
+
+
+Observaciones
+-------------
+
+No se detectaron inconsistencias entre la arquitectura documentada y el comportamiento observado durante la auditoría.
+
+El documento describe exclusivamente las responsabilidades propias de la Gestión de Pedidos y evita incorporar funciones que corresponden a otros procesos operativos.
+
+
+Conclusión
+----------
+
+El documento 004_Gestion_de_Pedidos_SGOF_CORE_v1.0.txt queda oficialmente aprobado e incorporado a la Biblioteca Técnica del SGOF Core como referencia del proceso responsable de registrar y administrar las solicitudes de servicio que dan origen a la operación.
+
+
+Principio Rector
+----------------
+
+Todo servicio comienza con una necesidad registrada; la Gestión de Pedidos garantiza que esa necesidad ingrese al sistema de forma estructurada, trazable y consistente.
+
+
+=====================================================
+
+
+7. Relación entre Pedido y Viaje
+--------------------------------
+
+Introducción
+------------
+
+Aunque la Gestión de Pedidos y la Gestión de Viajes participan de un mismo flujo operativo, ambos procesos administran responsabilidades diferentes dentro del SGOF Core.
+
+La correcta separación entre ambos permite mantener una arquitectura modular, preservar la trazabilidad de la operación y facilitar la evolución independiente de cada proceso.
+
+El Pedido como origen
+
+El pedido representa la necesidad expresada por el cliente.
+
+Su función consiste en registrar la información necesaria para iniciar el proceso operativo, sin intervenir en la organización de los recursos ni en la ejecución del servicio.
+
+El Viaje como ejecución
+
+El viaje representa la materialización del servicio solicitado.
+
+A partir de la información contenida en el pedido, el sistema administra la asignación del recurso, el desarrollo de la operación y la finalización del servicio.
+
+Relación funcional
+
+Todo viaje tiene su origen en un pedido.
+
+Sin embargo, un pedido no constituye un viaje por sí mismo.
+
+Esta diferenciación permite conservar la identidad de la necesidad planteada por el cliente y, al mismo tiempo, administrar de forma independiente la ejecución del servicio.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+La separación entre Pedido y Viaje constituye uno de los principios fundamentales del modelo operativo del SGOF Core.
+
+El pedido responde a la gestión de la necesidad; el viaje responde a la gestión de la ejecución.
+
+Esta división favorece la claridad conceptual, evita la superposición de responsabilidades y facilita la incorporación de nuevos procesos sin alterar la arquitectura general del sistema.
+
+
+Principio Rector
+----------------
+
+El pedido inicia la operación; el viaje la materializa.
+
+
+=======================================================
+
+
+
+
+
+
+
+
+
+
+
+

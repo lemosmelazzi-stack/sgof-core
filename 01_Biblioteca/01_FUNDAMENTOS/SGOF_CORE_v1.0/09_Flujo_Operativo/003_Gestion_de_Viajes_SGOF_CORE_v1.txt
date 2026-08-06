@@ -1,0 +1,654 @@
+003_Gestion_de_Viajes_SGOF_CORE_v1.0.txt
+========================================
+
+
+1. Introducción
+---------------
+
+El presente documento forma parte de la Biblioteca Técnica del SGOF Core.
+
+Los principios generales de Arquitectura, Backend, Frontend, Modelo Funcional, API REST, Sistema GPS, Socket.IO, Cola Operativa y Asignación Inteligente se consideran previamente documentados y constituyen el marco de referencia para el presente volumen.
+
+En consecuencia, este documento desarrolla exclusivamente el proceso de Gestión de Viajes, responsable de administrar el ciclo de vida operativo de cada servicio desde su creación hasta su finalización.
+
+La Gestión de Viajes constituye uno de los procesos centrales del SGOF Core, integrando las distintas etapas operativas mediante un conjunto de estados claramente definidos que permiten controlar la evolución de cada servicio y coordinar la interacción entre los diferentes subsistemas de la plataforma.
+
+2. Objetivo
+-----------
+
+La Gestión de Viajes tiene como objetivo administrar de forma integral el ciclo operativo de cada servicio solicitado dentro del SGOF Core.
+
+Para ello coordina la evolución del viaje mediante una secuencia ordenada de estados, garantizando que cada transición responda a las reglas operativas definidas por el sistema.
+
+Su finalidad es asegurar la trazabilidad completa del servicio, mantener sincronizados los distintos componentes de la plataforma y proporcionar una representación fiel de la situación operativa en todo momento.
+
+
+3. Concepto de Gestión de Viajes
+--------------------------------
+
+La Gestión de Viajes constituye el proceso encargado de administrar la evolución operativa de cada servicio dentro del SGOF Core.
+
+Cada viaje representa una unidad de trabajo individual que atraviesa distintas etapas desde su creación hasta su cierre.
+
+El sistema registra y controla cada cambio de estado, permitiendo conocer en todo momento la situación del servicio y coordinando las acciones necesarias para su correcta ejecución.
+
+Este proceso actúa como eje integrador de la operación, relacionándose con la Asignación Inteligente, la Gestión de Taxis, el Sistema GPS, PostgreSQL, Socket.IO y el Frontend.
+
+
+4. Principios de Funcionamiento
+-------------------------------
+
+La Gestión de Viajes se desarrolla conforme a un conjunto de principios que garantizan la consistencia del proceso operativo.
+
+Entre ellos se destacan:
+
+cada viaje posee un ciclo de vida claramente definido;
+los cambios de estado siguen una secuencia controlada;
+cada transición responde a una operación válida del sistema;
+la información permanece sincronizada entre todos los componentes;
+el estado del viaje refleja permanentemente la realidad operativa;
+todas las modificaciones son registradas y pueden ser auditadas.
+
+Estos principios permiten mantener un control preciso sobre la evolución de cada servicio y asegurar la coherencia de toda la operación.
+
+Principio Rector
+----------------
+
+Todo viaje evoluciona mediante un ciclo de estados controlado, trazable y consistente, garantizando que la operación refleje en todo momento la realidad del servicio.
+
+=======================================================
+
+5. Ciclo de Vida del Viaje
+--------------------------
+
+Introducción
+------------
+
+Todo viaje administrado por el SGOF Core atraviesa una secuencia ordenada de estados que representan su evolución operativa.
+
+Cada estado refleja una situación concreta del servicio y determina las acciones que pueden ejecutarse en cada momento.
+
+La transición entre estados se encuentra controlada por las reglas del sistema, garantizando la consistencia del proceso y permitiendo reconstruir la historia completa de cada viaje.
+
+
+Estado inicial
+--------------
+
+El ciclo comienza con la creación del viaje.
+
+En este momento el sistema registra la existencia de una nueva solicitud de servicio y la incorpora al proceso operativo.
+
+A partir de este instante el viaje queda disponible para las etapas posteriores de asignación y ejecución.
+
+Proceso de asignación
+---------------------
+
+Una vez creado, el viaje ingresa al proceso de asignación.
+
+Durante esta etapa el sistema identifica el recurso que atenderá el servicio utilizando los mecanismos documentados en el proceso de Asignación Inteligente.
+
+Finalizada esta etapa, el viaje queda asociado a un vehículo determinado.
+
+
+Ejecución del servicio
+----------------------
+
+Después de la asignación, el viaje continúa evolucionando mediante los distintos estados operativos previstos por el sistema.
+
+Cada transición representa un avance real en la ejecución del servicio y mantiene sincronizados a todos los componentes de la plataforma.
+
+La evolución del viaje refleja permanentemente la situación operativa del servicio.
+
+
+Finalización
+------------
+
+El ciclo concluye cuando el servicio ha sido completamente realizado.
+
+En ese momento el viaje alcanza su estado final, la información correspondiente queda registrada y los recursos utilizados quedan disponibles para participar nuevamente en la operación conforme a las reglas del sistema.
+
+
+Trazabilidad
+------------
+
+Cada cambio de estado queda registrado como parte del historial del viaje.
+
+Este mecanismo permite reconstruir el ciclo completo del servicio, facilitando las tareas de supervisión, auditoría y análisis operativo.
+
+La trazabilidad constituye uno de los principios fundamentales de la Gestión de Viajes.
+
+Observaciones de arquitectura
+
+El ciclo de vida del viaje representa el eje temporal de la operación del SGOF Core.
+
+Mientras otros procesos organizan recursos o toman decisiones, la Gestión de Viajes administra la evolución del servicio desde su inicio hasta su cierre, manteniendo la coherencia entre todos los componentes de la plataforma.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría funcional se verificó que la Gestión de Viajes mantiene una secuencia ordenada y consistente de estados operativos.
+
+Cada transición responde a una operación válida del sistema y preserva la trazabilidad completa del servicio, permitiendo conocer en todo momento la situación real del viaje y reconstruir posteriormente toda su evolución.
+
+===================================================
+
+
+6. Estados Operativos del Viaje
+-------------------------------
+
+Introducción
+------------
+
+La Gestión de Viajes administra la evolución de cada servicio mediante un conjunto de estados operativos que representan las distintas etapas del ciclo de vida del viaje.
+
+Cada estado describe una situación específica del servicio y determina la condición operativa en la que se encuentra en un momento determinado.
+
+La transición entre estados se realiza de forma controlada, garantizando la consistencia del proceso y la correcta coordinación entre los distintos componentes del SGOF Core.
+
+
+Viaje Pendiente
+---------------
+
+Corresponde al estado inicial del viaje una vez registrada la solicitud de servicio.
+
+En esta etapa el viaje se encuentra a la espera de que el proceso de Asignación Inteligente determine el recurso que realizará el servicio.
+
+
+Viaje Asignado
+--------------
+
+Indica que el sistema ha seleccionado el recurso responsable de atender el servicio.
+
+A partir de este momento el viaje queda asociado a un vehículo determinado y se inicia la etapa previa al desplazamiento hacia el origen.
+
+En Camino al Origen
+-------------------
+
+Representa la etapa en la cual el vehículo asignado se dirige hacia el punto de encuentro con el pasajero.
+
+Este estado informa que el servicio ha comenzado operativamente, aunque el pasajero todavía no ha sido recogido.
+
+
+En Origen
+---------
+
+Indica que el vehículo ha llegado al punto de recogida y se encuentra preparado para iniciar el servicio.
+
+Este estado refleja la finalización del desplazamiento previo y el comienzo de la interacción con el pasajero.
+
+
+En Curso
+--------
+
+Corresponde a la ejecución efectiva del viaje.
+
+Durante esta etapa el pasajero se encuentra a bordo y el vehículo realiza el recorrido hacia el destino previsto.
+
+
+Finalizado
+----------
+
+Representa la conclusión satisfactoria del servicio.
+
+El viaje alcanza su estado final, la operación queda registrada y los recursos utilizados pueden reincorporarse a la operación conforme a las reglas establecidas por el sistema.
+
+
+Cancelado
+---------
+
+Este estado identifica aquellos servicios que no llegan a ejecutarse debido a una cancelación realizada antes de su finalización.
+
+Una vez cancelado, el viaje abandona el ciclo operativo normal y queda registrado para fines de control y auditoría.
+
+
+No Show
+-------
+
+Corresponde a los casos en los cuales el recurso asignado concurre al punto de origen, pero el pasajero no se presenta para realizar el viaje.
+
+El servicio concluye sin haberse ejecutado el traslado, quedando igualmente registrado dentro del historial operativo.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+Los estados operativos constituyen el mecanismo mediante el cual el SGOF Core representa la evolución de un viaje.
+
+Cada uno refleja una situación operativa concreta y permite coordinar el comportamiento de los distintos componentes de la plataforma.
+
+La existencia de estados claramente definidos favorece la trazabilidad, la supervisión y la consistencia de toda la operación.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría funcional se verificó que los estados operativos implementados por el SGOF Core representan de forma completa el ciclo de vida de un viaje.
+
+Asimismo, se comprobó que las transiciones entre estados responden a operaciones válidas del sistema y permiten mantener una representación precisa de la evolución del servicio.
+
+=======================================================
+
+7. Transiciones entre Estados
+-----------------------------
+
+Introducción
+------------
+
+Las transiciones entre estados representan la evolución controlada de un viaje a lo largo de su ciclo de vida.
+
+Cada cambio de estado responde a una operación válida del sistema y refleja un avance real en la ejecución del servicio.
+
+La Gestión de Viajes administra estas transiciones con el propósito de preservar la consistencia operativa y garantizar que la representación del viaje coincida permanentemente con la realidad de la operación.
+
+Secuencia operativa
+-------------------
+
+El SGOF Core administra la evolución del viaje mediante una secuencia lógica de estados.
+
+Cada transición constituye un cambio controlado dentro del ciclo de vida del servicio y únicamente puede producirse cuando se cumplen las condiciones correspondientes.
+
+La secuencia general puede representarse de la siguiente manera:
+
+Pendiente
+    │
+    ▼
+Asignado
+    │
+    ▼
+En camino al origen
+    │
+    ▼
+En origen
+    │
+    ▼
+En curso
+    │
+    ▼
+Finalizado
+
+En situaciones particulares, el ciclo puede finalizar anticipadamente mediante los estados Cancelado o No Show, de acuerdo con las reglas operativas definidas por el sistema.
+
+Control de las transiciones
+---------------------------
+
+Cada transición modifica el estado operativo del viaje y produce la actualización de la información necesaria para mantener sincronizados los distintos componentes del SGOF Core.
+
+Este mecanismo garantiza que todos los subsistemas trabajen sobre una representación consistente del servicio.
+
+
+Integridad del proceso
+----------------------
+
+El sistema controla la secuencia de estados para evitar transiciones incompatibles con el ciclo de vida del viaje.
+
+Como consecuencia, cada cambio conserva la coherencia operativa y facilita la reconstrucción completa de la evolución del servicio.
+
+
+Actualización del entorno operativo
+-----------------------------------
+
+Toda transición puede generar modificaciones en otros procesos relacionados, tales como la disponibilidad del recurso asignado, la información presentada al operador o la sincronización entre los distintos componentes de la plataforma.
+
+Estas actualizaciones forman parte del funcionamiento normal del sistema y aseguran la continuidad de la operación.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+Las transiciones entre estados constituyen el mecanismo mediante el cual la Gestión de Viajes coordina la evolución del servicio.
+
+La arquitectura del SGOF Core mantiene claramente diferenciados los conceptos de estado y transición:
+
+el estado representa la situación actual del viaje;
+la transición representa el cambio controlado entre dos estados consecutivos.
+
+Esta separación favorece la claridad del modelo funcional y facilita la evolución futura del sistema.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría funcional se verificó que el ciclo de vida de los viajes se desarrolla mediante transiciones claramente definidas y coherentes con las reglas operativas implementadas.
+
+La separación entre estados y transiciones permitió documentar el proceso con mayor precisión, facilitando la comprensión del funcionamiento general de la Gestión de Viajes y preservando la consistencia de la arquitectura.
+
+
+Principio Rector
+----------------
+
+Un viaje solo puede evolucionar mediante transiciones válidas que preserven la coherencia de su ciclo de vida.
+
+========================================================
+
+8. Eventos Operativos
+---------------------
+
+Introducción
+------------
+
+Los eventos operativos constituyen las acciones que provocan la transición de un viaje entre los distintos estados de su ciclo de vida.
+
+Cada evento representa una operación válida del sistema y actúa como desencadenante de una transición previamente definida.
+
+La separación entre estados, transiciones y eventos permite describir con claridad el comportamiento de la Gestión de Viajes y facilita la comprensión del modelo operativo implementado por el SGOF Core.
+
+Concepto de evento
+------------------
+
+Un evento representa una acción que modifica la situación operativa de un viaje.
+
+Como consecuencia de dicho evento, el sistema evalúa las condiciones correspondientes y, cuando procede, ejecuta la transición hacia un nuevo estado.
+
+Los eventos no describen estados permanentes, sino acciones puntuales que impulsan la evolución del servicio.
+
+Eventos principales
+-------------------
+
+Durante la auditoría funcional se identificaron, entre otros, los siguientes eventos operativos:
+
+asignar recurso;
+aceptar asignación;
+llegada al origen;
+iniciar viaje;
+finalizar servicio;
+cancelar viaje;
+registrar No Show.
+
+Cada uno de estos eventos produce una transición específica dentro del ciclo de vida del viaje.
+
+Relación entre estados, transiciones y eventos
+
+El funcionamiento de la Gestión de Viajes puede resumirse mediante el siguiente modelo conceptual:
+
+Estado
+   │
+   ▼
+Evento
+   │
+   ▼
+Transición
+   │
+   ▼
+Nuevo Estado
+
+Este esquema representa el principio general utilizado por el SGOF Core para administrar la evolución de los servicios.
+
+Consistencia operativa
+----------------------
+
+Todos los eventos son procesados conforme a las reglas establecidas por el sistema.
+
+Una vez ejecutado un evento válido, la información correspondiente se actualiza y el nuevo estado queda disponible para el resto de los componentes de la plataforma.
+
+Este mecanismo garantiza que la representación del viaje permanezca sincronizada con la realidad operativa.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+La separación entre estado, evento y transición constituye uno de los principios fundamentales del modelo funcional del SGOF Core.
+
+Esta organización permite comprender con claridad:
+
+cuál es la situación actual del viaje;
+qué acción provoca un cambio;
+cuál es el resultado de esa acción.
+
+Como consecuencia, la arquitectura mantiene una representación ordenada, consistente y fácilmente auditable del ciclo de vida de cada servicio.
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría se comprobó que la utilización de eventos claramente definidos simplifica la comprensión del funcionamiento de la Gestión de Viajes y favorece la trazabilidad de las operaciones realizadas.
+
+La separación conceptual entre estados, eventos y transiciones permite documentar el proceso de forma precisa, evitando ambigüedades y facilitando futuras ampliaciones del sistema.
+
+
+Principio Rector
+----------------
+
+Los eventos impulsan la evolución del viaje; los estados representan su situación y las transiciones conectan ambos momentos.
+
+
+=======================================================
+
+9. Integración con el SGOF Core
+-------------------------------
+
+Introducción
+------------
+
+La Gestión de Viajes constituye uno de los procesos centrales del SGOF Core y mantiene una interacción permanente con los distintos componentes de la plataforma.
+
+Su responsabilidad consiste en coordinar el ciclo de vida de cada servicio, integrando la información generada por los procesos de organización, asignación, seguimiento y finalización.
+
+Esta integración garantiza que todos los componentes del sistema trabajen sobre una representación única y consistente del viaje.
+
+Relación con la Cola Operativa
+------------------------------
+
+La Gestión de Viajes recibe el resultado del proceso de organización de recursos proporcionado por la Cola Operativa.
+
+Esta información constituye la base sobre la cual se desarrolla posteriormente el proceso de asignación del servicio.
+
+
+Relación con la Asignación Inteligente
+--------------------------------------
+
+La Asignación Inteligente determina el recurso que atenderá el viaje.
+
+Una vez adoptada la decisión, la Gestión de Viajes incorpora dicha información y continúa administrando la evolución del servicio durante todo su ciclo de vida.
+
+
+Relación con la Gestión de Taxis
+--------------------------------
+
+La evolución del viaje mantiene una relación directa con la situación operativa del vehículo asignado.
+
+Los cambios producidos durante el ciclo del servicio se reflejan en la disponibilidad y estado operativo del recurso correspondiente.
+
+
+Relación con el Sistema GPS
+---------------------------
+
+Cuando la operación utiliza información de posicionamiento, la Gestión de Viajes incorpora estos datos para representar el avance operativo del servicio.
+
+La información GPS actúa como un elemento de apoyo para el seguimiento del viaje, sin modificar la responsabilidad propia de este proceso.
+
+
+Relación con PostgreSQL
+-----------------------
+
+Toda la información correspondiente al viaje se registra y mantiene sincronizada en la Base de Datos.
+
+Esto garantiza la persistencia del historial operativo y permite reconstruir la evolución completa de cada servicio.
+
+
+Relación con Socket.IO
+----------------------
+
+Las modificaciones producidas durante el ciclo de vida del viaje pueden ser distribuidas mediante Socket.IO a los distintos clientes conectados.
+
+Como consecuencia, la información presentada por el Frontend permanece sincronizada con la situación operativa registrada por el sistema.
+
+
+Relación con el Frontend
+------------------------
+
+El Frontend representa visualmente el estado del viaje y permite al operador interactuar con las distintas etapas del servicio.
+
+Su función consiste en reflejar la información generada por la Gestión de Viajes sin intervenir en la lógica de negocio.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+La Gestión de Viajes actúa como el eje integrador de la operación del SGOF Core.
+
+Su responsabilidad consiste en coordinar la evolución temporal del servicio, manteniendo sincronizados los distintos componentes que intervienen durante su ejecución.
+
+Esta posición central convierte a la Gestión de Viajes en uno de los procesos fundamentales de la arquitectura operativa de la plataforma.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría funcional se comprobó que la Gestión de Viajes mantiene una integración consistente con los principales componentes del SGOF Core.
+
+La coordinación entre la Cola Operativa, la Asignación Inteligente, la Gestión de Taxis, el Sistema GPS, PostgreSQL, Socket.IO y el Frontend permite administrar el ciclo completo del servicio preservando la coherencia operativa y la trazabilidad de la información.
+
+
+Principio Rector
+----------------
+
+La Gestión de Viajes coordina la evolución del servicio; los demás componentes aportan la información necesaria para que esa evolución sea consistente y trazable.
+
+
+Observaciones de Arquitectura
+-----------------------------
+
+La Gestión de Viajes constituye el eje operativo del SGOF Core. Los demás procesos colaboran proporcionando organización, información o soporte para administrar correctamente el ciclo de vida de cada servicio.
+
+
+ GESTIÓN DE VIAJES
+                     ▲
+                     │
+      ┌──────────────┼──────────────┐
+      │              │              │
+      │              │              │
+COLA OPERATIVA   ASIGNACIÓN     GESTIÓN
+                 INTELIGENTE    DE TAXIS
+      │              │              │
+      └──────────────┼──────────────┘
+                     │
+                PostgreSQL
+                     │
+                Socket.IO
+                     │
+                 Frontend
+
+
+El viaje es la unidad central de trabajo del SGOF Core. Los demás procesos existen para organizar, decidir, registrar, comunicar o representar su evolución.
+
+
+Principio Arquitectónico del SGOF Core
+--------------------------------------
+
+El viaje constituye la unidad central de trabajo del SGOF Core.
+
+Todos los procesos operativos de la plataforma colaboran para organizar, asignar, ejecutar, registrar, comunicar y representar la evolución de cada viaje durante su ciclo de vida.
+
+
+========================================================
+
+10. Beneficios Operativos
+-------------------------
+
+La Gestión de Viajes constituye el proceso encargado de coordinar la evolución de cada servicio dentro del SGOF Core, proporcionando una visión única y consistente de la operación.
+
+Entre los principales beneficios de este proceso se destacan:
+
+administración integral del ciclo de vida de cada viaje;
+control uniforme de los estados operativos;
+trazabilidad completa de los servicios;
+sincronización entre los distintos componentes del sistema;
+representación consistente de la situación operativa;
+integración natural con los procesos de organización, asignación y seguimiento.
+
+Estos beneficios permiten mantener un control preciso sobre la operación y facilitan la supervisión permanente de los servicios administrados por la plataforma.
+
+
+11. Observaciones de Arquitectura
+---------------------------------
+
+Desde la perspectiva arquitectónica, la Gestión de Viajes constituye el eje operativo del SGOF Core.
+
+Mientras los distintos procesos organizan recursos, seleccionan unidades o suministran información complementaria, la Gestión de Viajes coordina la evolución completa del servicio desde su creación hasta su finalización.
+
+Esta posición central permite integrar de manera consistente la información proveniente de los diferentes componentes de la plataforma y mantener una representación única del estado operativo de cada viaje.
+
+La separación entre organización, decisión y administración del servicio constituye uno de los principios fundamentales de la arquitectura del SGOF Core y favorece su mantenibilidad, escalabilidad y evolución futura.
+
+
+12. Conclusiones
+----------------
+
+La Gestión de Viajes constituye el proceso responsable de administrar el ciclo de vida completo de cada servicio dentro del SGOF Core.
+
+A lo largo del presente documento se describieron sus objetivos, principios de funcionamiento, estados operativos, transiciones, eventos e integración con los distintos procesos que participan en la operación.
+
+La auditoría permitió comprobar que este proceso mantiene una representación consistente del estado de cada viaje y coordina la interacción entre los diferentes componentes de la plataforma, garantizando la trazabilidad y continuidad del servicio.
+
+Su diseño responde a una arquitectura basada en responsabilidades claramente diferenciadas, donde la organización de recursos, la toma de decisiones y la administración del ciclo de vida permanecen desacopladas, favoreciendo la claridad del modelo operativo y la evolución futura del sistema.
+
+=======================================================
+
+Dictamen Final de Auditoría
+---------------------------
+
+----------------------------------------------------
+Documento: 003_Gestion_de_Viajes_SGOF_CORE_v1.0.txt
+
+Estado: APROBADO
+
+----------------------------------------------------
+
+Resultado del relevamiento
+--------------------------
+
+Durante la auditoría técnica se verificó el funcionamiento del proceso de Gestión de Viajes y su integración con la Cola Operativa, la Asignación Inteligente, la Gestión de Taxis, el Sistema GPS, PostgreSQL, Socket.IO y el Frontend.
+
+Se comprobó que el ciclo de vida de los viajes se desarrolla mediante estados claramente definidos, transiciones controladas y eventos operativos consistentes, permitiendo administrar cada servicio de forma trazable y coordinada.
+
+La documentación desarrollada describe los principios permanentes de este proceso y mantiene una clara separación respecto de las responsabilidades asignadas a los demás componentes del SGOF Core.
+
+
+Observaciones
+-------------
+
+No se detectaron inconsistencias entre el comportamiento observado durante la auditoría y la arquitectura documentada.
+
+El documento describe exclusivamente la responsabilidad propia de la Gestión de Viajes y mantiene el nivel de abstracción definido para la Biblioteca Técnica.
+
+
+Conclusión
+----------
+
+El documento 003_Gestion_de_Viajes_SGOF_CORE_v1.0.txt queda oficialmente aprobado e incorporado a la Biblioteca Técnica del SGOF Core como referencia del proceso responsable de administrar el ciclo de vida de los servicios dentro de la plataforma.
+
+
+Principio Rector
+----------------
+
+La Gestión de Viajes administra el ciclo de vida del servicio; los demás procesos proporcionan la organización, la decisión y la información necesarias para hacerlo posible.
+
+=====================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

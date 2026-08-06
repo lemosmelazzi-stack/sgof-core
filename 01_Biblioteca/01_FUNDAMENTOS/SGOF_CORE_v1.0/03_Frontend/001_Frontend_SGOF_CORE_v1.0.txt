@@ -1,0 +1,871 @@
+001_Frontend_SGOF_CORE_v1.0.txt
+===============================
+
+
+1. Introducción
+---------------
+
+El Frontend del SGOF Core constituye la capa de presentación de la plataforma y el componente responsable de materializar visualmente la interacción entre los usuarios y el sistema.
+
+A través de la interfaz gráfica, operadores, supervisores y demás usuarios pueden consultar información, ejecutar operaciones y supervisar el estado general de la flota utilizando una representación clara, organizada y actualizada de los distintos procesos operativos.
+
+El Frontend no implementa reglas de negocio ni administra directamente la información permanente del sistema.
+
+Su función consiste en presentar la información procesada por el Backend, capturar las acciones realizadas por los usuarios y comunicar dichas solicitudes mediante los mecanismos definidos por la arquitectura del SGOF Core.
+
+Desde esta perspectiva, el Frontend constituye el punto de contacto entre las personas y la lógica operativa implementada por la plataforma.
+
+
+2. Objetivos
+------------
+
+El Frontend tiene como objetivo proporcionar una interfaz de usuario intuitiva, eficiente y permanentemente sincronizada con el estado operativo del sistema.
+
+Para cumplir esta función, concentra las tareas relacionadas con la representación visual de la información y la interacción del usuario con los distintos procesos gestionados por el Backend.
+
+Entre sus principales objetivos se encuentran:
+
+representar gráficamente la información operativa;
+facilitar la interacción del usuario con el sistema;
+capturar las acciones realizadas por los operadores;
+consumir los servicios publicados por la API REST;
+recibir eventos distribuidos mediante Socket.IO;
+mantener sincronizada la información presentada;
+ofrecer una experiencia de uso clara y consistente.
+
+El Frontend constituye, por tanto, el componente encargado de transformar la lógica del sistema en una herramienta de trabajo accesible para el usuario.
+
+
+3. Arquitectura General
+-----------------------
+
+El Frontend del SGOF Core se organiza siguiendo una arquitectura modular orientada a separar claramente la presentación visual, la interacción con el usuario y la comunicación con los servicios proporcionados por el Backend.
+
+Conceptualmente, su funcionamiento puede representarse mediante el siguiente esquema:
+
+                 Usuario
+                     │
+                     ▼
+          Interfaz de Usuario
+                     │
+      ┌──────────────┼──────────────┐
+      ▼              ▼              ▼
+  Componentes     Mapas         Paneles
+      │              │              │
+      └──────────────┼──────────────┘
+                     ▼
+          Comunicación
+         (API + Socket.IO)
+                     │
+                     ▼
+                Backend
+
+Dentro de esta arquitectura:
+
+la interfaz organiza la interacción del usuario;
+los componentes visuales representan la información operativa;
+la comunicación con el Backend permite consultar y actualizar datos;
+Socket.IO mantiene sincronizada la información en tiempo real.
+
+Cada uno de estos elementos desarrolla una responsabilidad específica, contribuyendo a una interfaz organizada, reactiva y fácilmente mantenible.
+
+
+Principios arquitectónicos
+--------------------------
+
+El diseño del Frontend responde a una serie de principios que orientan su funcionamiento.
+
+Separación entre presentación y procesamiento
+
+El Frontend presenta la información, mientras que el Backend ejecuta la lógica de negocio.
+
+Actualización en tiempo real
+
+La información visual permanece sincronizada mediante los eventos distribuidos por Socket.IO.
+
+
+Modularidad
+-----------
+
+Los distintos componentes visuales se encuentran organizados según la función que desarrollan dentro de la operación.
+
+Interacción uniforme
+
+Todas las acciones realizadas por el usuario siguen mecanismos homogéneos de comunicación con el Backend.
+
+Independencia funcional
+
+La evolución de la interfaz puede realizarse sin modificar las reglas de negocio implementadas por el Backend.
+
+Observaciones de arquitectura
+
+Desde el punto de vista arquitectónico, el Frontend constituye la capa de interacción del SGOF Core.
+
+Su responsabilidad consiste en transformar la información operativa en una representación visual comprensible, facilitando la supervisión y el control de la operación sin intervenir en el procesamiento interno del sistema.
+
+La arquitectura adoptada mantiene claramente diferenciadas las responsabilidades de presentación, procesamiento, persistencia y comunicación, consolidando el modelo modular definido para toda la plataforma.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría del Frontend se verificó que la interfaz implementa correctamente el papel de consumidor de los servicios proporcionados por el Backend y de los eventos distribuidos mediante Socket.IO.
+
+Asimismo, se comprobó que la lógica de negocio permanece centralizada en el servidor, mientras que la interfaz concentra exclusivamente las tareas relacionadas con la representación visual y la interacción del usuario.
+
+===================================================================
+
+
+4. Organización del Proyecto
+----------------------------
+
+Introducción
+------------
+
+El Frontend del SGOF Core se encuentra organizado siguiendo una estructura modular destinada a facilitar el mantenimiento, la evolución de la interfaz y la reutilización de sus distintos componentes.
+
+La distribución de archivos y recursos responde a criterios de separación de responsabilidades, permitiendo que cada elemento de la aplicación cumpla una función claramente definida dentro de la arquitectura general del sistema.
+
+Esta organización contribuye a mantener una interfaz ordenada, escalable y sencilla de mantener a medida que la plataforma incorpora nuevas funcionalidades.
+
+Objetivo
+
+El objetivo de la organización del proyecto es estructurar el Frontend de forma que la presentación visual, la interacción con el usuario y la comunicación con el Backend permanezcan claramente diferenciadas.
+
+Esta separación facilita:
+
+el mantenimiento de la interfaz;
+la incorporación de nuevas pantallas;
+la reutilización de componentes;
+la comprensión de la arquitectura;
+la evolución progresiva del sistema.
+Estructura general
+
+Conceptualmente, el Frontend puede organizarse en los siguientes bloques principales:
+
+Frontend SGOF Core
+│
+├── Páginas
+├── Componentes Visuales
+├── Scripts JavaScript
+├── Recursos Gráficos
+├── Estilos
+├── Comunicación
+└── Recursos Compartidos
+
+Cada bloque desarrolla una responsabilidad específica dentro de la interfaz.
+
+
+Páginas
+-------
+
+Las páginas constituyen el punto de acceso a las distintas funcionalidades del sistema.
+
+Cada una presenta una parte específica de la operación, permitiendo organizar la navegación sin concentrar toda la interfaz en una única pantalla.
+
+Entre las páginas auditadas se encuentran:
+
+Panel Operativo;
+Gestión de Viajes;
+Dashboard;
+Mapa Operativo.
+
+Cada una consume los servicios proporcionados por el Backend según su función.
+
+Scripts JavaScript
+
+La lógica del Frontend se encuentra organizada mediante distintos archivos JavaScript especializados.
+
+Estos scripts coordinan:
+
+la comunicación con la API REST;
+la recepción de eventos mediante Socket.IO;
+la actualización de la interfaz;
+la interacción con mapas;
+la administración del estado visual.
+
+Cada archivo concentra responsabilidades relacionadas con un dominio funcional determinado.
+
+
+Componentes visuales
+--------------------
+
+Los componentes visuales representan la información operativa que recibe el usuario.
+
+Entre ellos pueden encontrarse:
+
+paneles;
+tablas;
+formularios;
+botones de acción;
+indicadores de estado;
+listas operativas;
+elementos cartográficos.
+
+Cada componente interpreta la información suministrada por el Backend y la presenta de forma clara y consistente.
+
+
+Recursos gráficos
+-----------------
+
+El Frontend incorpora distintos recursos destinados a mejorar la experiencia visual del usuario.
+
+Estos elementos incluyen iconografía, estilos y componentes gráficos que facilitan la interpretación rápida del estado operativo de la plataforma.
+
+
+Integración entre componentes
+-----------------------------
+
+Los distintos elementos del Frontend colaboran mediante una organización modular.
+
+Cada componente mantiene responsabilidades claramente definidas y reutiliza los servicios comunes cuando resulta necesario.
+
+Esta estructura reduce la duplicación de código y simplifica el mantenimiento evolutivo de la interfaz.
+
+
+Beneficios de la organización
+-----------------------------
+
+La estructura adoptada proporciona importantes ventajas:
+
+mayor claridad del proyecto;
+facilidad para localizar componentes;
+reutilización de código;
+mantenimiento simplificado;
+incorporación progresiva de nuevas funcionalidades;
+mejor escalabilidad.
+
+Estas características permiten mantener organizada la interfaz incluso durante procesos de evolución prolongados.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+La organización del Frontend refleja el mismo principio aplicado al resto del SGOF Core:
+
+cada componente desarrolla una única responsabilidad y colabora con los demás mediante interfaces claramente definidas.
+
+Esta coherencia entre la organización física del proyecto y la arquitectura funcional facilita el mantenimiento y mejora la comprensión global del sistema.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría estructural del Frontend se revisó la organización de páginas, scripts y componentes visuales, eliminando código obsoleto, consolidando funcionalidades y verificando la coherencia entre la estructura del proyecto y la arquitectura general del SGOF Core.
+
+Como resultado, el Frontend presenta actualmente una organización modular consistente, preparada para futuras ampliaciones y alineada con los principios definidos para el resto de la plataforma.
+
+====================================================================
+
+5. Flujo de Interacción
+-----------------------
+
+Introducción
+------------
+
+El Frontend del SGOF Core constituye el medio mediante el cual los usuarios interactúan con la plataforma durante la operación diaria.
+
+Cada acción realizada por un operador inicia una secuencia de procesos que involucra la captura de la interacción, la comunicación con el Backend, el procesamiento de la solicitud y la actualización automática de la interfaz.
+
+Este flujo permite mantener una experiencia de uso coherente, donde la información presentada refleja permanentemente el estado operativo del sistema.
+
+Objetivo
+--------
+
+El objetivo del flujo de interacción es transformar las acciones realizadas por el usuario en operaciones completas dentro del SGOF Core, garantizando una comunicación eficiente con el Backend y una actualización consistente de la interfaz.
+
+Este mecanismo constituye el eje del funcionamiento del Frontend.
+
+
+Inicio de la interacción
+------------------------
+
+El proceso comienza cuando el usuario realiza una acción sobre alguno de los componentes de la interfaz.
+
+Entre las acciones habituales se encuentran:
+
+seleccionar un viaje;
+asignar un taxi;
+aceptar un servicio;
+iniciar un viaje;
+finalizar una operación;
+consultar información;
+navegar sobre el mapa.
+
+Cada una de estas acciones representa el punto de partida del flujo de interacción.
+
+
+Procesamiento local
+-------------------
+
+Una vez capturada la acción, el Frontend ejecuta las validaciones e instrucciones necesarias para preparar la solicitud.
+
+Durante esta etapa pueden realizarse tareas como:
+
+obtención de datos de la interfaz;
+validaciones básicas;
+preparación de parámetros;
+actualización temporal de componentes visuales.
+
+Estas operaciones no modifican la lógica de negocio, sino que preparan la comunicación con el Backend.
+
+
+Comunicación con el Backend
+---------------------------
+
+Una vez preparada la solicitud, el Frontend la envía al Backend mediante la API REST.
+
+El Backend procesa la operación aplicando las reglas de negocio correspondientes y devuelve la respuesta asociada.
+
+Esta etapa constituye el punto de integración entre la interfaz y el núcleo operativo del sistema.
+
+
+Actualización de la interfaz
+----------------------------
+
+Cuando el Frontend recibe la respuesta del Backend, actualiza los componentes visuales afectados.
+
+Dependiendo de la operación realizada, pueden modificarse:
+
+paneles operativos;
+listas de viajes;
+estado de los taxis;
+información del mapa;
+indicadores visuales;
+botones de acción;
+datos estadísticos.
+
+El usuario observa inmediatamente el resultado de la operación.
+
+
+Sincronización mediante Socket.IO
+---------------------------------
+
+Además de la respuesta directa del Backend, el Frontend permanece conectado a Socket.IO.
+
+Cuando otros usuarios realizan modificaciones relevantes, la interfaz recibe automáticamente los eventos correspondientes y actualiza la información presentada sin intervención del operador.
+
+Este mecanismo mantiene sincronizados todos los puestos de trabajo.
+
+
+Flujo general
+-------------
+
+El recorrido completo puede representarse mediante el siguiente esquema:
+
+Usuario
+    │
+    ▼
+Interfaz
+    │
+    ▼
+Captura de la acción
+    │
+    ▼
+JavaScript
+    │
+    ▼
+API REST
+    │
+    ▼
+Backend
+    │
+    ▼
+Respuesta
+    │
+    ▼
+Actualización visual
+
+Este flujo representa el comportamiento habitual del Frontend durante la operación.
+
+
+Beneficios del modelo
+---------------------
+
+La organización del flujo de interacción proporciona importantes ventajas:
+
+respuesta inmediata al usuario;
+actualización consistente de la interfaz;
+separación entre presentación y lógica de negocio;
+integración natural con Socket.IO;
+facilidad para incorporar nuevas funcionalidades.
+
+Estas características fortalecen la experiencia de uso y mejoran la eficiencia operativa.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+Desde el punto de vista arquitectónico, el Frontend actúa como un intermediario entre el usuario y el Backend.
+
+La interfaz captura acciones, representa información y coordina la comunicación, mientras que las decisiones operativas permanecen centralizadas en el servidor.
+
+Esta separación mantiene una arquitectura organizada y facilita la evolución independiente de ambos componentes.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría funcional del Frontend se verificó que las distintas operaciones implementadas siguen un patrón uniforme de interacción.
+
+Independientemente de la funcionalidad utilizada, el recorrido general permanece constante: el usuario inicia una acción, el Frontend prepara la solicitud, el Backend procesa la operación y la interfaz refleja el resultado mediante la respuesta recibida y los eventos distribuidos por Socket.IO.
+
+Esta uniformidad constituye uno de los principales factores que favorecen la mantenibilidad y la consistencia del SGOF Core.
+
+
+Observación para la Biblioteca Técnica
+--------------------------------------
+
+Este capítulo representa, desde la perspectiva del usuario, el equivalente al Flujo de Procesamiento documentado en el Backend.
+
+Ambos describen el mismo recorrido, pero desde extremos opuestos de la arquitectura:
+
+El Backend explica cómo el sistema procesa una solicitud.
+El Frontend explica cómo el usuario inicia esa solicitud y cómo percibe el resultado.
+
+Esta complementariedad refuerza la coherencia de la Biblioteca Técnica y proporciona una visión completa del funcionamiento del SGOF Core, tanto desde el punto de vista técnico como desde la experiencia operativa del usuario.
+
+====================================================================================
+
+6. Gestión de Pantallas
+
+Introducción
+------------
+
+El Frontend del SGOF Core organiza la interacción del usuario mediante un conjunto de pantallas especializadas, cada una diseñada para representar un área funcional específica de la operación.
+
+Esta organización permite distribuir la información de forma clara, evitando concentrar todas las funcionalidades en una única interfaz y facilitando el acceso a los distintos procesos gestionados por el sistema.
+
+Cada pantalla constituye un punto de interacción entre el usuario y el Backend, manteniendo siempre una representación consistente del estado operativo.
+
+
+Objetivo
+--------
+
+El objetivo de la gestión de pantallas es organizar la interfaz de usuario de manera que cada proceso operativo disponga de un espacio de trabajo adecuado, manteniendo una navegación sencilla y una distribución lógica de la información.
+
+Esta estructura favorece la productividad del operador y facilita el aprendizaje del sistema.
+
+
+Organización funcional
+----------------------
+
+Las pantallas del Frontend se encuentran organizadas según las funciones que desarrollan dentro del SGOF Core.
+
+Durante la auditoría se identificaron, entre otras, las siguientes áreas funcionales:
+
+Panel Operativo;
+Gestión de Viajes;
+Dashboard;
+Mapa Operativo;
+Paneles auxiliares de información.
+
+Cada una de ellas presenta una visión específica de la operación y consume únicamente la información necesaria para cumplir su función.
+
+
+Independencia entre pantallas
+-----------------------------
+
+Cada pantalla mantiene una responsabilidad claramente definida.
+
+Aunque todas comparten la misma infraestructura de comunicación con el Backend, cada una administra sus propios componentes visuales y presenta únicamente la información relevante para el proceso correspondiente.
+
+Esta organización reduce la complejidad de la interfaz y facilita su mantenimiento.
+
+
+Navegación
+----------
+
+La navegación entre pantallas permite al usuario desplazarse entre las distintas áreas funcionales del sistema sin perder coherencia en la operación.
+
+Todas las pantallas mantienen criterios homogéneos de interacción, lo que facilita la adaptación del operador y reduce la curva de aprendizaje.
+
+
+Actualización de la información
+-------------------------------
+
+Las distintas pantallas reciben información desde el Backend mediante la API REST y permanecen sincronizadas gracias a los eventos distribuidos por Socket.IO.
+
+Como consecuencia, cada vista refleja permanentemente el estado actualizado de la operación, independientemente del punto desde el cual se haya originado una modificación.
+
+
+Coordinación entre pantallas
+----------------------------
+
+Aunque cada pantalla desarrolla una función específica, todas forman parte de una única aplicación.
+
+Las operaciones realizadas en una vista pueden generar cambios que se reflejan automáticamente en otras pantallas relacionadas, manteniendo una representación consistente del estado general del sistema.
+
+Esta coordinación constituye uno de los principales beneficios de la arquitectura basada en eventos implementada por el SGOF Core.
+
+
+Beneficios de la organización
+-----------------------------
+
+La distribución funcional de las pantallas proporciona importantes ventajas:
+
+mejor organización de la información;
+reducción de la complejidad visual;
+especialización de las áreas de trabajo;
+facilidad para incorporar nuevas vistas;
+mantenimiento simplificado;
+experiencia de usuario más intuitiva.
+Observaciones de arquitectura
+
+Desde la perspectiva arquitectónica, las pantallas representan la capa superior de interacción del Frontend.
+
+Cada una constituye una representación especializada de un conjunto de procesos operativos, mientras que la lógica de negocio permanece completamente centralizada en el Backend.
+
+Esta separación permite ampliar la interfaz sin modificar el funcionamiento interno del sistema.
+
+
+Comentario de auditoría
+-----------------------
+
+Durante la auditoría del Frontend se verificó que la organización por pantallas responde a una distribución funcional coherente con la arquitectura general del SGOF Core.
+
+Cada vista presenta una responsabilidad claramente delimitada y reutiliza los mismos mecanismos de comunicación y actualización implementados para el resto de la plataforma.
+
+Esta uniformidad facilita tanto el mantenimiento del código como la evolución futura de la interfaz.
+
+
+Observación para la Biblioteca Técnica
+--------------------------------------
+
+Este capítulo documenta la organización funcional de las pantallas del Frontend.
+
+En los próximos apartados profundizaremos en los mecanismos que utilizan estas vistas para comunicarse con el Backend, recibir información en tiempo real y representar elementos específicos como el mapa operativo y los distintos componentes visuales.
+
+
+Observación metodológica
+------------------------
+
+
+El Frontend del SGOF Core no está organizado por páginas, sino por funciones operativas.
+
+Esa diferencia es importante.
+
+Una "página" es un concepto técnico del navegador.
+
+Una pantalla operativa es una herramienta de trabajo para el usuario.
+
+Documentarlas desde esa perspectiva hace que la Biblioteca describa el sistema tal como lo utiliza un operador, y no únicamente como está construido desde el punto de vista del desarrollo. 
+
+=======================================================================
+
+7. Integración con la API REST
+------------------------------
+
+Introducción
+------------
+
+La API REST constituye el principal mecanismo de comunicación entre el Frontend y el Backend del SGOF Core.
+
+A través de ella, la interfaz solicita información, ejecuta operaciones y recibe las respuestas correspondientes, manteniendo una separación clara entre la presentación visual y la lógica de negocio.
+
+Toda operación iniciada por el usuario se canaliza mediante este mecanismo.
+
+
+Objetivo
+--------
+
+El objetivo de la integración con la API REST es proporcionar una interfaz uniforme para el intercambio de información entre el Frontend y el Backend, garantizando que todas las solicitudes sean procesadas de forma consistente y conforme a las reglas operativas del sistema.
+
+Flujo de comunicación
+
+Cada solicitud realizada desde el Frontend sigue un recorrido uniforme:
+
+Usuario
+    │
+    ▼
+Frontend
+    │
+    ▼
+API REST
+    │
+    ▼
+Backend
+    │
+    ▼
+Respuesta
+    │
+    ▼
+Frontend
+
+Este patrón se repite para todas las operaciones implementadas por la plataforma.
+
+
+Beneficios
+----------
+
+La utilización de una API REST proporciona:
+
+uniformidad de acceso;
+independencia entre cliente y servidor;
+reutilización de servicios;
+facilidad para incorporar nuevos clientes;
+mantenimiento simplificado.
+Observaciones de arquitectura
+
+La API REST constituye la frontera entre la capa de presentación y la capa de procesamiento.
+
+Gracias a esta separación, el Frontend puede evolucionar independientemente del Backend, siempre que se mantenga la compatibilidad de los servicios publicados.
+
+==========================================================================
+
+8. Integración con Socket.IO
+----------------------------
+
+Introducción
+------------
+
+Además de las solicitudes realizadas mediante la API REST, el Frontend permanece conectado permanentemente al servidor mediante Socket.IO.
+
+Esta conexión permite recibir automáticamente los cambios producidos durante la operación sin necesidad de efectuar consultas repetitivas.
+
+
+Objetivo
+--------
+
+Mantener sincronizada la información presentada al usuario mediante la distribución inmediata de eventos generados por el Backend.
+
+Funcionamiento
+
+Cuando el Backend genera un evento:
+
+Socket.IO lo distribuye;
+el Frontend lo recibe;
+la interfaz identifica los componentes afectados;
+únicamente esos componentes son actualizados.
+
+Este comportamiento mejora el rendimiento y evita recargas innecesarias.
+
+Beneficios
+sincronización inmediata;
+menor tráfico de red;
+actualización automática;
+mejor experiencia de usuario;
+coordinación entre múltiples operadores.
+Observaciones de arquitectura
+
+Socket.IO convierte al Frontend en un consumidor permanente de eventos, permitiendo que la interfaz represente el estado operativo del sistema prácticamente en tiempo real.
+
+
+========================================================================
+
+9. Integración con el Mapa
+--------------------------
+
+Introducción
+------------
+
+El mapa operativo constituye uno de los componentes visuales más importantes del Frontend del SGOF Core.
+
+Durante la auditoría se comprobó que su función trasciende la representación cartográfica, convirtiéndose en una herramienta central para el seguimiento operativo de la flota.
+
+Objetivo
+--------
+
+Representar gráficamente la operación utilizando información geográfica actualizada y permitir al operador supervisar la ubicación y evolución de los recursos.
+
+
+Funciones principales
+---------------------
+
+El mapa permite visualizar:
+
+ubicación de los taxis;
+posición GPS;
+estado operativo;
+viajes activos;
+recorridos;
+rutas calculadas;
+puntos de origen y destino.
+Integración
+
+
+El mapa consume información proveniente de:
+
+Backend;
+PostgreSQL;
+GPS;
+Socket.IO;
+Cola Inteligente;
+Gestión de Viajes.
+
+Como consecuencia, se convierte en un punto de convergencia de múltiples subsistemas.
+
+
+Observaciones de arquitectura
+-----------------------------
+
+El mapa representa gráficamente la operación, pero no toma decisiones.
+
+Toda la lógica permanece centralizada en el Backend.
+
+=====================================================================
+
+
+10. Integración con los Componentes Visuales
+--------------------------------------------
+
+Introducción
+------------
+
+Los distintos componentes visuales del Frontend colaboran para representar la información operativa de manera organizada y consistente.
+
+Cada uno desarrolla una responsabilidad específica dentro de la interfaz.
+
+Componentes principales
+
+Durante la auditoría fueron identificados, entre otros:
+
+paneles operativos;
+listas de viajes;
+indicadores;
+botones de acción;
+formularios;
+tablas;
+paneles de información;
+componentes cartográficos.
+Coordinación
+
+Todos estos elementos consumen la información suministrada por el Backend y permanecen sincronizados mediante Socket.IO.
+
+Aunque representan distintos aspectos de la operación, forman parte de una única interfaz coherente.
+
+Beneficios
+claridad visual;
+reutilización;
+mantenimiento sencillo;
+escalabilidad;
+experiencia uniforme.
+
+=======================================================================
+
+11. Experiencia de Usuario
+--------------------------
+
+Introducción
+------------
+
+El diseño del Frontend busca proporcionar una experiencia de uso sencilla, eficiente y orientada a las necesidades de la operación diaria.
+
+La organización de la información responde a criterios funcionales, priorizando la rapidez de acceso y la claridad visual.
+
+
+Principios
+----------
+
+La interfaz procura ofrecer:
+
+navegación intuitiva;
+información clara;
+actualización inmediata;
+mínima cantidad de pasos para cada operación;
+coherencia entre pantallas.
+Beneficios operativos
+
+Una interfaz organizada permite:
+
+reducir errores;
+acelerar la toma de decisiones;
+disminuir los tiempos de aprendizaje;
+mejorar la productividad de los operadores.
+
+========================================================================
+
+12. Escalabilidad
+-----------------
+La arquitectura modular del Frontend facilita la incorporación de nuevas pantallas, componentes y funcionalidades sin modificar la estructura general de la aplicación.
+
+Esta organización permite que la interfaz evolucione junto con el crecimiento del SGOF Core, reutilizando los mecanismos de comunicación y actualización ya existentes.
+
+========================================================================
+
+13. Observaciones de Arquitectura
+---------------------------------
+
+Desde la perspectiva arquitectónica, el Frontend constituye la capa de presentación del SGOF Core.
+
+Su responsabilidad consiste exclusivamente en representar la información, capturar las acciones del usuario y comunicarse con el Backend mediante la API REST y Socket.IO.
+
+La lógica de negocio permanece completamente fuera de la interfaz.
+
+Esta separación asegura una arquitectura modular, mantenible y preparada para futuras ampliaciones.
+
+=======================================================================
+
+14. Conclusiones
+----------------
+
+El Frontend del SGOF Core constituye el punto de interacción entre los usuarios y la plataforma.
+
+A lo largo de este documento se describieron su organización, el flujo de interacción, la integración con el Backend, la API REST, Socket.IO, el mapa operativo y los distintos componentes visuales.
+
+Asimismo, se documentaron los principios de organización, experiencia de usuario y escalabilidad que orientan el diseño de la interfaz.
+
+Como resultado de la auditoría, se comprobó que el Frontend implementa correctamente su función como capa de presentación, manteniendo una clara separación respecto de la lógica de negocio y contribuyendo a una operación eficiente, sincronizada y consistente.
+
+========================================================================
+
+--------------------------------------------------
+Dictamen Final de Auditoría
+
+Documento: 001_Frontend_SGOF_CORE_v1.0.txt
+
+Estado: APROBADO
+
+Resultado del relevamiento
+
+---------------------------------------------------
+
+=========================================================================
+
+
+La auditoría confirmó que el Frontend del SGOF Core presenta una arquitectura modular, organizada y coherente con el diseño general de la plataforma.
+
+Se verificó la correcta integración con el Backend, PostgreSQL (a través del Backend), la API REST, Socket.IO y los distintos subsistemas funcionales.
+
+La documentación desarrollada mantiene el mismo nivel metodológico y arquitectónico aplicado en el resto de la Biblioteca Técnica.
+
+Conclusión
+----------
+
+El documento 001_Frontend_SGOF_CORE_v1.0.txt queda oficialmente APROBADO e incorporado a la Biblioteca Técnica del SGOF Core como referencia de la capa de presentación de la plataforma.
+
+========================================================================
+
+==============================================
+METADATOS DEL DOCUMENTO
+==============================================
+
+
+Título             : Frontend del SGOF Core
+Código             : SGOF-FE-001
+Documento padre    : Arquitectura General del SGOF Core
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Documentos relacionados :
+- Modelo de Datos
+- Modelo Relacional
+- Modelo Funcional
+
+=========================================================
+
+
+
+
+
+
+
+
+
+

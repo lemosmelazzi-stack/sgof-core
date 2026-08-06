@@ -1,0 +1,497 @@
+003_Algoritmo_Calidad_GPS_SGOF_CORE_v1.0
+========================================
+
+	Los algoritmos del SGOF Core se documentan exactamente en el orden en que el sistema desarrolla su razonamiento para alcanzar una decisión, y no en el orden en que dicho razonamiento fue implementado en el código fuente.
+
+=======================================================
+
+1. Introducción
+---------------
+
+El presente documento describe el algoritmo de Evaluación de Calidad GPS implementado por el SGOF Core.
+
+Los principios generales de Arquitectura, Procesos Operativos y la Metodología de Documentación de Algoritmos se consideran previamente documentados y constituyen el marco de referencia para el presente volumen.
+
+El algoritmo tiene como finalidad evaluar la calidad de la información de posicionamiento disponible, determinando si puede ser utilizada por los procesos operativos que dependen de datos geográficos.
+
+Su funcionamiento garantiza que únicamente la información considerada válida participe en los procesos de organización y asignación de recursos.
+
+
+2. Objetivo
+-----------
+
+El objetivo del algoritmo consiste en analizar la información GPS recibida y determinar su grado de confiabilidad para ser utilizada durante la operación.
+
+La evaluación se desarrolla mediante criterios objetivos previamente definidos, permitiendo clasificar la calidad de la información sin intervenir en los procesos posteriores que utilizarán dicho resultado.
+
+
+3. Principios del Algoritmo
+---------------------------
+
+El algoritmo de Calidad GPS desarrolla su funcionamiento conforme a los siguientes principios:
+
+evaluación objetiva de la información recibida;
+utilización exclusiva de datos disponibles;
+independencia respecto de la asignación de recursos;
+clasificación uniforme de la calidad de la información;
+generación de resultados reproducibles;
+integración con los procesos operativos del SGOF Core.
+
+Estos principios garantizan que todos los recursos sean evaluados mediante los mismos criterios de calidad.
+
+
+Observación de Arquitectura
+---------------------------
+
+Este algoritmo no calcula posiciones.
+
+Tampoco corrige coordenadas.
+
+Su responsabilidad consiste únicamente en responder una pregunta:
+
+¿La información GPS disponible es lo suficientemente confiable para ser utilizada por el sistema?
+
+Ese resultado será utilizado posteriormente por otros algoritmos, especialmente por la Asignación Inteligente.
+
+========================================================
+
+4. Datos de Entrada
+-------------------
+
+Introducción
+------------
+
+El algoritmo de Evaluación de Calidad GPS inicia su funcionamiento a partir de la información de posicionamiento disponible para cada recurso operativo.
+
+Su finalidad consiste en analizar la calidad de dichos datos y determinar si reúnen las condiciones necesarias para ser utilizados por los procesos que dependen de información geográfica.
+
+El algoritmo no genera información de posicionamiento ni modifica los datos recibidos; únicamente desarrolla una evaluación objetiva sobre su calidad.
+
+
+Información de Posicionamiento
+------------------------------
+
+El algoritmo recibe las coordenadas geográficas disponibles correspondientes al recurso evaluado.
+
+Estas coordenadas constituyen el elemento principal del proceso de evaluación y representan la ubicación reportada por el sistema de posicionamiento.
+
+
+Marca Temporal
+--------------
+
+Cada registro de posicionamiento incorpora la fecha y hora en que fue generado.
+
+La antigüedad de la información constituye uno de los principales criterios utilizados para evaluar su vigencia operativa.
+
+
+Estado de la Señal
+------------------
+
+El algoritmo considera el estado de la señal GPS asociado al registro de posicionamiento.
+
+Esta información permite complementar la evaluación y determinar el grado de confiabilidad de los datos disponibles.
+
+
+Parámetros Operativos
+---------------------
+
+La evaluación utiliza los parámetros definidos por el SGOF Core para establecer los límites aceptables de calidad de la información GPS.
+
+Estos parámetros garantizan que todos los recursos sean evaluados utilizando exactamente los mismos criterios.
+
+
+Observaciones de Arquitectura
+-----------------------------
+
+Toda la información utilizada por este algoritmo es generada previamente por los mecanismos de captura y registro de datos GPS.
+
+El algoritmo de Calidad GPS no interviene en la obtención de la información, limitándose exclusivamente a evaluar su aptitud para ser utilizada por otros procesos del sistema.
+
+
+Comentario de Auditoría
+-----------------------
+
+Durante la auditoría técnica se verificó que el algoritmo desarrolla la evaluación utilizando exclusivamente información objetiva proveniente de los registros GPS, manteniendo independencia respecto de los procesos responsables de capturar y almacenar dichos datos.
+
+Esta separación favorece la modularidad del sistema y garantiza uniformidad en la evaluación de todos los recursos.
+
+
+Principio Rector
+----------------
+
+La calidad de una decisión depende de la calidad de la información que la sustenta; por ello, toda información GPS debe ser evaluada antes de ser utilizada.
+
+
+=====================================================
+
+5. Proceso de Evaluación
+------------------------
+
+Introducción
+------------
+
+Una vez recibida la información de posicionamiento, el algoritmo inicia el proceso de evaluación destinado a determinar la calidad operativa de los datos GPS.
+
+La evaluación se desarrolla mediante una secuencia lógica de verificaciones, donde cada etapa aporta elementos para clasificar la información y establecer su grado de confiabilidad.
+
+El resultado obtenido permitirá a los procesos posteriores decidir si la información puede ser utilizada durante la operación.
+
+
+Etapa 1 – Recepción de la información
+-------------------------------------
+
+El algoritmo recibe la información de posicionamiento correspondiente al recurso evaluado y verifica que existan datos disponibles para iniciar el proceso de análisis.
+
+La ausencia de información impide continuar con la evaluación y determina inmediatamente la condición operativa del registro.
+
+
+Etapa 2 – Verificación de vigencia
+----------------------------------
+
+El algoritmo analiza la antigüedad de la información GPS utilizando la marca temporal asociada al registro.
+
+Este análisis permite determinar si los datos representan adecuadamente la situación actual del recurso o si han perdido vigencia para la operación.
+
+
+Etapa 3 – Evaluación del estado de la señal
+-------------------------------------------
+
+Cuando la información se encuentra disponible y vigente, el algoritmo incorpora el estado de la señal GPS como elemento complementario del proceso de evaluación.
+
+Esta verificación permite identificar condiciones que puedan afectar la confiabilidad del posicionamiento.
+
+
+Etapa 4 – Clasificación de la calidad
+-------------------------------------
+
+Con la información obtenida durante las etapas anteriores, el algoritmo clasifica el registro GPS conforme a las categorías operativas definidas por el SGOF Core.
+
+La clasificación refleja el nivel de confiabilidad de la información y constituye el resultado principal del algoritmo.
+
+
+Etapa 5 – Disponibilidad para otros procesos
+--------------------------------------------
+
+Finalizada la clasificación, el resultado queda disponible para ser utilizado por los procesos que requieren información de posicionamiento, especialmente el algoritmo de Asignación Inteligente.
+
+El algoritmo de Calidad GPS concluye su intervención una vez determinada la categoría correspondiente al registro evaluado.
+
+
+Observaciones de Arquitectura
+-----------------------------
+
+El proceso de evaluación desarrolla una secuencia progresiva donde cada etapa incorpora nuevos elementos de análisis sin alterar la información original.
+
+La arquitectura garantiza que la clasificación obtenida sea independiente de los procesos que posteriormente utilizarán dicho resultado.
+
+
+Comentario de Auditoría
+-----------------------
+
+Durante la auditoría técnica se verificó que el algoritmo desarrolla la evaluación siguiendo una secuencia lógica claramente definida, basada en la disponibilidad, vigencia y calidad de la información GPS.
+
+La clasificación obtenida constituye un insumo objetivo para los algoritmos posteriores y evita que decisiones operativas se apoyen en información desactualizada o poco confiable.
+
+
+Principio Rector
+----------------
+
+Antes de utilizar una posición GPS, el sistema verifica que la información sea suficiente, vigente y confiable para respaldar una decisión operativa.
+
+=================================================
+
+6. Criterios de Clasificación
+-----------------------------
+
+Introducción
+------------
+
+Una vez completado el proceso de evaluación, el algoritmo aplica los criterios de clasificación definidos por el SGOF Core para determinar el nivel de calidad de la información GPS.
+
+La clasificación se realiza utilizando reglas objetivas y uniformes, garantizando que todos los registros sean evaluados bajo las mismas condiciones.
+
+El resultado obtenido permite a los procesos posteriores conocer el grado de confiabilidad de la información disponible antes de utilizarla en la operación.
+
+
+Disponibilidad de la información
+--------------------------------
+
+El primer criterio de clasificación consiste en verificar la existencia de información GPS válida para el recurso evaluado.
+
+La ausencia de datos determina una condición operativa que impide utilizar información de posicionamiento durante los procesos posteriores.
+
+
+Vigencia temporal
+-----------------
+
+El algoritmo evalúa la antigüedad de la información recibida.
+
+La vigencia constituye uno de los principales criterios para determinar si los datos representan adecuadamente la situación actual del recurso.
+
+Información excesivamente antigua reduce la confiabilidad del posicionamiento y modifica la clasificación correspondiente.
+
+
+Calidad de la señal
+-------------------
+
+Cuando la información se encuentra disponible y vigente, el algoritmo incorpora el estado de la señal GPS como criterio complementario de clasificación.
+
+Este análisis permite valorar la confiabilidad del posicionamiento reportado y determinar su aptitud para ser utilizado por otros procesos.
+
+
+Clasificación operativa
+-----------------------
+
+Aplicados los criterios anteriores, el algoritmo asigna al registro una categoría de calidad conforme a las reglas definidas por el SGOF Core.
+
+La clasificación representa el resultado final del proceso de evaluación y constituye la referencia utilizada posteriormente por los algoritmos que requieren información GPS.
+
+
+Uniformidad de la evaluación
+----------------------------
+
+Todos los recursos son clasificados utilizando exactamente los mismos criterios.
+
+Este principio garantiza objetividad, reproducibilidad y consistencia en la evaluación de la información de posicionamiento.
+
+
+Observaciones de Arquitectura
+-----------------------------
+
+El algoritmo no interpreta el significado operativo de la información GPS.
+
+Su responsabilidad finaliza al clasificar objetivamente la calidad de los datos disponibles.
+
+Corresponde a los algoritmos posteriores decidir cómo utilizar dicha clasificación dentro del proceso operativo.
+
+
+Comentario de Auditoría
+-----------------------
+
+Durante la auditoría funcional se verificó que el algoritmo desarrolla una clasificación uniforme de la información GPS, manteniendo independencia respecto de los procesos que posteriormente utilizan dicho resultado.
+
+Esta separación favorece la reutilización de la clasificación por distintos componentes del SGOF Core y preserva la coherencia de la arquitectura.
+
+
+Principio Rector
+----------------
+
+Toda información GPS debe clasificarse antes de ser utilizada; únicamente una evaluación objetiva permite conocer su verdadera confiabilidad.
+
+===================================================
+
+7. Resultado del Algoritmo
+--------------------------
+
+Introducción
+------------
+
+Como resultado del proceso de evaluación y clasificación, el algoritmo determina el nivel de calidad de la información GPS correspondiente al recurso analizado.
+
+La clasificación obtenida representa una evaluación objetiva de la confiabilidad de los datos disponibles y constituye el producto final del algoritmo.
+
+
+Clasificación resultante
+------------------------
+
+El algoritmo asigna al registro GPS una categoría de calidad conforme a los criterios definidos por el SGOF Core.
+
+Esta clasificación resume el resultado de todas las verificaciones realizadas durante el proceso de evaluación.
+
+
+Disponibilidad para otros procesos
+----------------------------------
+
+La clasificación obtenida queda disponible para ser utilizada por los algoritmos y procesos que requieren información de posicionamiento.
+
+Especialmente, constituye uno de los insumos considerados por el algoritmo de Asignación Inteligente durante el proceso de selección del recurso.
+
+
+Consistencia de la evaluación
+-----------------------------
+
+La aplicación uniforme de los criterios de clasificación garantiza que todos los recursos sean evaluados utilizando exactamente las mismas reglas.
+
+Esta consistencia permite comparar objetivamente la calidad de la información GPS disponible en toda la flota.
+
+
+Principio Rector
+----------------
+
+El resultado del algoritmo no es una posición geográfica; es una valoración objetiva de la calidad de esa posición.
+
+
+=======================================================
+
+8. Integración con el SGOF Core
+-------------------------------
+
+Introducción
+------------
+
+El algoritmo de Calidad GPS forma parte del conjunto de mecanismos de evaluación del SGOF Core y proporciona información objetiva sobre la confiabilidad del posicionamiento de los recursos.
+
+Su función consiste en clasificar la calidad de los datos GPS antes de que sean utilizados por otros procesos operativos.
+
+
+Relación con GPS
+----------------
+
+Recibe la información generada por los mecanismos de captura y almacenamiento del posicionamiento de los recursos.
+
+
+Relación con la Gestión de Taxis
+--------------------------------
+
+Evalúa la calidad de la información GPS asociada a cada recurso operativo.
+
+
+Relación con la Asignación Inteligente
+--------------------------------------
+
+Proporciona la clasificación de calidad utilizada como criterio complementario durante el proceso de selección del recurso.
+
+
+Relación con PostgreSQL
+-----------------------
+
+Utiliza la información registrada en la Base de Datos y permite conservar la trazabilidad de la evaluación desarrollada.
+
+
+Relación con Socket.IO
+----------------------
+
+La clasificación obtenida puede formar parte de la información distribuida en tiempo real a los componentes que representan el estado operativo de la flota.
+
+
+Relación con el Frontend
+------------------------
+
+El Frontend puede representar visualmente el estado de calidad GPS de cada recurso utilizando la clasificación generada por el algoritmo.
+
+
+=======================================================
+
+9. Observaciones de Arquitectura
+--------------------------------
+
+Desde la perspectiva arquitectónica, el algoritmo de Calidad GPS constituye el mecanismo responsable de evaluar objetivamente la confiabilidad de la información de posicionamiento utilizada por el SGOF Core.
+
+Su función consiste en clasificar la calidad de los datos GPS antes de que sean utilizados por otros procesos, manteniendo una clara separación entre la obtención de la información, su evaluación y la utilización posterior de los resultados.
+
+Esta organización favorece la modularidad de la plataforma y permite que la misma clasificación pueda ser utilizada por distintos algoritmos sin duplicar procesos de evaluación.
+
+
+10. Conclusiones
+----------------
+
+El algoritmo de Calidad GPS constituye el proceso responsable de evaluar y clasificar la información de posicionamiento utilizada por el SGOF Core.
+
+A lo largo del presente documento se describieron sus principios, datos de entrada, proceso de evaluación, criterios de clasificación e integración con el resto de la plataforma.
+
+La auditoría permitió comprobar que la arquitectura implementada mantiene una clara separación entre la captura de datos GPS, su evaluación objetiva y la utilización posterior de dicha información durante la operación.
+
+Esta organización garantiza uniformidad en la clasificación, mejora la confiabilidad de las decisiones y favorece la evolución futura del sistema.
+
+======================================================
+
+Dictamen Final de Auditoría
+---------------------------
+
+Documento: 003_Algoritmo_Calidad_GPS_SGOF_CORE_v1.0.txt
+
+Estado: APROBADO
+
+=======================================================
+
+Resultado del relevamiento
+--------------------------
+
+Durante la auditoría técnica se verificó el funcionamiento del algoritmo responsable de evaluar la calidad de la información GPS utilizada por el SGOF Core.
+
+Se comprobó que el algoritmo desarrolla una clasificación objetiva basada en la disponibilidad, vigencia y confiabilidad de la información de posicionamiento, proporcionando un resultado uniforme para todos los recursos operativos.
+
+La documentación desarrollada refleja fielmente la lógica implementada, manteniendo independencia respecto de la implementación técnica y respetando el nivel de abstracción definido para la Biblioteca Técnica.
+
+
+Observaciones
+-------------
+
+No se detectaron inconsistencias entre la arquitectura documentada y el comportamiento observado durante la auditoría.
+
+La separación entre captura de datos, evaluación de calidad y utilización de la información constituye uno de los principios que fortalecen la arquitectura del SGOF Core.
+
+
+Conclusión
+----------
+
+El documento 003_Algoritmo_Calidad_GPS_SGOF_CORE_v1.0.txt queda oficialmente aprobado e incorporado a la Biblioteca Técnica del SGOF Core como referencia del algoritmo responsable de la evaluación y clasificación de la calidad de la información GPS.
+
+
+
+Resumen Técnico del Algoritmo
+==============================================
+        RESUMEN TÉCNICO DEL ALGORITMO
+==============================================
+
+Algoritmo            : Calidad GPS
+Código               : SGOF-ALG-003
+Nivel                : Algoritmo de Evaluación
+Estado               : APROBADO
+
+----------------------------------------------
+PROPÓSITO
+----------------------------------------------
+Evaluar y clasificar la calidad de la
+información GPS antes de su utilización por
+los procesos operativos.
+
+----------------------------------------------
+ENTRADAS
+----------------------------------------------
+• Información de posicionamiento.
+• Marca temporal.
+• Estado de la señal.
+• Parámetros operativos.
+
+----------------------------------------------
+PROCESO
+----------------------------------------------
+1. Recepción de la información.
+2. Verificación de vigencia.
+3. Evaluación del estado de la señal.
+4. Aplicación de los criterios de clasificación.
+5. Generación de la clasificación final.
+
+----------------------------------------------
+RESULTADO
+----------------------------------------------
+• Clasificación de la calidad GPS.
+• Información disponible para otros procesos.
+
+----------------------------------------------
+COMPONENTES RELACIONADOS
+----------------------------------------------
+GPS
+Gestión de Taxis
+Asignación Inteligente
+PostgreSQL
+Socket.IO
+Frontend
+
+==============================================
+
+
+Principio Rector
+----------------
+
+La confiabilidad de una decisión comienza por la confiabilidad de la información sobre la que se apoya.
+
+
+
+
+
+
+
+
+
