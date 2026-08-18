@@ -1,5 +1,46 @@
+
 001_Backend_SGOF_CORE_v1.0
 ==========================
+
+==============================================
+METADATOS DEL DOCUMENTO
+==============================================
+
+Título             : Backend del SGOF Core
+
+Código             : SGOF-BE-001
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  : 01/08/2026
+Última revisión    : 13/08/2026
+
+Documento padre    : Biblioteca Técnica del SGOF Core
+
+Documentos relacionados :
+- Modelo Funcional
+- API REST
+- Frontend
+- Socket.IO
+
+Próxima revisión   : Según evolución de la arquitectura
+
+=============================================================
+
+=============================================================
+02_BACKEND
+=============================================================
+
+001_Backend_SGOF_CORE_v1.0.txt
+Código : SGOF-BE-001
+Estado : 🟢 APROBADO
+=============================================================
 
 1. Introducción
 ---------------
@@ -13,6 +54,9 @@ Desde esta perspectiva, el Backend no debe entenderse únicamente como un conjun
 
 2. Objetivos
 ------------
+Dictamen
+--------
+🟢 APROBADO
 
 El Backend tiene como objetivo proporcionar una infraestructura robusta, modular y escalable para la ejecución de los procesos operativos del SGOF Core.
 
@@ -20,17 +64,23 @@ Para cumplir esta función, concentra la lógica de negocio del sistema y coordi
 
 Entre sus principales objetivos se encuentran:
 
-administrar las solicitudes provenientes del Frontend;
-validar la información recibida antes de su procesamiento;
-ejecutar las reglas de negocio del sistema;
-coordinar el acceso a la Base de Datos;
-generar y distribuir eventos mediante Socket.IO;
-garantizar la consistencia de las operaciones;
-proporcionar una interfaz uniforme mediante la API REST.
+ • administrar las solicitudes provenientes del Frontend;
+• validar la información recibida antes de su procesamiento;
+• ejecutar las reglas de negocio del sistema;
+• coordinar el acceso a la Base de Datos;
+• generar y distribuir eventos mediante Socket.IO;
+• garantizar la consistencia de las operaciones;
+• proporcionar una interfaz uniforme mediante la API REST.
 
 La centralización de estas responsabilidades permite mantener un comportamiento homogéneo en toda la plataforma y facilita la evolución futura del sistema.
 
-3. Arquitectura General
+Capítulo 2 – Objetivos
+
+Estado:
+🟢 Conforme
+
+==================================================
+Arquitectura General
 -----------------------
 
 El Backend del SGOF Core fue concebido siguiendo una arquitectura modular, donde cada componente posee responsabilidades claramente definidas y colabora con los demás mediante interfaces bien establecidas.
@@ -61,12 +111,12 @@ Su estructura puede representarse conceptualmente de la siguiente manera:
 
 En esta arquitectura:
 
-API REST constituye el punto de entrada de las solicitudes.
-Las rutas organizan y direccionan las operaciones.
-La lógica de negocio implementa las reglas operativas del sistema.
-Los servicios proporcionan funcionalidades reutilizables entre distintos procesos.
-La Base de Datos conserva de forma permanente la información.
-Socket.IO distribuye los eventos generados durante la operación.
+•  API REST constituye el punto de entrada de las solicitudes.
+•  Las rutas organizan y direccionan las operaciones.
+•  La lógica de negocio implementa las reglas operativas del sistema.
+•  Los servicios proporcionan funcionalidades reutilizables entre distintos procesos.
+•  La Base de Datos conserva de forma permanente la información.
+•  Socket.IO distribuye los eventos generados durante la operación.
 
 Cada uno de estos componentes participa en un flujo coordinado que garantiza la correcta ejecución de las operaciones del sistema.
 
@@ -115,6 +165,12 @@ Comentario de auditoría
 Durante el proceso de auditoría técnica se verificó que el Backend implementa efectivamente el papel de orquestador central del SGOF Core.
 
 El relevamiento realizado sobre la estructura del proyecto, las rutas, los servicios, las integraciones con PostgreSQL y la comunicación mediante Socket.IO permitió comprobar que la lógica de negocio permanece concentrada en este componente, mientras que el resto de los módulos conserva responsabilidades específicas y claramente delimitadas.
+
+=========================================
+Capítulo 3 – Arquitectura General
+
+Estado:
+🟢 Conforme
 
 ==========================================================================
 
@@ -251,7 +307,13 @@ Durante la auditoría estructural del Backend se revisó exhaustivamente la orga
 
 Como resultado, el Backend presenta actualmente una organización consistente con la arquitectura definida para el SGOF Core y preparada para futuras ampliaciones sin comprometer la claridad del proyecto.
 
-==================================================================
+=========================================
+Capítulo 4 – Organización del Proyecto
+
+Estado:
+🟢 Conforme
+
+=========================
 
 5. Flujo de Procesamiento
 -------------------------
@@ -276,7 +338,7 @@ Recepción de la solicitud
 
 El proceso comienza cuando un cliente realiza una solicitud a través de la API REST.
 
-Dicha solicitud puede originarse desde:
+•  Dicha solicitud puede originarse desde:
 
 el Frontend;
 procesos automáticos;
@@ -304,7 +366,7 @@ Validación
 
 Antes de ejecutar cualquier operación, el Backend verifica la validez de la información recibida.
 
-Entre otros aspectos, pueden controlarse:
+•  Entre otros aspectos, pueden controlarse:
 
 integridad de los datos;
 existencia de los recursos involucrados;
@@ -318,7 +380,7 @@ Ejecución de la lógica de negocio
 
 Una vez validada la información, el Backend ejecuta las reglas correspondientes al proceso solicitado.
 
-Durante esta etapa pueden realizarse operaciones como:
+•  Durante esta etapa pueden realizarse operaciones como:
 
 creación de registros;
 actualización de estados;
@@ -381,8 +443,8 @@ al cliente           │
 
 Este flujo representa el comportamiento general observado durante la auditoría del Backend.
 
-Beneficios del modelo
----------------------
+•  Beneficios del modelo
+------------------------
 
 La utilización de un flujo uniforme proporciona importantes ventajas:
 
@@ -409,7 +471,17 @@ Aunque cada operación implementa reglas de negocio particulares, todas siguen l
 
 La uniformidad de este flujo constituye una de las fortalezas más importantes de la arquitectura del SGOF Core y facilita significativamente las tareas de desarrollo, mantenimiento y auditoría.
 
-===========================================================================
+
+
+=====================================================
+Capítulo 5 – Flujo de Procesamiento
+
+Estado:
+🟢 Conforme
+
+
+
+======================
 
 6. Gestión de Rutas
 -------------------
@@ -438,17 +510,17 @@ Cada conjunto de rutas concentra operaciones relacionadas con una entidad o proc
 
 Entre los principales dominios auditados se encuentran:
 
-Viajes
-Taxis
-GPS
-Pedidos
-Clientes
-Usuarios
-Asignaciones
+•  Viajes
+•  Taxis
+•  GPS
+•  Pedidos
+•  Clientes
+•  Usuarios
+•  Asignaciones
 
 Esta organización facilita tanto el mantenimiento del código como la incorporación de nuevas funcionalidades.
 
-Función de las rutas
+•  Función de las rutas
 
 Cada ruta tiene como responsabilidad principal:
 
@@ -470,7 +542,7 @@ Durante esta etapa pueden intervenir distintos módulos del Backend, dependiendo
 
 Esta separación permite mantener una arquitectura organizada donde cada componente desarrolla únicamente la responsabilidad que le corresponde.
 
-Relación con la API REST
+•  Relación con la API REST
 
 Las rutas constituyen la implementación práctica de la API REST del SGOF Core.
 
@@ -478,7 +550,7 @@ Cada operación disponible para los clientes queda representada mediante un endp
 
 Esta organización proporciona una interfaz consistente para todas las aplicaciones que interactúan con el sistema.
 
-Uniformidad del procesamiento
+•  Uniformidad del procesamiento
 
 Durante la auditoría se verificó que las distintas rutas siguen un patrón común de funcionamiento.
 
@@ -543,7 +615,16 @@ El detalle de cada endpoint, sus parámetros, respuestas y reglas específicas s
 
 De este modo, evitamos duplicar información y mantenemos una clara separación entre la arquitectura interna del Backend y la documentación funcional de la API, siguiendo el criterio metodológico que venimos aplicando en toda la Biblioteca Técnica.
 
-==========================================================================
+=====================================================
+Auditoría
+Capítulo 6 – Gestión de Rutas
+Estado
+
+🟢 Conforme
+
+===============================================
+
+
 
 7. Integración con PostgreSQL
 -----------------------------
@@ -571,11 +652,11 @@ Cada vez que una operación requiere acceder a información persistente, el Back
 
 Este proceso puede involucrar:
 
-consultas de información;
-inserción de nuevos registros;
-actualización de datos existentes;
-eliminación lógica o física cuando corresponda;
-validaciones sobre la existencia de recursos.
+•  consultas de información;
+•  inserción de nuevos registros;
+•  actualización de datos existentes;
+•  eliminación lógica o física cuando corresponda;
+•  validaciones sobre la existencia de recursos.
 
 La Base de Datos responde exclusivamente a solicitudes originadas por el Backend.
 
@@ -600,39 +681,39 @@ Esta organización fortalece la seguridad, simplifica el mantenimiento y asegura
 
 Coordinación con la lógica de negocio
 
-Antes de ejecutar cualquier operación sobre la Base de Datos, el Backend aplica las validaciones correspondientes.
+•  Antes de ejecutar cualquier operación sobre la Base de Datos, el Backend aplica las validaciones correspondientes.
 
-Solo una vez verificada la consistencia de la solicitud se realizan las operaciones necesarias sobre el Modelo Relacional.
+•  Solo una vez verificada la consistencia de la solicitud se realizan las operaciones necesarias sobre el Modelo Relacional.
 
 De esta forma, PostgreSQL actúa como repositorio permanente de información, mientras que el Backend conserva el control absoluto sobre las decisiones operativas.
 
-Persistencia de la información
+•  Persistencia de la información
 
 Las operaciones ejecutadas por el Backend permiten mantener actualizadas las distintas entidades del sistema.
 
 Entre ellas:
 
-pedidos;
-viajes;
-taxis;
-clientes;
-choferes;
-asignaciones;
-registros GPS;
-usuarios.
+• pedidos;
+• viajes;
+• taxis;
+• clientes;
+• choferes;
+• asignaciones;
+• registros GPS;
+• usuarios.
 
 Cada modificación queda reflejada en la Base de Datos respetando las relaciones y restricciones definidas durante el diseño del Modelo Relacional.
 
-Beneficios de la integración
+• Beneficios de la integración
 
 La arquitectura implementada proporciona importantes ventajas:
 
-centralización del acceso a la información;
-mayor seguridad;
-consistencia de los datos;
-reducción de errores;
-facilidad para realizar auditorías;
-independencia entre la lógica de negocio y la persistencia.
+• centralización del acceso a la información;
+• mayor seguridad;
+• consistencia de los datos;
+• reducción de errores;
+• facilidad para realizar auditorías;
+• independencia entre la lógica de negocio y la persistencia.
 
 Estos beneficios contribuyen a mantener una plataforma estable y preparada para evolucionar.
 
@@ -644,14 +725,14 @@ Desde el punto de vista arquitectónico, PostgreSQL constituye la capa de persis
 
 Ambos componentes colaboran estrechamente, pero mantienen responsabilidades claramente diferenciadas.
 
-La Base de Datos conserva la información.
+• La Base de Datos conserva la información.
 
-El Backend interpreta las reglas del negocio.
+• El Backend interpreta las reglas del negocio.
 
 Esta separación permite modificar la lógica operativa sin alterar la estructura de almacenamiento y viceversa.
 
 
-Comentario de auditoría
+• Comentario de auditoría
 -----------------------
 
 Durante la auditoría técnica se verificó que todas las operaciones relevantes del SGOF Core acceden a PostgreSQL exclusivamente a través del Backend.
@@ -659,7 +740,7 @@ Durante la auditoría técnica se verificó que todas las operaciones relevantes
 Asimismo, se comprobó la coherencia entre las operaciones implementadas y el Modelo Relacional previamente documentado, confirmando que la persistencia de la información responde a una arquitectura centralizada y consistente.
 
 
-Observación para la Biblioteca Técnica
+• Observación para la Biblioteca Técnica
 --------------------------------------
 
 Este capítulo describe cómo el Backend utiliza PostgreSQL.
@@ -668,7 +749,16 @@ No reemplaza al documento Modelo Relacional, que explica cómo están organizado
 
 Su propósito es documentar el papel de PostgreSQL como componente de persistencia dentro del flujo operativo del Backend, manteniendo la coherencia metodológica del resto de la Biblioteca Técnica.
 
-========================================================================
+=====================================================
+Auditoría
+Capítulo 7 – Integración con PostgreSQL
+Estado
+
+🟢 Conforme
+
+
+================================================
+
 
 8. Integración con Socket.IO
 ----------------------------
@@ -830,7 +920,15 @@ El Backend nunca comunica una intención; comunica un resultado.
 Es decir, primero procesa, valida y persiste la operación. Solo cuando el nuevo estado del sistema es consistente, genera el evento para que Socket.IO lo distribuya. Ese orden garantiza que todos los clientes trabajen siempre sobre una misma realidad operativa y es uno de los principios que más contribuyen a la robustez de la plataforma.
 
 
-=============================================================================
+=====================================================
+Auditoría
+Capítulo 8 – Integración con Socket.IO
+Estado
+
+🟢 Conforme
+
+===================================================
+
 
 9. Integración con el Frontend
 ------------------------------
@@ -997,7 +1095,15 @@ Socket.IO → Comunica
 
 Cada componente cumple una función exclusiva y bien delimitada. Esa especialización reduce el acoplamiento entre módulos, facilita las tareas de mantenimiento y proporciona una arquitectura preparada para crecer sin perder coherencia. Es, probablemente, una de las características más sólidas que hemos confirmado durante toda la auditoría del SGOF Core.
 
-======================================================================
+=====================================================
+Auditoría
+Capítulo 9 – Integración con el Frontend
+Estado
+
+🟢 Conforme
+
+====================================================
+
 
 10. Integración con los Subsistemas
 -----------------------------------
@@ -1044,13 +1150,13 @@ El Backend coordina todas las operaciones relacionadas con el ciclo de vida de l
 
 Entre ellas:
 
-creación;
-asignación;
-aceptación;
-inicio;
-finalización;
-cancelación;
-reasignación.
+• creación;
+• asignación;
+• aceptación;
+• inicio;
+• finalización;
+• cancelación;
+• reasignación.
 
 Cada cambio de estado es procesado conforme a las reglas operativas definidas por el sistema.
 
@@ -1069,15 +1175,15 @@ reorganización de la cola cuando corresponde.
 
 La decisión final siempre permanece bajo el control de las reglas de negocio centralizadas.
 
-Integración con el Sistema GPS
+• Integración con el Sistema GPS
 
 El Backend recibe, valida y procesa la información proveniente del subsistema GPS.
 
-Posteriormente:
+• Posteriormente:
 
-actualiza la Base de Datos;
-genera los eventos correspondientes;
-pone la información a disposición de los demás módulos.
+• actualiza la Base de Datos;
+• genera los eventos correspondientes;
+• pone la información a disposición de los demás módulos.
 
 De esta manera, el GPS se integra naturalmente con el resto de la plataforma.
 
@@ -1089,11 +1195,11 @@ Las operaciones relacionadas con los recursos de la flota también son coordinad
 
 Entre ellas:
 
-actualización de estados;
-disponibilidad;
-asignaciones;
-cambios operativos;
-sincronización con los viajes.
+• actualización de estados;
+• disponibilidad;
+• asignaciones;
+• cambios operativos;
+• sincronización con los viajes.
 
 Esta integración mantiene permanentemente actualizado el estado operativo de cada taxi.
 
@@ -1105,13 +1211,13 @@ La arquitectura del Backend permite incorporar nuevos subsistemas siguiendo el m
 
 Entre los componentes previstos para futuras etapas podrán incorporarse:
 
-módulos administrativos;
-facturación;
-estadísticas avanzadas;
-reportes;
-notificaciones;
-aplicaciones móviles;
-integraciones externas.
+• módulos administrativos;
+• facturación;
+• estadísticas avanzadas;
+• reportes;
+• notificaciones;
+• aplicaciones móviles;
+• integraciones externas.
 
 Todos ellos reutilizarán los mecanismos ya implementados por el Backend.
 
@@ -1162,7 +1268,14 @@ Cada uno de estos componentes dispone de su propia documentación técnica dentr
 
 El presente documento no sustituye dicha documentación; su propósito es mostrar cómo todos esos módulos se integran y colaboran entre sí a través del Backend, proporcionando una visión global de la arquitectura operativa del SGOF Core.
 
-============================================================================
+=====================================================
+Auditoría
+Capítulo 10 – Integración con los Subsistemas
+Estado
+
+🟢 Conforme
+
+=======================
 
 11. Seguridad y Validaciones
 ----------------------------
@@ -1233,7 +1346,14 @@ La seguridad implementada en el Backend responde principalmente a criterios de i
 
 Su propósito es asegurar que únicamente operaciones válidas modifiquen el estado del sistema y que todas las reglas de negocio sean aplicadas desde un único punto de control.
 
-===========================================================================
+=====================================================
+Auditoría
+Capítulo 11 – Seguridad y Validaciones
+Estado
+
+🟢 Conforme
+=====================================================
+
 
 
 12. Escalabilidad
@@ -1265,11 +1385,11 @@ Incorporación de nuevos módulos
 
 La arquitectura admite la incorporación de nuevos componentes, tales como:
 
-nuevos servicios REST;
-nuevos subsistemas;
-nuevas entidades del Modelo Relacional;
-nuevas integraciones externas;
-nuevos canales de comunicación.
+• nuevos servicios REST;
+• nuevos subsistemas;
+• nuevas entidades del Modelo Relacional;
+• nuevas integraciones externas;
+• nuevos canales de comunicación.
 
 Estas ampliaciones pueden realizarse respetando la estructura general del proyecto.
 
@@ -1306,11 +1426,11 @@ Esta organización mantiene desacopladas las capas de presentación, procesamien
 
 La arquitectura implementada favorece:
 
-modularidad;
-mantenibilidad;
-reutilización;
-escalabilidad;
-consistencia operativa.
+• modularidad;
+• mantenibilidad;
+• reutilización;
+• escalabilidad;
+• consistencia operativa.
 
 Estos principios constituyen la base sobre la cual se desarrolla toda la plataforma SGOF Core.
 
@@ -1330,7 +1450,15 @@ El relevamiento realizado durante la auditoría permitió comprobar que el Backe
 Como consecuencia, el Backend no constituye únicamente un servidor de aplicaciones, sino el elemento responsable de mantener la coherencia funcional del SGOF Core y de asegurar la correcta interacción entre sus distintos módulos.
 
 
-========================================================================
+=====================================================
+Capítulo 12 – Escalabilidad
+Estado
+
+🟢 Conforme
+
+
+====================================================
+
 
 -------------------------------------------
 Dictamen Final de Auditoría
@@ -1362,42 +1490,7 @@ El documento mantiene un nivel adecuado de abstracción, describiendo el funcion
 	----------
 El documento 001_Backend_SGOF_CORE_v1.0.txt queda oficialmente aprobado e incorporado a la Biblioteca Técnica del SGOF Core como referencia del componente responsable del procesamiento y coordinación de la plataforma.
 
-==========================================================================
-
-
-==============================================
-METADATOS DEL DOCUMENTO
-==============================================
-
-Título             : Backend del SGOF Core
-
-Código             : SGOF-BE-001
-Versión            : 1.0
-Estado             : APROBADO
-
-Clasificación      : Biblioteca Técnica
-Proyecto           : SGOF Core
-
-Autor              : Proyecto SGOF
-Revisión Técnica   : Auditoría Técnica SGOF
-
-Fecha de creación  :
-Última revisión    :
-
-Documento padre    : Biblioteca Técnica del SGOF Core
-
-Documentos relacionados : - Modelo Funcional
-                          - API REST
-                          - Frontend
-                          - Socket.IO
-
-
-Próxima revisión   : Según evolución de la arquitectura
-
-===========================================================
-
-
-
+=====================================================
 
 
 

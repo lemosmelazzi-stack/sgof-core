@@ -1,6 +1,35 @@
 001_Sistema_GPS_SGOF_CORE_v1.0.tx
 =================================
 
+METADATOS DEL DOCUMENTO
+-----------------------
+
+Título             : 001_Sistema_GPS_SGOF_CORE
+Código             : SGOF-GPS-001
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  : 2026-08-01
+Última revisión    : 2026-08-15
+
+Documento padre    : 004_Modelo_Funcional_SGOF_CORE_v1.0
+
+Documentos relacionados :
+- 003_Algoritmo_Calidad_GPS_SGOF_CORE_v1.0
+- 001_Algoritmo_Asignacion_Inteligente_SGOF_CORE_v1.0
+- 002_Algoritmo_Cola_Operativa_SGOF_CORE_v1.0
+- 001_SocketIO_SGOF_CORE_v1.0
+- 003_Modelo_Relacional_SGOF_CORE_v1.0
+
+Próxima revisión   : Según evolución de la arquitectura
+
+==================================================================
 
 7.7 Gestión del Sistema GPS
 ===========================
@@ -313,58 +342,8 @@ Esta arquitectura simplifica el mantenimiento, facilita la incorporación de nue
 
 =====================================================
 
-
 7.7.6 Persistencia en la Base de Datos
 --------------------------------------
-
-Aquí volveremos a conectar con todo el trabajo realizado en el Modelo Relacional, explicando:
-
-por qué se almacena la información GPS;
-qué entidades participan (gps_logs, taxis, eventos, etc.);
-cómo se conserva el historial;
-por qué no se sobreescriben los registros;
-cómo esa persistencia permite auditorías, reconstrucción de recorridos y análisis históricos.
-
-Será un capítulo muy interesante porque unirá el Modelo Funcional con el Modelo Relacional, mostrando cómo la arquitectura transforma un dato temporal en un activo permanente del sistema.
-
-Una observación de arquitectura
-
-Mientras redactábamos este documento noté algo que me parece importante y que merece quedar registrado.
-
-Hasta ahora, todos los componentes que hemos documentado siguen el mismo patrón:
-
-Capturar
-      ↓
-Validar
-      ↓
-Persistir
-      ↓
-Distribuir
-      ↓
-Consumir
-
-Es un patrón que ya apareció en:
-
-pedidos;
-viajes;
-GPS;
-Cola Inteligente.
-
-No es casualidad.
-
-Es un patrón arquitectónico del SGOF Core.
-
-Y creo que, cuando lleguemos al documento "Principios de Diseño del SGOF Core", éste deberá ser uno de ellos.
-
-Porque resume perfectamente la filosofía del sistema:
-
-Primero se captura la información. Luego se valida. Después se almacena. A continuación se distribuye. Finalmente otros módulos la utilizan para tomar decisiones.
-
-=====================================================
-
-7.7.6 Persistencia en la Base de Datos
---------------------------------------
-
 
 Introducción
 -------------
@@ -473,12 +452,13 @@ Esta arquitectura permite que los cambios de posición de los taxis sean visible
 La utilización de Socket.IO convierte al sistema en una plataforma reactiva, donde la información se propaga automáticamente a medida que ocurren los eventos operativos.
 
 Objetivo
-
+--------
 El objetivo de la integración con Socket.IO es garantizar que todos los componentes que requieren información de posicionamiento dispongan de datos actualizados en tiempo real.
 
 Este mecanismo mejora la capacidad de respuesta del sistema, reduce la carga de consultas repetitivas sobre la base de datos y mantiene sincronizados a operadores, supervisores y módulos operativos.
 
 Flujo de comunicación
+---------------------
 
 Una vez que el Backend finaliza el procesamiento de una nueva posición GPS, el flujo de distribución continúa de la siguiente manera:
 
@@ -532,11 +512,11 @@ Supervisión de Flota.
 Cada módulo consume únicamente los eventos que resultan relevantes para su funcionamiento.
 
 Eficiencia operativa
-
+--------------------
 La utilización de un mecanismo de comunicación basado en eventos presenta importantes ventajas respecto a un modelo tradicional de consultas periódicas.
 
 Entre ellas:
-
+-----------
 disminución del tráfico entre clientes y servidor;
 reducción de consultas innecesarias a la base de datos;
 actualización inmediata de la información;
@@ -554,7 +534,7 @@ Su función comienza una vez que el Backend ha finalizado el tratamiento de la a
 Esta separación de responsabilidades garantiza que la lógica de negocio permanezca centralizada en el Backend, mientras que Socket.IO actúa exclusivamente como un mecanismo de distribución de eventos.
 
 Observaciones de arquitectura
-
+-----------------------------
 Desde el punto de vista arquitectónico, Socket.IO constituye la capa de comunicación en tiempo real del SGOF Core.
 
 Mientras el Backend administra la lógica del sistema y la Base de Datos conserva la información, Socket.IO asegura que los cambios producidos durante la operación sean comunicados inmediatamente a todos los componentes interesados.
@@ -562,7 +542,7 @@ Mientras el Backend administra la lógica del sistema y la Base de Datos conserv
 Esta organización mantiene claramente separadas las funciones de procesamiento, almacenamiento y distribución de la información, favoreciendo una arquitectura modular, escalable y fácilmente mantenible.
 
 Comentario de auditoría
-
+-----------------------
 La incorporación de Socket.IO permite que el SGOF Core evolucione desde un modelo de consulta bajo demanda hacia un modelo basado en eventos.
 
 En esta arquitectura, los clientes dejan de preguntar constantemente si existen cambios y pasan a recibir automáticamente las actualizaciones cuando éstas ocurren.
@@ -570,130 +550,12 @@ En esta arquitectura, los clientes dejan de preguntar constantemente si existen 
 Este enfoque reduce la latencia percibida por el usuario, optimiza el uso de los recursos del sistema y mantiene sincronizados todos los componentes que participan en la operación de la flota.
 
 Observación técnica
-
-Este capítulo establece un puente directo con el futuro documento 05_SocketIO, donde se describirá en detalle la arquitectura de eventos, los canales de comunicación, los tipos de mensajes y los mecanismos de sincronización implementados por el SGOF Core.
-
-Aquí se documenta el papel de Socket.IO dentro del flujo GPS; en aquel documento se explicará cómo funciona internamente la infraestructura de comunicación en tiempo real. De esta forma, ambos documentos serán complementarios y evitarán duplicar contenido.
-
-======================================================
-
-7.7.7 Comunicación mediante Socket.IO
--------------------------------------
-
-Introducción
-------------
-
-Una vez procesada y almacenada la información GPS, el SGOF Core utiliza Socket.IO como mecanismo de comunicación en tiempo real para distribuir las actualizaciones hacia los distintos clientes conectados.
-
-Esta arquitectura permite que los cambios de posición de los taxis sean visibles de forma prácticamente inmediata, sin necesidad de realizar consultas periódicas al servidor.
-
-La utilización de Socket.IO convierte al sistema en una plataforma reactiva, donde la información se propaga automáticamente a medida que ocurren los eventos operativos.
-
-Objetivo
-
-El objetivo de la integración con Socket.IO es garantizar que todos los componentes que requieren información de posicionamiento dispongan de datos actualizados en tiempo real.
-
-Este mecanismo mejora la capacidad de respuesta del sistema, reduce la carga de consultas repetitivas sobre la base de datos y mantiene sincronizados a operadores, supervisores y módulos operativos.
-
-Flujo de comunicación
-
-Una vez que el Backend finaliza el procesamiento de una nueva posición GPS, el flujo de distribución continúa de la siguiente manera:
-
-Actualización GPS
-        │
-        ▼
-Backend
-        │
-        ▼
-Persistencia en Base de Datos
-        │
-        ▼
-Generación del evento Socket.IO
-        │
-        ▼
-Servidor Socket.IO
-        │
-        ▼
-Clientes conectados
-        │
-        ▼
-Actualización automática de la interfaz
-
-Cada evento representa una nueva información disponible para todos los clientes autorizados.
-
-Distribución en tiempo real
-
-Socket.IO permite que las actualizaciones sean enviadas inmediatamente después de su procesamiento.
-
-Como consecuencia:
-
-la posición de los taxis se actualiza automáticamente;
-los mapas reflejan el movimiento de la flota en tiempo real;
-los paneles operativos permanecen sincronizados;
-los distintos usuarios observan la misma información de manera consistente.
-
-Este comportamiento elimina la necesidad de refrescar manualmente la interfaz.
-
-Integración con los módulos del sistema
-
-La información distribuida mediante Socket.IO puede ser utilizada simultáneamente por diversos componentes del SGOF Core.
-
-Entre ellos:
-
-Visualización Cartográfica.
-Gestión de Viajes.
-Cola Inteligente.
-Panel de Operaciones.
-Supervisión de Flota.
-
-Cada módulo consume únicamente los eventos que resultan relevantes para su funcionamiento.
-
-Eficiencia operativa
-
-La utilización de un mecanismo de comunicación basado en eventos presenta importantes ventajas respecto a un modelo tradicional de consultas periódicas.
-
-Entre ellas:
-
-disminución del tráfico entre clientes y servidor;
-reducción de consultas innecesarias a la base de datos;
-actualización inmediata de la información;
-mejor experiencia para los operadores;
-mayor escalabilidad del sistema.
-
-La información se transmite únicamente cuando ocurre un cambio significativo.
-
-Coordinación con el Backend
-
-Socket.IO no procesa información GPS ni realiza validaciones.
-
-Su función comienza una vez que el Backend ha finalizado el tratamiento de la actualización correspondiente.
-
-Esta separación de responsabilidades garantiza que la lógica de negocio permanezca centralizada en el Backend, mientras que Socket.IO actúa exclusivamente como un mecanismo de distribución de eventos.
-
-Observaciones de arquitectura
-
-Desde el punto de vista arquitectónico, Socket.IO constituye la capa de comunicación en tiempo real del SGOF Core.
-
-Mientras el Backend administra la lógica del sistema y la Base de Datos conserva la información, Socket.IO asegura que los cambios producidos durante la operación sean comunicados inmediatamente a todos los componentes interesados.
-
-Esta organización mantiene claramente separadas las funciones de procesamiento, almacenamiento y distribución de la información, favoreciendo una arquitectura modular, escalable y fácilmente mantenible.
-
-Comentario de auditoría
-
-La incorporación de Socket.IO permite que el SGOF Core evolucione desde un modelo de consulta bajo demanda hacia un modelo basado en eventos.
-
-En esta arquitectura, los clientes dejan de preguntar constantemente si existen cambios y pasan a recibir automáticamente las actualizaciones cuando éstas ocurren.
-
-Este enfoque reduce la latencia percibida por el usuario, optimiza el uso de los recursos del sistema y mantiene sincronizados todos los componentes que participan en la operación de la flota.
-
-Observación técnica
-
-Este capítulo establece un puente directo con el futuro documento 05_SocketIO, donde se describirá en detalle la arquitectura de eventos, los canales de comunicación, los tipos de mensajes y los mecanismos de sincronización implementados por el SGOF Core.
+-------------------
+Este capítulo establece un puente directo con el documento 001_SocketIO_SGOF_Core_v1.0, donde se describirá en detalle la arquitectura de eventos, los canales de comunicación, los tipos de mensajes y los mecanismos de sincronización implementados por el SGOF Core.
 
 Aquí se documenta el papel de Socket.IO dentro del flujo GPS; en aquel documento se explicará cómo funciona internamente la infraestructura de comunicación en tiempo real. De esta forma, ambos documentos serán complementarios y evitarán duplicar contenido.
 
-
-========================================================
+====================================================================
 
 7.7.8 Consumo desde el Frontend
 -------------------------------
@@ -708,13 +570,13 @@ Su función consiste en representar gráficamente el estado de la flota, proporc
 La información recibida desde Socket.IO es procesada por la interfaz para mantener sincronizada la representación visual de la operación sin necesidad de intervención manual.
 
 Objetivo
-
+--------
 El objetivo del Frontend es transformar la información técnica proveniente del subsistema GPS en una representación visual clara, actualizada y fácilmente interpretable por los usuarios del sistema.
 
 Esta representación facilita el seguimiento operativo de la flota y mejora la capacidad de supervisión durante la prestación de los servicios.
 
 Recepción de eventos
-
+--------------------
 El Frontend permanece conectado al servidor mediante Socket.IO, recibiendo automáticamente las actualizaciones generadas por el Backend.
 
 Cada nuevo evento contiene la información necesaria para actualizar la representación del recurso correspondiente.
@@ -722,7 +584,7 @@ Cada nuevo evento contiene la información necesaria para actualizar la represen
 Esta arquitectura elimina la necesidad de consultas repetitivas y mantiene la interfaz permanentemente sincronizada con la operación.
 
 Actualización de la interfaz
-
+----------------------------
 Una vez recibido un nuevo evento, el Frontend actualiza los elementos visuales afectados.
 
 Entre ellos pueden encontrarse:
@@ -737,11 +599,11 @@ rutas representadas sobre la cartografía.
 Cada actualización se realiza únicamente sobre los elementos modificados, optimizando el rendimiento general de la aplicación.
 
 Visualización operativa
-
+-----------------------
 La integración entre el GPS y el Frontend permite que la operación pueda supervisarse en tiempo real.
 
 Los operadores disponen de información actualizada para:
-
+-------------------------------------------------------
 conocer la ubicación de cada taxi;
 verificar el progreso de un viaje;
 identificar recursos disponibles;
@@ -765,7 +627,7 @@ Gestión de Pedidos.
 Como resultado, la interfaz ofrece una visión unificada de la operación, donde la posición geográfica constituye solo uno de los elementos disponibles para el usuario.
 
 Beneficios operativos
-
+---------------------
 El consumo de información GPS desde el Frontend aporta importantes ventajas:
 
 seguimiento visual permanente de la flota;
@@ -777,7 +639,7 @@ mejora en la capacidad de respuesta ante incidencias.
 Estas características fortalecen el papel del Frontend como herramienta de apoyo a la operación diaria.
 
 Observaciones de arquitectura
-
+-----------------------------
 Desde el punto de vista arquitectónico, el Frontend actúa como la capa de presentación del flujo de información GPS.
 
 No genera posiciones, no valida datos y no toma decisiones operativas.
@@ -787,12 +649,12 @@ Su responsabilidad consiste exclusivamente en representar de forma clara y oport
 Esta separación mantiene desacopladas la lógica de negocio y la interfaz de usuario, permitiendo que ambas evolucionen de manera independiente.
 
 Comentario de auditoría
-
+-----------------------
 El Frontend constituye el punto donde el flujo de información GPS adquiere utilidad directa para el operador humano.
 
 Toda la cadena previamente documentada —captura, validación, persistencia y distribución— converge finalmente en una interfaz que transforma datos técnicos en información comprensible y accionable.
 
-Este apartado establece además el vínculo natural con el futuro documento 03_Frontend, donde se describirán en detalle la arquitectura de la interfaz, la representación cartográfica, los componentes visuales y la interacción del usuario con el sistema.
+Este apartado establece además el vínculo natural con documentación técnica del Frontend, donde se describirán en detalle la arquitectura de la interfaz, la representación cartográfica, los componentes visuales y la interacción del usuario con el sistema.
 
 Balance del documento
 
@@ -1089,9 +951,7 @@ Observaciones: Ninguna.
 
 Conclusión: El documento queda oficialmente cerrado y aprobado, incorporándose como referencia técnica del subsistema GPS dentro de la Biblioteca Técnica del SGOF Core.
 
-==========================================================
-
-
-
-
+===================================================================
+🟢 001_Sistema_GPS_SGOF_CORE_v1.0 — REVISADO, DEPURADO Y APROBADO
+===================================================================
 

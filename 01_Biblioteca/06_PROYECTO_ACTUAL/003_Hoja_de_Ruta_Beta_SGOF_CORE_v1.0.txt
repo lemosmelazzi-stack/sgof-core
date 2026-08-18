@@ -1,0 +1,1104 @@
+003_Hoja_de_Ruta_Beta_SGOF_CORE_v1.0.txt
+========================================
+
+1. Introducción
+---------------
+
+El Proyecto SGOF Core ha concluido su primera etapa de desarrollo, auditoría técnica y consolidación documental.
+
+Durante esta etapa se implementaron las principales capacidades funcionales del sistema, se documentó su arquitectura, se verificó la coherencia entre sus componentes y se estableció una Biblioteca Técnica como referencia oficial del proyecto.
+
+Como resultado de dicho proceso, el Proyecto dispone actualmente de un núcleo funcional integrado y preparado para afrontar una etapa de validación operativa.
+
+La presente Hoja de Ruta establece el plan de trabajo para conducir al SGOF Core desde su estado actual hasta una versión Beta, definiendo los objetivos, principios, etapas y criterios que orientarán esta nueva fase del proyecto.
+
+
+2. Objetivo
+------------
+
+El Proyecto SGOF Core ha concluido su primera etapa de desarrollo, auditoría técnica y consolidación documental.
+
+Durante esta etapa se implementaron las principales capacidades funcionales del sistema, se documentó su arquitectura, se verificó la coherencia entre sus componentes y se estableció una Biblioteca Técnica como referencia oficial del proyecto.
+
+Como resultado de dicho proceso, el Proyecto dispone actualmente de un núcleo funcional integrado y preparado para afrontar una etapa de validación operativa.
+
+La presente Hoja de Ruta establece el plan de trabajo para conducir al SGOF Core desde su estado actual hasta una versión Beta, definiendo los objetivos, principios, etapas y criterios que orientarán esta nueva fase del proyecto.
+
+3. Alcance
+----------
+La presente Hoja de Ruta comprende exclusivamente las actividades relacionadas con la preparación, ejecución y evaluación de la etapa Beta del Proyecto SGOF Core.
+
+Incluye la validación de las capacidades funcionales implementadas, la estabilización de la plataforma tecnológica, la evaluación de la experiencia operativa y la identificación de mejoras necesarias antes de una futura versión de producción.
+
+Quedan fuera del alcance de esta etapa el desarrollo de nuevos módulos funcionales, la incorporación de capacidades ajenas al núcleo operativo y cualquier modificación que comprometa la estabilidad del sistema sin una justificación técnica debidamente documentada.
+
+4. Principios Rectores de la Etapa Beta
+---------------------------------------
+
+Introducción
+------------
+
+La etapa Beta del Proyecto SGOF Core representa la transición entre el desarrollo técnico del sistema y su validación en un entorno operativo controlado.
+
+Durante esta fase, todas las actividades deberán orientarse a verificar el comportamiento integral de la plataforma, priorizando la estabilidad, la confiabilidad y la experiencia operativa por encima de la incorporación de nuevas funcionalidades.
+
+Los principios definidos en este capítulo constituyen el marco de referencia para la planificación y ejecución de todas las acciones comprendidas dentro de la presente Hoja de Ruta.
+
+
+4.1 Validar antes de ampliar
+----------------------------
+
+El objetivo principal de la etapa Beta consiste en demostrar el correcto funcionamiento de las capacidades ya implementadas.
+
+La incorporación de nuevas funcionalidades sólo deberá considerarse cuando exista una necesidad operativa debidamente fundamentada y siempre que no comprometa la estabilidad del núcleo funcional del sistema.
+
+Durante esta etapa, la prioridad estará centrada en consolidar la plataforma existente.
+
+
+4.2 La operación como criterio de decisión
+------------------------------------------
+
+Todas las decisiones deberán evaluarse en función de su impacto sobre la operación real del sistema.
+
+Las mejoras, ajustes o modificaciones propuestas deberán aportar beneficios concretos a la gestión operativa, evitando desarrollos cuya utilidad no pueda justificarse desde el punto de vista funcional.
+
+El criterio principal será siempre la mejora de la operación y no la incorporación de tecnología por sí misma.
+
+
+4.3 Arquitectura antes que implementación
+-----------------------------------------
+
+Toda modificación deberá respetar la arquitectura general del Proyecto SGOF Core.
+
+Las soluciones particulares no deberán comprometer la coherencia del diseño general ni introducir dependencias que dificulten el mantenimiento o la evolución futura de la plataforma.
+
+La arquitectura constituirá el principal criterio técnico para evaluar cualquier cambio.
+
+
+4.4 Documentar cada decisión
+----------------------------
+
+Toda modificación significativa realizada durante la etapa Beta deberá quedar documentada.
+
+La documentación permitirá preservar la trazabilidad del proyecto, justificar las decisiones adoptadas y facilitar futuras tareas de mantenimiento, evolución y auditoría.
+
+La Biblioteca Técnica continuará siendo la referencia oficial para registrar el conocimiento generado durante esta etapa.
+
+
+4.5 La estabilidad tiene prioridad
+----------------------------------
+
+La estabilidad operativa prevalecerá sobre la incorporación acelerada de nuevas capacidades.
+
+Ante la necesidad de elegir entre una nueva funcionalidad y la consolidación de una existente, se priorizará siempre la alternativa que contribuya a mantener la confiabilidad del sistema.
+
+La Beta deberá fortalecer el núcleo operativo del Proyecto SGOF Core antes de ampliar su alcance funcional.
+
+
+4.6 La evidencia precede a la decisión
+--------------------------------------
+
+Las decisiones relacionadas con la evolución del proyecto deberán fundamentarse en resultados obtenidos durante la validación operativa.
+
+Las observaciones, mediciones, pruebas y experiencias recogidas durante la etapa Beta constituirán la principal fuente de información para definir las prioridades de desarrollo posteriores.
+
+Las decisiones no deberán basarse exclusivamente en hipótesis o apreciaciones subjetivas.
+
+
+Conclusión del Capítulo
+-----------------------
+
+Los principios rectores establecidos constituyen el marco metodológico de la etapa Beta del Proyecto SGOF Core.
+
+Su aplicación permitirá mantener una evolución ordenada del proyecto, preservando la coherencia arquitectónica, la estabilidad operativa y la trazabilidad documental alcanzadas durante las etapas anteriores.
+
+===========================================================
+
+5. Objetivos Estratégicos de la Etapa Beta
+------------------------------------------
+
+Introducción
+------------
+
+La etapa Beta tiene como finalidad validar el funcionamiento integral del Proyecto SGOF Core en condiciones operativas controladas.
+
+Para ello se establecen objetivos estratégicos cuya consecución permitirá evaluar el grado de preparación del sistema antes de su utilización en un entorno de producción.
+
+Cada objetivo representa un resultado esperado y deberá alcanzarse mediante actividades concretas de implementación, validación y evaluación.
+
+Objetivo Estratégico N.º 1
+--------------------------
+
+Validar el núcleo operativo del SGOF Core
+
+El primer objetivo de la etapa Beta consiste en confirmar que las capacidades fundamentales del sistema funcionan de manera integrada, consistente y estable durante la operación cotidiana.
+
+La validación comprenderá el ciclo operativo completo, desde la recepción de una solicitud hasta la finalización del viaje, verificando la correcta interacción entre los distintos componentes funcionales del sistema.
+
+El cumplimiento de este objetivo permitirá confirmar que el núcleo operativo del Proyecto constituye una base sólida para continuar con las siguientes etapas de validación.
+
+
+Objetivo Estratégico N.º 2
+--------------------------
+
+Confirmar la estabilidad de la plataforma
+
+La plataforma deberá demostrar un funcionamiento continuo y confiable durante jornadas completas de operación.
+
+Se evaluará la estabilidad de los componentes principales, la consistencia de la información, la respuesta del sistema ante situaciones habituales de trabajo y la capacidad para mantener la continuidad operativa sin degradación apreciable.
+
+
+Objetivo Estratégico N.º 3
+--------------------------
+
+Validar la experiencia operativa
+--------------------------------
+
+La etapa Beta permitirá evaluar la interacción entre el sistema y sus usuarios.
+
+Se analizará la facilidad de utilización, la claridad de la información presentada, la secuencia de trabajo propuesta y la capacidad del sistema para acompañar el flujo operativo de la empresa.
+
+Las observaciones obtenidas durante esta etapa constituirán una fuente fundamental para la mejora continua de la plataforma.
+
+
+Objetivo Estratégico N.º 4
+--------------------------
+
+Identificar oportunidades de mejora
+-----------------------------------
+
+La etapa Beta deberá proporcionar evidencia objetiva sobre aquellos aspectos susceptibles de optimización.
+
+Las mejoras identificadas serán analizadas posteriormente, priorizando aquellas que aporten beneficios concretos a la operación sin comprometer la estabilidad del núcleo funcional del sistema.
+
+
+Objetivo Estratégico N.º 5
+--------------------------
+
+Preparar la transición hacia Producción
+---------------------------------------
+
+Como resultado de la etapa Beta, el Proyecto deberá disponer de la información necesaria para decidir, con fundamento técnico y operativo, el momento adecuado para iniciar una versión de producción.
+
+La decisión se sustentará en la evidencia obtenida durante el proceso de validación y en el cumplimiento de los criterios establecidos en la presente Hoja de Ruta.
+
+=====================================================
+
+5. Plan Estratégico de la Etapa Beta
+------------------------------------
+
+Introducción
+------------
+
+La etapa Beta del Proyecto SGOF Core se desarrollará mediante un conjunto de objetivos estratégicos orientados a validar el comportamiento integral del sistema en condiciones operativas controladas.
+
+Cada objetivo representa una capacidad que deberá demostrarse mediante evidencia objetiva antes de considerar concluida la presente etapa.
+
+La planificación prioriza la consolidación del núcleo funcional del sistema, la estabilidad de la plataforma y la experiencia de utilización por encima de la incorporación de nuevas funcionalidades.
+
+
+5.1 Objetivo Estratégico N.º 1
+------------------------------
+
+Validar el Núcleo Operativo del SGOF Core
+Objetivo
+
+Demostrar que el ciclo operativo completo del SGOF Core funciona de forma integrada, consistente y estable durante la ejecución de viajes reales.
+
+Alcance
+-------
+
+La validación comprenderá la totalidad del flujo operativo:
+
+
+Solicitud
+
+↓
+
+Asignación
+
+↓
+
+Aceptación
+
+↓
+
+En camino
+
+↓
+
+En origen
+
+↓
+
+Inicio del viaje
+
+↓
+
+Finalización
+
+↓
+
+Disponibilidad nuevamente
+
+Cada transición deberá verificarse tanto desde el punto de vista funcional como desde la consistencia de la información registrada por el sistema.
+
+
+Actividades
+-----------
+
+Durante esta etapa deberán realizarse, entre otras, las siguientes actividades:
+
+Validación del flujo completo de viajes.
+Verificación de los cambios de estado.
+Confirmación del comportamiento de la cola inteligente.
+Validación de la actualización del GPS.
+Verificación de la sincronización mediante Socket.IO.
+Control de la persistencia de la información en la Base de Datos.
+Confirmación de la consistencia visual del Frontend.
+Evidencias Esperadas
+
+Al finalizar este objetivo deberá demostrarse que:
+
+El flujo operativo puede ejecutarse sin interrupciones.
+Los estados representan correctamente la situación del viaje.
+La información permanece sincronizada entre Backend, Frontend y Base de Datos.
+No se producen inconsistencias funcionales durante la operación.
+
+Criterio de Aprobación
+----------------------
+
+Este objetivo se considerará cumplido cuando el ciclo operativo completo pueda ejecutarse repetidamente sin errores críticos y manteniendo consistencia entre todos los componentes del sistema.
+
+
+5.2 Objetivo Estratégico N.º 2
+------------------------------
+
+Confirmar la Estabilidad de la Plataforma
+-----------------------------------------
+
+Objetivo
+--------
+
+Demostrar que el Proyecto SGOF Core puede operar de forma continua durante jornadas reales de trabajo, manteniendo un comportamiento estable, consistente y confiable.
+
+La estabilidad deberá verificarse tanto desde el punto de vista técnico como operativo, asegurando que el sistema responda adecuadamente durante períodos prolongados de utilización.
+
+Alcance
+-------
+La validación comprenderá todos los componentes principales del sistema durante su funcionamiento continuo:
+
+Backend.
+Frontend.
+Base de Datos.
+Socket.IO.
+Sistema GPS.
+Servicios de asignación.
+Cola Inteligente.
+
+La evaluación no estará orientada únicamente a detectar errores, sino también a confirmar la capacidad del sistema para mantener un funcionamiento sostenido.
+
+
+Actividades
+-----------
+
+Durante esta etapa deberán realizarse, entre otras, las siguientes actividades:
+
+Simulación de jornadas completas de operación.
+Monitoreo del comportamiento del Backend.
+Verificación de la estabilidad de las comunicaciones en tiempo real.
+Control de la consistencia de la Base de Datos.
+Supervisión del comportamiento del mapa y del seguimiento GPS.
+Registro y clasificación de incidencias detectadas.
+Evidencias Esperadas
+
+Al finalizar este objetivo deberá demostrarse que:
+
+La plataforma mantiene un funcionamiento continuo.
+No se producen fallas críticas durante la operación.
+Los componentes permanecen sincronizados.
+La información conserva su consistencia durante toda la jornada.
+Las incidencias detectadas son excepcionales y se encuentran documentadas.
+
+Criterio de Aprobación
+----------------------
+
+Este objetivo se considerará cumplido cuando el Proyecto SGOF Core demuestre un funcionamiento estable durante jornadas operativas completas, sin errores críticos que comprometan la continuidad del servicio.
+
+
+5.3 Priorización Estratégica de la Beta
+---------------------------------------
+
+Introducción
+------------
+
+Las actividades previstas para la etapa Beta no se ejecutarán únicamente según un orden cronológico, sino considerando su impacto sobre la estabilidad del Proyecto SGOF Core.
+
+Las funcionalidades que constituyen el núcleo operativo del sistema tendrán prioridad sobre aquellas orientadas a mejorar la experiencia de usuario o incorporar nuevas capacidades.
+
+Este criterio permitirá reducir riesgos, concentrar los esfuerzos de validación y asegurar una evolución ordenada de la plataforma.
+
+
+Nivel 1 — Prioridad Crítica
+---------------------------
+
+El sistema debe demostrar que puede operar.
+
+Comprende todas las funciones indispensables para prestar el servicio.
+
+Incluye:
+
+Flujo completo del viaje.
+Gestión de pedidos.
+Asignación Inteligente.
+Cola Inteligente.
+Estados del viaje.
+Persistencia de datos.
+Sincronización Backend–Frontend.
+Socket.IO.
+GPS operativo.
+
+Sin esta etapa validada, la Beta no podrá continuar.
+
+
+Nivel 2 — Prioridad Alta
+------------------------
+
+El sistema debe demostrar que puede operar durante una jornada completa.
+
+Comprende:
+
+Estabilidad general.
+Recuperación ante errores.
+Consistencia de la Base de Datos.
+Sincronización permanente.
+Uso continuo por parte del operador.
+Nivel 3 — Prioridad Media
+
+El sistema debe resultar cómodo y eficiente para trabajar.
+
+Comprende:
+
+Mejoras de interfaz.
+Optimización de tiempos.
+Claridad de la información.
+Experiencia de usuario.
+Ajustes visuales.
+
+Estas actividades podrán desarrollarse siempre que no afecten la estabilidad alcanzada en los niveles anteriores.
+
+
+Nivel 4 — Prioridad Evolutiva
+-----------------------------
+
+Una vez consolidada la Beta, podrán planificarse nuevas capacidades funcionales.
+
+Entre ellas:
+
+Aplicación para choferes.
+Clientes registrados.
+Cobro electrónico.
+Estadísticas avanzadas.
+Nuevos módulos operativos.
+Integraciones externas.
+
+Estas funcionalidades no forman parte de los criterios necesarios para declarar exitosa la etapa Beta.
+
+
+=========================================================
+
+Conclusión
+----------
+
+La priorización estratégica definida para la etapa Beta establece el orden en que deberán abordarse las actividades de validación del Proyecto SGOF Core.
+
+Este criterio permitirá concentrar los esfuerzos en aquellas capacidades que resultan esenciales para la operación del sistema, asegurando que la estabilidad y el funcionamiento del núcleo operativo prevalezcan sobre la incorporación de nuevas funcionalidades o mejoras secundarias.
+
+La aplicación de esta priorización contribuirá a una evolución ordenada del proyecto, reduciendo riesgos y proporcionando una base objetiva para la toma de decisiones durante el desarrollo de la etapa Beta.
+
+========================================================
+
+6. Fase I – Validación Técnica
+------------------------------
+
+Introducción
+------------
+
+La primera fase de la etapa Beta tiene como finalidad verificar el correcto funcionamiento técnico del Proyecto SGOF Core como plataforma integrada.
+
+Durante esta fase se comprobará que los distintos componentes del sistema operan de forma consistente, mantienen la integridad de la información y responden adecuadamente durante la ejecución del ciclo operativo completo.
+
+La validación técnica constituye el requisito previo para iniciar la validación operativa, ya que sólo un sistema técnicamente estable puede ser evaluado en condiciones reales de utilización.
+
+En consecuencia, la presente fase estará orientada a obtener evidencia objetiva sobre la confiabilidad, estabilidad e integración de los distintos componentes que conforman el núcleo funcional del SGOF Core.
+
+Comentario de Arquitectura
+--------------------------
+
+Este capítulo marca un cambio de enfoque dentro de la Hoja de Ruta.
+
+Hasta el Capítulo 5 se definieron los objetivos, principios y prioridades que orientarán la etapa Beta.
+
+A partir de la presente fase comienza el proceso de validación propiamente dicho, mediante el cual cada componente del sistema deberá demostrar su correcto funcionamiento antes de considerarse apto para la operación real.
+
+La validación técnica no persigue incorporar nuevas funcionalidades, sino confirmar que las capacidades implementadas cumplen los requisitos establecidos para el Proyecto SGOF Core.
+
+=========================================================
+
+6. Fase I – Validación Técnica
+------------------------------
+
+Introducción
+------------
+
+La primera fase de la etapa Beta tiene como finalidad verificar el correcto funcionamiento técnico del Proyecto SGOF Core como plataforma integrada.
+
+Durante esta fase se comprobará que los distintos componentes del sistema operan de forma consistente, mantienen la integridad de la información y responden adecuadamente durante la ejecución del ciclo operativo completo.
+
+La validación técnica constituye el requisito previo para iniciar la validación operativa, ya que sólo un sistema técnicamente estable puede ser evaluado en condiciones reales de utilización.
+
+En consecuencia, la presente fase estará orientada a obtener evidencia objetiva sobre la confiabilidad, estabilidad e integración de los distintos componentes que conforman el núcleo funcional del SGOF Core.
+
+
+Comentario de Arquitectura
+--------------------------
+
+Este capítulo marca un cambio de enfoque dentro de la Hoja de Ruta.
+
+Hasta el Capítulo 5 se definieron los objetivos, principios y prioridades que orientarán la etapa Beta.
+
+A partir de la presente fase comienza el proceso de validación propiamente dicho, mediante el cual cada componente del sistema deberá demostrar su correcto funcionamiento antes de considerarse apto para la operación real.
+
+La validación técnica no persigue incorporar nuevas funcionalidades, sino confirmar que las capacidades implementadas cumplen los requisitos establecidos para el Proyecto SGOF Core.
+
+
+==========================================================
+
+6.2 Certificación de la Plataforma Tecnológica
+----------------------------------------------
+
+1. Objetivo
+-----------
+Certificar que la plataforma tecnológica del Proyecto SGOF Core deberá operar de forma estable, integrada y confiable durante la etapa Beta, garantizando el correcto funcionamiento de todos los componentes que sustentan la operación del sistema.
+
+La certificación comprenderá la verificación de la infraestructura lógica y de los servicios que permiten el funcionamiento continuo de la plataforma.
+
+
+2. Alcance
+----------
+
+La presente certificación comprenderá la totalidad de los componentes tecnológicos que conforman la plataforma SGOF Core.
+
+Entre ellos:
+
+Backend.
+Frontend.
+Base de Datos PostgreSQL.
+Servicios Socket.IO.
+Sistema GPS.
+API REST.
+Servicios internos del sistema.
+
+Asimismo, se verificará la correcta comunicación entre dichos componentes y su funcionamiento conjunto durante la operación normal.
+
+
+3. Actividades
+--------------
+
+Durante esta etapa se deberán realizar, entre otras, las siguientes actividades:
+
+Verificar la estabilidad del Backend durante jornadas continuas de operación.
+Confirmar el correcto funcionamiento del Frontend en todos los procesos operativos.
+Validar la integridad y consistencia de la Base de Datos.
+Comprobar el funcionamiento de los servicios Socket.IO.
+Verificar la recepción y actualización de información GPS.
+Confirmar la disponibilidad y respuesta de la API REST.
+Registrar y documentar las incidencias técnicas detectadas.
+4. Evidencias Esperadas
+
+Al finalizar esta certificación deberá demostrarse que:
+
+Todos los componentes tecnológicos operan correctamente.
+La comunicación entre los distintos servicios resulta consistente.
+La Base de Datos mantiene la integridad de la información.
+Los servicios en tiempo real funcionan de forma estable.
+La plataforma responde adecuadamente durante la operación continua.
+
+5. Criterios de Certificación
+-----------------------------
+
+La Plataforma Tecnológica podrá considerarse certificada cuando:
+
+Todos los componentes definidos en el alcance hayan sido verificados satisfactoriamente.
+No existan incidencias críticas pendientes de resolución.
+Los servicios tecnológicos operen de manera integrada y estable.
+Se disponga de evidencia suficiente para garantizar la continuidad técnica de la plataforma.
+
+La certificación de este apartado habilitará el inicio de la Certificación de la Integración General.
+
+
+6. Conclusión
+-------------
+
+La certificación de la Plataforma Tecnológica permitirá confirmar que el Proyecto SGOF Core dispone de una infraestructura técnica confiable para sostener la operación prevista durante la etapa Beta.
+
+Su aprobación constituirá un requisito indispensable para continuar con la evaluación de la integración general de los componentes del sistema.
+
+
+6.3 Certificación de la Integración General
+-------------------------------------------
+
+1. Objetivo
+-----------
+
+Certificar que los distintos componentes del Proyecto SGOF Core deberán operar de manera integrada, intercambiando información de forma consistente y manteniendo la coherencia funcional durante todo el ciclo operativo del sistema.
+
+La certificación tendrá como finalidad demostrar que la plataforma actúa como un sistema único y no como un conjunto de módulos independientes.
+
+2. Alcance
+----------
+
+La presente certificación comprenderá la integración funcional entre los principales componentes del Proyecto SGOF Core.
+
+Entre ellos:
+
+Gestión de Pedidos.
+Gestión de Viajes.
+Cola Inteligente.
+Asignación Inteligente.
+Sistema GPS.
+Backend.
+Frontend.
+Base de Datos.
+API REST.
+Servicios Socket.IO.
+
+Asimismo, se verificará la correcta circulación de la información entre dichos componentes durante la operación normal.
+
+
+3. Actividades
+--------------
+
+Durante esta etapa se deberán realizar, entre otras, las siguientes actividades:
+
+Verificar la correcta comunicación entre Backend y Frontend.
+Confirmar la sincronización de eventos mediante Socket.IO.
+Validar la actualización de la Base de Datos durante las operaciones.
+Comprobar la consistencia de la información presentada al operador.
+Verificar la integración del Sistema GPS con la gestión de viajes.
+Confirmar el funcionamiento coordinado de los algoritmos de asignación y cola operativa.
+Registrar cualquier inconsistencia detectada entre componentes.
+
+4. Evidencias Esperadas
+-----------------------
+
+Al finalizar esta certificación deberá demostrarse que:
+
+Todos los componentes intercambian información correctamente.
+No existen pérdidas de sincronización entre módulos.
+La información presentada corresponde al estado real del sistema.
+Las operaciones generan resultados consistentes en todos los componentes involucrados.
+La plataforma mantiene un comportamiento integrado durante toda la operación.
+
+5. Criterios de Certificación
+-----------------------------
+
+La Integración General podrá considerarse certificada cuando:
+
+Las pruebas de integración hayan sido superadas satisfactoriamente.
+No existan inconsistencias funcionales entre componentes.
+La información permanezca sincronizada durante todo el ciclo operativo.
+Se disponga de evidencia suficiente que demuestre el funcionamiento integrado del Proyecto SGOF Core.
+
+La certificación de este apartado habilitará la Certificación de la Estabilidad General de la Plataforma.
+
+
+6. Conclusión
+-------------
+
+La certificación de la integración general permitirá demostrar que el Proyecto SGOF Core funciona como una plataforma unificada, donde cada componente contribuye de manera coordinada al cumplimiento del proceso operativo.
+
+La aprobación de este apartado constituirá el paso previo a la evaluación de la estabilidad general del sistema durante la etapa Beta.
+
+
+6.4 Certificación de la Estabilidad Operativa de la Plataforma
+--------------------------------------------------------------
+
+1. Objetivo
+-----------
+
+Certificar que el Proyecto SGOF Core deberá mantener un funcionamiento estable, continuo y confiable durante jornadas operativas prolongadas, preservando la integridad de la información, la disponibilidad de los servicios y la consistencia funcional de la plataforma.
+
+La presente certificación constituirá la verificación final de la Fase I.
+
+2. Alcance
+----------
+
+La certificación comprenderá la operación continua de todos los componentes previamente certificados durante la presente fase.
+
+Se evaluará el comportamiento conjunto del sistema bajo condiciones normales de utilización, verificando especialmente:
+
+continuidad operativa;
+estabilidad funcional;
+disponibilidad de servicios;
+integridad de la información;
+sincronización permanente;
+recuperación frente a incidencias menores.
+
+3. Actividades
+--------------
+
+Durante esta etapa se deberán realizar, entre otras, las siguientes actividades:
+
+Ejecutar jornadas completas de operación.
+Monitorear el comportamiento general de la plataforma.
+Verificar la estabilidad del Backend.
+Confirmar la estabilidad del Frontend.
+Supervisar el comportamiento de la Base de Datos.
+Controlar la continuidad de las comunicaciones Socket.IO.
+Verificar la estabilidad del Sistema GPS.
+Registrar cualquier incidencia detectada.
+
+4. Evidencias Esperadas
+-----------------------
+
+Al finalizar esta certificación deberá demostrarse que:
+
+La plataforma mantiene un funcionamiento continuo.
+Los servicios permanecen disponibles durante toda la jornada.
+La información conserva su integridad.
+No se producen errores críticos.
+Las incidencias menores no comprometen la continuidad del servicio.
+
+5. Criterios de Certificación
+-----------------------------
+
+La Estabilidad Operativa podrá considerarse certificada cuando:
+
+La plataforma complete satisfactoriamente las jornadas de validación previstas.
+No existan incidencias críticas pendientes.
+La operación pueda mantenerse de manera continua y consistente.
+El Equipo SGOF disponga de evidencia suficiente para declarar finalizada la Certificación Técnica.
+
+6. Conclusión
+-------------
+
+La certificación de la estabilidad operativa representa la culminación de la Fase I de la Hoja de Ruta Beta.
+
+Su aprobación permitirá afirmar que el Proyecto SGOF Core dispone de una base técnica sólida para iniciar la validación operativa en condiciones reales de utilización.
+
+
+
+====================================================================
+
+7. Fase II – Certificación Operativa
+------------------------------------
+
+Introducción
+------------
+
+Una vez concluida la Certificación Técnica del Proyecto SGOF Core, la Fase II tendrá como finalidad verificar que la plataforma pueda utilizarse de forma efectiva dentro de un entorno operativo real y controlado.
+
+Durante esta etapa, la evaluación dejará de concentrarse principalmente en los componentes tecnológicos y pasará a considerar la relación entre el sistema, los usuarios y los procesos cotidianos de trabajo.
+
+La Certificación Operativa deberá demostrar que las capacidades implementadas no solo funcionan correctamente desde el punto de vista técnico, sino que también resultan comprensibles, útiles y adecuadas para sostener la gestión diaria de la operación.
+
+Esta fase permitirá obtener evidencia sobre la adaptación del sistema al ritmo real de trabajo, la claridad de la información presentada, la eficiencia de los procedimientos y la respuesta de los usuarios ante la utilización continua de la plataforma.
+
+
+Alcance de la Fase II
+---------------------
+
+La Certificación Operativa comprenderá:
+
+7.1 Certificación de la Operación Real
+
+7.2 Certificación de la Experiencia del Operador
+
+7.3 Certificación Funcional en Condiciones Reales
+
+7.4 Gestión y Clasificación de Incidencias
+
+7.5 Mejoras Previas a Producción
+
+Puerta de Certificación N.º 2
+Principio Rector
+
+La Beta no quedará operativamente certificada cuando el sistema simplemente funcione, sino cuando la operación pueda confiar en él y utilizarlo de manera sostenida.
+
+
+Condición de Inicio
+-------------------
+
+La Fase II solo podrá comenzar después de aprobarse la Puerta de Certificación N.º 1 – Certificación Técnica.
+
+Toda incidencia técnica crítica pendiente deberá resolverse antes de trasladar la plataforma a una validación con usuarios y procesos reales.
+
+Conclusión de la Introducción
+
+La Certificación Operativa constituirá la instancia en la que el Proyecto SGOF Core deberá demostrar su utilidad práctica.
+
+La evidencia obtenida durante esta fase permitirá determinar si la plataforma acompaña correctamente el funcionamiento cotidiano de la empresa y si reúne las condiciones necesarias para avanzar hacia la certificación final de la etapa Beta.
+
+======================================================================
+
+7.1 Certificación de la Operación Real
+--------------------------------------
+
+1. Objetivo
+-----------
+
+Certificar que el Proyecto SGOF Core deberá sostener correctamente la operación diaria de la empresa durante un período controlado de utilización, demostrando que los procesos implementados responden adecuadamente a las necesidades operativas del servicio.
+
+La presente certificación tendrá como finalidad comprobar que la plataforma permite desarrollar la actividad cotidiana de forma ordenada, eficiente y consistente.
+
+2. Alcance
+----------
+
+La certificación comprenderá la utilización del sistema durante jornadas reales de trabajo, involucrando la totalidad del flujo operativo previsto para la etapa Beta.
+
+Entre otros aspectos, se evaluarán:
+
+Recepción de pedidos.
+Gestión de la cola operativa.
+Asignación de servicios.
+Gestión integral del viaje.
+Seguimiento GPS.
+Finalización de los servicios.
+Disponibilidad continua del sistema durante la operación.
+
+La evaluación se realizará utilizando los procedimientos normales de trabajo definidos para la empresa.
+
+
+3. Actividades
+--------------
+
+Durante esta etapa se deberán realizar, entre otras, las siguientes actividades:
+
+Operar el sistema durante jornadas reales.
+Registrar el comportamiento general de la plataforma.
+Verificar el cumplimiento del flujo operativo completo.
+Confirmar la continuidad del servicio durante toda la jornada.
+Registrar las observaciones realizadas por los operadores.
+Documentar cualquier incidencia detectada durante la utilización.
+
+4. Evidencias Esperadas
+-----------------------
+
+Al finalizar esta certificación deberá demostrarse que:
+
+La operación diaria puede desarrollarse utilizando el SGOF Core.
+Los procesos operativos se ejecutan conforme a lo previsto.
+La plataforma acompaña adecuadamente el ritmo de trabajo.
+La información presentada resulta suficiente para la toma de decisiones.
+La continuidad operativa no se ve afectada por el uso normal del sistema.
+5. Criterios de Certificación
+
+La Operación Real podrá considerarse certificada cuando:
+
+Las jornadas previstas hayan sido completadas satisfactoriamente.
+Los procesos operativos se ejecuten sin incidencias críticas.
+Los operadores puedan desarrollar sus tareas utilizando el sistema como herramienta principal.
+Exista evidencia suficiente que demuestre la viabilidad operativa del Proyecto SGOF Core.
+
+La certificación de este apartado habilitará la evaluación de la Experiencia del Operador.
+
+
+6. Conclusión
+-------------
+
+La Certificación de la Operación Real permitirá comprobar que el Proyecto SGOF Core puede integrarse al funcionamiento cotidiano de la empresa, sosteniendo la actividad operativa de forma continua y confiable.
+
+Su aprobación constituirá el primer paso de la Certificación Operativa y proporcionará la base necesaria para evaluar la experiencia de los usuarios y el desempeño funcional del sistema en condiciones reales.
+
+========================================================================
+
+7.2 Certificación de la Experiencia del Operador
+------------------------------------------------
+
+1. Objetivo
+-----------
+
+Certificar que la interacción entre los operadores y el Proyecto SGOF Core resulte clara, eficiente y adecuada para el desarrollo de las tareas diarias, permitiendo que la plataforma sea utilizada como herramienta principal de gestión operativa.
+
+La presente certificación evaluará la experiencia de uso desde la perspectiva del operador, considerando tanto la facilidad de utilización como la capacidad del sistema para acompañar el proceso de toma de decisiones.
+
+2. Alcance
+----------
+La certificación comprenderá la utilización de todas las funciones operativas disponibles para el personal responsable de la gestión del servicio.
+
+Entre otros aspectos, se evaluarán:
+
+Claridad de la interfaz.
+Facilidad de navegación.
+Comprensión de la información presentada.
+Fluidez de los procesos operativos.
+Rapidez para ejecutar las acciones habituales.
+Capacidad del sistema para asistir la toma de decisiones.
+
+Asimismo, se registrarán las observaciones realizadas por los usuarios durante la utilización cotidiana de la plataforma.
+
+
+3. Actividades
+--------------
+
+Durante esta etapa se deberán realizar, entre otras, las siguientes actividades:
+
+Operar el sistema en condiciones normales de trabajo.
+Registrar dificultades de utilización.
+Identificar procesos susceptibles de simplificación.
+Evaluar la comprensión de la información presentada.
+Analizar la secuencia de las operaciones habituales.
+Documentar sugerencias de mejora formuladas por los operadores.
+
+4. Evidencias Esperadas
+-----------------------
+
+Al finalizar esta certificación deberá demostrarse que:
+
+Los operadores utilizan la plataforma con naturalidad.
+La información presentada resulta clara y suficiente.
+Las funciones pueden ejecutarse sin dificultades significativas.
+La interfaz favorece la rapidez de la operación.
+Las incidencias detectadas corresponden principalmente a oportunidades de mejora y no a problemas estructurales.
+
+5. Criterios de Certificación
+-----------------------------
+
+La Experiencia del Operador podrá considerarse certificada cuando:
+
+Los usuarios completen satisfactoriamente las tareas habituales utilizando el sistema.
+No existan dificultades que comprometan la operación diaria.
+Las observaciones registradas puedan resolverse mediante ajustes menores o mejoras evolutivas.
+Se disponga de evidencia suficiente que demuestre la aceptación operativa de la plataforma.
+
+La certificación de este apartado habilitará la Certificación Funcional en Condiciones Reales.
+
+
+6. Conclusión
+-------------
+
+La Certificación de la Experiencia del Operador permitirá confirmar que el Proyecto SGOF Core no solo funciona correctamente desde el punto de vista técnico, sino que también constituye una herramienta práctica, comprensible y eficiente para quienes desarrollan la operación diaria.
+
+Su aprobación representará un paso fundamental hacia la consolidación del sistema como plataforma de trabajo para la empresa.
+
+
+=======================================================================
+
+7.3 Certificación Funcional en Condiciones Reales
+-------------------------------------------------
+
+1. Objetivo
+-----------
+
+Certificar que las funcionalidades implementadas en el Proyecto SGOF Core responden adecuadamente a las necesidades operativas de la empresa cuando son utilizadas en condiciones reales de trabajo.
+
+La presente certificación tendrá como finalidad comprobar que los procesos diseñados durante el desarrollo del sistema cumplen eficazmente el propósito para el cual fueron concebidos.
+
+2. Alcance
+----------
+
+La certificación comprenderá la evaluación funcional del sistema durante la ejecución normal de las actividades operativas.
+
+Entre otros aspectos, se verificarán:
+
+Cumplimiento del flujo operativo previsto.
+Correcta ejecución de las funcionalidades implementadas.
+Coherencia entre los procesos definidos y su aplicación práctica.
+Correspondencia entre los resultados esperados y los obtenidos.
+Adaptación del sistema a las situaciones habituales de trabajo.
+
+Asimismo, se analizará la capacidad de la plataforma para resolver los escenarios operativos contemplados durante el diseño del Proyecto SGOF Core.
+
+
+3. Actividades
+--------------
+
+Durante esta etapa se deberán realizar, entre otras, las siguientes actividades:
+
+Ejecutar los distintos procesos funcionales previstos para la etapa Beta.
+Verificar el comportamiento del sistema frente a situaciones habituales de operación.
+Confirmar la correcta interacción entre las distintas funcionalidades.
+Registrar desvíos funcionales detectados durante la utilización.
+Evaluar la necesidad de ajustes o mejoras antes de la etapa de producción.
+Documentar las observaciones surgidas durante la certificación.
+
+4. Evidencias Esperadas
+-----------------------
+
+Al finalizar esta certificación deberá demostrarse que:
+
+Las funcionalidades implementadas cumplen los objetivos definidos durante el desarrollo del proyecto.
+Los procesos operativos se ejecutan de manera consistente.
+La plataforma responde correctamente a las situaciones habituales de trabajo.
+Las observaciones registradas corresponden principalmente a mejoras evolutivas y no a deficiencias funcionales críticas.
+El sistema proporciona el soporte funcional esperado para la operación diaria.
+
+5. Criterios de Certificación
+-----------------------------
+
+La Certificación Funcional podrá considerarse aprobada cuando:
+
+Todas las funcionalidades previstas para la etapa Beta hayan sido verificadas satisfactoriamente.
+No existan desvíos funcionales críticos pendientes de resolución.
+Los resultados obtenidos sean consistentes con los objetivos definidos para el Proyecto SGOF Core.
+Exista evidencia suficiente que demuestre la madurez funcional de la plataforma.
+
+La aprobación de este apartado habilitará la Gestión y Clasificación de Incidencias como etapa final de consolidación antes de las mejoras previas a producción.
+
+
+6. Conclusión
+-------------
+
+La Certificación Funcional en Condiciones Reales permitirá confirmar que el Proyecto SGOF Core satisface los requisitos operativos establecidos para la etapa Beta y constituye una herramienta confiable para la gestión cotidiana del servicio.
+
+Su aprobación representará un avance significativo hacia la consolidación funcional del sistema y preparará el proyecto para las actividades finales de ajuste y estabilización previas a la certificación de la Beta.
+
+
+==========================================================================
+
+7.4 Gestión y Clasificación de Incidencias
+------------------------------------------
+
+1. Objetivo
+-----------
+
+Establecer un proceso sistemático para registrar, analizar, clasificar y gestionar las incidencias detectadas durante la etapa Beta, con el propósito de fortalecer la calidad, estabilidad y confiabilidad del Proyecto SGOF Core antes de su incorporación al entorno de producción.
+
+La presente actividad tendrá como finalidad convertir cada incidencia en una oportunidad objetiva de mejora del sistema.
+
+2. Alcance
+----------
+
+La gestión comprenderá todas las incidencias identificadas durante la Certificación Operativa, independientemente de su origen.
+
+Entre ellas podrán incluirse:
+
+Incidencias funcionales.
+Incidencias técnicas.
+Observaciones de los operadores.
+Mejoras de usabilidad.
+Ajustes en procesos operativos.
+Recomendaciones de optimización.
+
+Cada incidencia deberá registrarse, analizarse y clasificarse antes de definir su tratamiento.
+
+
+3. Actividades
+--------------
+
+Durante esta etapa se deberán realizar, entre otras, las siguientes actividades:
+
+Registrar todas las incidencias detectadas.
+Clasificar cada incidencia según su naturaleza e impacto.
+Determinar su nivel de prioridad.
+Analizar sus posibles causas.
+Definir la acción correctiva o evolutiva correspondiente.
+Verificar la resolución de las incidencias tratadas.
+Documentar las decisiones adoptadas por el Equipo SGOF.
+
+4. Evidencias Esperadas
+-----------------------
+
+Al finalizar esta etapa deberá demostrarse que:
+
+Todas las incidencias relevantes fueron registradas.
+Cada incidencia dispone de una clasificación objetiva.
+Se definieron prioridades de resolución.
+Las incidencias críticas fueron corregidas.
+Las incidencias menores fueron documentadas para futuras versiones cuando correspondiera.
+
+5. Criterios de Certificación
+-----------------------------
+
+La Gestión de Incidencias podrá considerarse concluida cuando:
+
+No existan incidencias críticas pendientes.
+Las incidencias de prioridad alta hayan sido resueltas o cuenten con un plan de acción aprobado.
+Las mejoras evolutivas se encuentren debidamente documentadas.
+El Equipo SGOF disponga de evidencia suficiente para continuar con la etapa de mejoras previas a producción.
+
+
+6. Conclusión
+-------------
+
+La correcta gestión de las incidencias permitirá consolidar la calidad del Proyecto SGOF Core y proporcionará una base objetiva para las decisiones de mejora adoptadas durante la etapa Beta.
+
+El conocimiento obtenido mediante este proceso contribuirá al perfeccionamiento continuo de la plataforma y fortalecerá su preparación para la futura puesta en producción.
+
+=========================================================================
+
+7.5 Consolidación y Mejoras Previas a Producción
+------------------------------------------------
+
+1. Objetivo
+-----------
+
+Consolidar los resultados obtenidos durante la Certificación Operativa, incorporando las mejoras consideradas necesarias antes de la certificación final de la etapa Beta, con el propósito de incrementar la estabilidad, confiabilidad y calidad general del Proyecto SGOF Core.
+
+2. Alcance
+----------
+
+La presente etapa comprenderá la implementación de los ajustes derivados de la Certificación Operativa.
+
+Entre ellos:
+
+Corrección de incidencias pendientes.
+Optimización de procesos.
+Ajustes funcionales.
+Mejoras de usabilidad.
+Refinamiento de la interfaz.
+Optimización del rendimiento.
+Actualización de la documentación cuando corresponda.
+3. Actividades
+
+Durante esta etapa se deberán realizar, entre otras, las siguientes actividades:
+
+Priorizar las mejoras aprobadas.
+Implementar los ajustes definidos.
+Verificar el resultado de cada modificación.
+Confirmar que las mejoras no introduzcan nuevos desvíos.
+Actualizar la documentación correspondiente.
+Registrar la evidencia obtenida.
+
+4. Evidencias Esperadas
+-----------------------
+
+Al finalizar esta etapa deberá demostrarse que:
+
+Las mejoras previstas fueron implementadas.
+Las incidencias críticas quedaron resueltas.
+La plataforma presenta un mayor nivel de estabilidad.
+La documentación refleja el estado actualizado del sistema.
+La Beta reúne las condiciones para su certificación final.
+
+5. Criterios de Certificación
+-----------------------------
+
+La etapa podrá considerarse concluida cuando:
+
+Se hayan implementado todas las mejoras aprobadas para la Beta.
+No existan incidencias críticas pendientes.
+El Equipo SGOF disponga de evidencia suficiente para solicitar la Certificación Final de la Beta.
+
+La aprobación del presente apartado habilitará la Puerta de Certificación N.º 2.
+
+
+6. Conclusión
+-------------
+
+La consolidación de las mejoras representa el cierre de la Certificación Operativa y refleja el compromiso del Proyecto SGOF Core con la mejora continua, la calidad y la evolución ordenada de la plataforma.
+
+Su aprobación permitirá avanzar hacia la Certificación Final de la etapa Beta.
+
+========================================================================
+
+ 	Observación de Arquitectura
+        ---------------------------
+La etapa de planificación de la Beta permitió consolidar no sólo los objetivos técnicos del Proyecto SGOF Core, sino también una metodología de trabajo basada en la evidencia, la certificación progresiva y la mejora continua.
+
+La experiencia obtenida durante la elaboración de la presente Hoja de Ruta permitió establecer un marco metodológico común para la planificación, ejecución, validación y evolución del proyecto, constituyendo una referencia para las futuras etapas de desarrollo del SGOF Core.
+
+En consecuencia, se recomienda preservar esta metodología como parte integrante del patrimonio documental del proyecto y utilizarla como criterio orientador para las versiones y módulos que se incorporen en el futuro.
+
+=======================================================================

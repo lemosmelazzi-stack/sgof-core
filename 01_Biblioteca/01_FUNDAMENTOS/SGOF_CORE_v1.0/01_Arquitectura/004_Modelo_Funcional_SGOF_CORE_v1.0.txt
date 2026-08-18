@@ -2,6 +2,35 @@
 Modelo Funcional del SGOF Core
 ───────────────────────
 
+==============================================================
+METADATOS DEL DOCUMENTO
+==============================================================
+
+Título             : Modelo Funcional del SGOF Core
+Código             : SGOF-ARQ-004
+Versión            : 1.0
+Estado             : 🟡 EN DESARROLLO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  : 01/08/2026
+Última revisión    : 13/08/2026
+
+Documento padre    : 001_Arquitectura_General_SGOF_CORE_v1.0
+
+Documentos relacionados :
+- 002_Modelo_de_Datos_SGOF_CORE_v1.0
+- 003_Modelo_Relacional_SGOF_CORE_v1.0
+
+Próxima revisión   : Durante la revisión y consolidación documental
+
+==============================================================
+
+
 
 7.1 Introducción
 ----------------

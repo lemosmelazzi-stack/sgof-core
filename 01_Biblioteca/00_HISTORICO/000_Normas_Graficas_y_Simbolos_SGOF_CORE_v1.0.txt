@@ -1,0 +1,161 @@
+000_Leyenda_Grafica_SGOF_CORE_v1.0.txt
+--------------------------------------
+
+000_Normas_Graficas_y_Simbolos_SGOF_CORE_v1.0.txt
+
+
+🔴  Pendiente
+
+🟠  En preparación
+
+🟡  En desarrollo
+
+🟢  Aprobado
+
+🔵  En revisión
+
+⚪  Sin iniciar
+
+⚫  Archivado
+
+Estado del Proyecto
+🟢  Operativo
+
+🟡  Operativo con observaciones
+
+🟠  En pruebas
+
+🔴  Fuera de servicio
+
+🔵  En certificación
+
+⚪  Planificado
+
+Estado de Documentación
+
+📄  Documento
+
+📝  Borrador
+
+📚  Biblioteca
+
+📦  Repositorio
+
+📁  Carpeta
+
+📌  Observación
+
+📎  Evidencia
+
+📷  Captura
+
+📊  Informe
+
+📋  Acta
+
+✅  Aprobado
+
+❌  Rechazado
+
+⚠️  Atención
+
+ℹ️  Información
+
+
+Estados de Trabajo
+
+🚧  En construcción
+
+🛠️  En desarrollo
+
+🔍  En análisis
+
+🧪  En pruebas
+
+🎯  Objetivo
+
+🏁  Finalizado
+
+🚀  Producción
+
+💡  Idea
+
+⭐  Recomendación
+
+Estado: 🚧 En construcción
+
+Estado: 🟠 En preparación
+
+
+1. Introducción
+
+El presente documento establece las normas gráficas y la simbología oficial
+utilizada en la Biblioteca Técnica del Proyecto SGOF Core.
+
+Su finalidad es unificar la representación visual de los documentos,
+facilitando la identificación de estados, categorías, observaciones y
+niveles de avance mediante el uso de símbolos normalizados.
+
+La aplicación de estas normas contribuirá a mantener una identidad
+documental homogénea en toda la documentación técnica y metodológica
+del Proyecto SGOF Core.
+-----------------------------------------------
+
+Observación Editorial
+---------------------
+
+Las presentes normas podrán ampliarse en futuras versiones del proyecto,
+incorporando nuevos símbolos o convenciones gráficas cuando resulte
+necesario, procurando preservar la coherencia visual de la Biblioteca
+Técnica del Proyecto SGOF Core.
+
+
+====================================================
+
+Cada documento pasa por cinco preguntas.
+
+1.
+
+¿El contenido está completo?
+
+☐ Sí
+
+☐ No
+
+2.
+
+¿Mantiene coherencia con el resto de la Biblioteca?
+
+☐ Sí
+
+☐ No
+
+3.
+
+¿Tiene estructura uniforme?
+
+☐ Sí
+
+☐ No
+
+4.
+
+¿No existen duplicaciones?
+
+☐ Sí
+
+☐ No
+
+5.
+
+¿Representa la versión oficial?
+
+☐ Sí
+
+☐ No
+
+Si responde Sí a todo...
+
+Recibe el sello:
+
+Estado: 🟢 Aprobado

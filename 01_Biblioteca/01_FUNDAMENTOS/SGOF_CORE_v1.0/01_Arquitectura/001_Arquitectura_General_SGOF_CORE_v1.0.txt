@@ -1,10 +1,39 @@
-SGOF CORE v1.0
+==============================================================
+01_ARQUITECTURA
+==============================================================
 
-DOCUMENTO 001
+001_Arquitectura_General_SGOF_CORE_v1.0.txt
+Estado : 🟡 EN DESARROLLO
 
-ARQUITECTURA GENERAL DEL SISTEMA
+004_Modelo_Funcional_SGOF_CORE_v1.0.txt
+Estado : 🟢 APROBADO
+====================================================================
 
---------------------------------------------
+
+==============================================
+METADATOS DEL DOCUMENTO
+==============================================
+
+Título             :Arquitectura General del SGOF Core
+Código             :SGOF-ARQ-001
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  :miércoles, ‎29 ‎de ‎julio ‎de ‎2026, ‏‎6:38:22
+Última revisión    :sábado,15/08/2026
+
+Documento padre    :
+Documentos relacionados :
+
+Próxima revisión   : Según evolución de la arquitectura
+
+===========================================================
 
 Versión:
 1.0

@@ -1,0 +1,1039 @@
+005A_Revision_Componentes_Proyecto_SGOF_CORE_v1.0
+=================================================
+
+🟢 APROBADOS Y CERRADOS.
+
+=====================================================
+
+METADATOS DEL DOCUMENTO
+=======================
+
+Título              : 005A_Revision_Componentes_Proyecto_SGOF_CORE
+Código              : SGOF-DOC-005A
+Versión             : 1.0
+Estado              : APROBADO
+
+Clasificación       : Biblioteca Técnica
+Proyecto            : SGOF Core
+
+Autor               : Proyecto SGOF
+Revisión Técnica    : Auditoría Técnica SGOF
+
+Fecha de creación   : [MANTENER FECHA ORIGINAL]
+Última revisión     : 18/08/2026
+
+Documento padre     : 005_Revisión_General_Proyecto_SGOF_CORE_v1.0
+
+Documentos relacionados :
+- 005_Revisión_General_Proyecto_SGOF_CORE_v1.0
+- 001_Inventario_General_Biblioteca_Tecnica_SGOF_CORE
+- 002_Indice_Descriptivo_Biblioteca_SGOF_CORE_v1.0
+- 006_Acta_de_Cierre_Etapa_Fundacional_SGOF_CORE_v1.0
+- 007_Certificacion_Documental_Biblioteca_SGOF_CORE_v1.0
+
+Próxima revisión    : Según evolución del Proyecto SGOF Core
+
+===================================================================
+
+1. Introducción
+---------------
+
+La presente Revisión de Componentes constituye el registro oficial del proceso de inspección realizado sobre los distintos componentes que integran el Proyecto SGOF Core.
+
+Su finalidad consiste en documentar el resultado de la revisión efectuada sobre cada carpeta de la Biblioteca Técnica, dejando constancia de su finalidad, estado general, observaciones, recomendaciones y dictamen correspondiente.
+
+El presente documento complementa la Revisión General del Proyecto SGOF Core, constituyendo la evidencia documental del proceso de evaluación desarrollado durante la etapa previa a la Certificación Documental y al inicio de la primera Beta Operativa Controlada.
+
+2. Metodología Aplicada
+-----------------------
+
+Cada componente del Proyecto SGOF Core será revisado de forma individual, siguiendo una metodología uniforme que permita mantener criterios homogéneos durante toda la evaluación.
+
+Para cada carpeta se registrará:
+
+• Resumen Ejecutivo.
+
+• Objetivo de la Revisión.
+
+• Resultado de la Revisión.
+
+• Observaciones.
+
+• Recomendaciones.
+
+• Dictamen.
+
+La revisión se desarrollará siguiendo el orden estructural de la Biblioteca Técnica del Proyecto SGOF Core.
+
+	Los componentes del Proyecto SGOF Core serán revisados conforme a su
+naturaleza.
+
+Las carpetas de carácter institucional serán evaluadas considerando su
+organización, finalidad y coherencia documental.
+
+Las carpetas de carácter técnico serán evaluadas considerando, además,
+la correspondencia entre la documentación disponible y la implementación
+efectiva de los componentes del sistema.
+
+Este criterio permitirá adecuar el nivel de profundidad de la revisión a
+las características de cada componente, manteniendo uniformidad en la
+metodología general del proceso.
+
+3. Revisión de Componentes
+==========================
+
+
+
+3.1 Carpeta 00_Documentacion
+============================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 00_Documentacion reúne la documentación institucional del
+Proyecto SGOF Core, concentrando los documentos que establecen las normas, la organización, el gobierno, la planificación, el control y la evolución general del proyecto.
+
+Constituye el núcleo documental de la Biblioteca Técnica y el principal punto de referencia para la gestión, administración y seguimiento del Proyecto SGOF Core.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar la organización, coherencia y estado general de la documentación
+institucional de la Biblioteca Técnica del SGOF Core, así como la correcta
+identificación de los documentos destinados a regular, organizar,
+controlar y acompañar la evolución del proyecto.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar y consolidar la estructura documental de
+la carpeta 00_Documentacion.
+
+Se revisaron la organización general, los estados documentales, las
+referencias entre documentos y los instrumentos destinados a identificar
+y describir la composición vigente de la Biblioteca Técnica.
+
+Como resultado del proceso fueron consolidados el Inventario General y
+el Índice Descriptivo de la Biblioteca Técnica, estableciendo una
+referencia organizada para identificar los documentos existentes,
+conocer su estado y comprender la función que cumplen dentro del proyecto.
+
+Observaciones
+-------------
+
+Los documentos que permanecen en desarrollo, preparación o condición
+reservada mantienen expresamente sus estados correspondientes y no son
+presentados como documentación concluida.
+
+No se identifican inconsistencias que impidan considerar consolidada la
+organización documental de la carpeta en su estado actual.
+
+Recomendaciones
+---------------
+
+Mantener actualizados el Inventario General y el Índice Descriptivo
+conforme evolucione la Biblioteca Técnica.
+
+Preservar la correspondencia entre los estados registrados en ambos
+documentos y los estados efectivos de la documentación existente.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME
+
+Conclusión
+----------
+
+La carpeta 00_Documentacion cumple adecuadamente su función como núcleo
+institucional y de organización de la Biblioteca Técnica del SGOF Core.
+
+Su estructura actual proporciona una base documental ordenada, trazable
+y adecuada para acompañar la evolución posterior del proyecto.
+
+=========================================================
+
+3.2 Carpeta 01_Arquitectura
+---------------------------
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 01_Arquitectura reúne la documentación que define la estructura
+general del Proyecto SGOF Core, estableciendo los principios de diseño, la
+organización de sus componentes y la relación entre los distintos módulos
+que conforman la plataforma.
+
+Constituye el marco técnico de referencia para comprender la arquitectura
+del sistema y orientar su evolución de forma ordenada y consistente.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación arquitectónica del Proyecto SGOF Core se encuentre organizada de manera coherente, mantenga consistencia con la estructura general del sistema y proporcione una base adecuada para la comprensión y evolución de la plataforma.
+
+Resultado de la Revisión
+------------------------
+
+Se verificó la estructura general de la carpeta 01_Arquitectura,
+constatándose una organización consistente de la documentación
+arquitectónica del Proyecto SGOF Core.
+
+La documentación disponible define adecuadamente los principios
+arquitectónicos del sistema y mantiene correspondencia con la organización
+general de la Biblioteca Técnica.
+
+Observaciones
+-------------
+
+No se identificaron observaciones relevantes respecto a la organización y
+finalidad de la carpeta.
+
+La documentación arquitectónica mantiene una estructura clara y constituye el punto de referencia para el resto de la documentación técnica del proyecto.
+
+Recomendaciones
+---------------
+
+Mantener la organización documental vigente e incorporar, en futuras etapas, la documentación arquitectónica correspondiente a los nuevos módulos que se integren al Proyecto SGOF Core.
+
+Preservar la correspondencia entre la arquitectura documentada y la evolución efectiva del sistema.
+
+
+
+DICTAMEN
+---------
+
+Estado:
+🟢 Conforme
+
+Conclusión
+
+La carpeta 01_Arquitectura cumple adecuadamente su función como referencia técnica de la arquitectura del Proyecto SGOF Core.
+
+Su organización resulta consistente con la metodología documental adoptada
+y proporciona una base sólida para la comprensión y evolución del sistema.
+
+
+✅ 3.2 Carpeta 01_Arquitectura → Revisada.
+
+========================================================
+
+3.3 – Carpeta 02_Backend
+------------------------
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 02_Backend reúne la documentación correspondiente a la lógica
+de negocio del Proyecto SGOF Core, incluyendo la arquitectura de servicios,
+los procesos operativos, la comunicación con la Base de Datos y las reglas
+que gobiernan el funcionamiento interno del sistema.
+
+Constituye el núcleo funcional del SGOF Core, donde se implementan los
+procesos que permiten administrar la operación, garantizar la consistencia
+de la información y coordinar la interacción entre los distintos
+componentes de la plataforma.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación correspondiente al Backend del SGOF Core
+represente adecuadamente sus responsabilidades dentro de la plataforma,
+mantenga coherencia con la arquitectura general del sistema y describa
+de forma consistente su relación con los demás componentes técnicos.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar la organización y contenido de la
+documentación correspondiente al Backend del SGOF Core.
+
+Se constató que el Backend se encuentra correctamente identificado como
+el componente responsable de ejecutar y coordinar la lógica de negocio,
+procesar las solicitudes recibidas, aplicar las reglas operativas,
+interactuar con la Base de Datos y distribuir las actualizaciones
+correspondientes hacia los demás componentes de la plataforma.
+
+La documentación mantiene una adecuada separación entre las
+responsabilidades del Backend y las correspondientes al Frontend,
+la API REST, Socket.IO, la Base de Datos y los demás subsistemas
+documentados dentro de la Biblioteca Técnica.
+
+Observaciones
+-------------
+
+Durante la revisión se verificó la coherencia general de la documentación
+del Backend con la estructura conocida del sistema y con las relaciones
+establecidas entre sus principales componentes.
+
+No se identificaron inconsistencias documentales que impidan considerar
+consolidada la documentación correspondiente al Backend en el estado
+actual del proyecto.
+
+Recomendaciones
+---------------
+
+Mantener actualizada la documentación del Backend conforme se incorporen
+nuevas funcionalidades, rutas, servicios o reglas de negocio.
+
+Preservar la separación de responsabilidades entre el Backend y los
+demás componentes de la plataforma, evitando trasladar a su documentación
+funciones que correspondan específicamente a otros subsistemas.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME
+
+Conclusión
+----------
+
+La carpeta 02_Backend cumple adecuadamente su función como referencia
+documental de la lógica de negocio y de los mecanismos de coordinación
+interna del SGOF Core.
+
+La documentación disponible resulta coherente con la arquitectura
+general del sistema y proporciona una base adecuada para su mantenimiento
+y evolución.
+	
+===============================================================
+
+3.4 Carpeta 03_Frontend
+=======================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 03_Frontend reúne la documentación correspondiente a la capa
+de presentación e interacción del Proyecto SGOF Core.
+
+Documenta la organización de la interfaz, los componentes visuales,
+mapas y paneles utilizados para representar la información operativa,
+así como los mecanismos mediante los cuales los usuarios interactúan
+con la plataforma.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación correspondiente al Frontend represente
+adecuadamente sus responsabilidades dentro del SGOF Core, mantenga
+coherencia con la arquitectura general y preserve la separación entre
+la capa de presentación y la lógica de negocio.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar la organización y contenido de la
+documentación correspondiente al Frontend del SGOF Core.
+
+Se constató que el Frontend se encuentra correctamente identificado como
+el componente responsable de presentar la información operativa, capturar
+las acciones realizadas por los usuarios y mantener actualizada la
+interfaz conforme al estado del sistema.
+
+La documentación describe adecuadamente su integración con el Backend
+mediante la API REST y Socket.IO, así como la utilización de mapas,
+paneles y demás componentes visuales destinados a representar la
+operación.
+
+Se verificó además una adecuada separación conceptual entre las
+responsabilidades de presentación correspondientes al Frontend y la
+lógica de negocio ejecutada por el Backend.
+
+Observaciones
+-------------
+
+La documentación mantiene coherencia con la arquitectura general del
+SGOF Core y con las responsabilidades asignadas a los demás componentes
+de la plataforma.
+
+No se identificaron inconsistencias documentales que impidan considerar
+consolidada la documentación correspondiente al Frontend en el estado
+actual del proyecto.
+
+Recomendaciones
+---------------
+
+Mantener actualizada la documentación conforme evolucionen las pantallas,
+mapas, paneles y mecanismos de interacción de la plataforma.
+
+Preservar la separación entre presentación y lógica de negocio durante
+las futuras modificaciones del sistema y documentar las nuevas
+interacciones que puedan surgir durante las siguientes etapas de
+desarrollo y validación.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME
+
+Conclusión
+----------
+
+La carpeta 03_Frontend cumple adecuadamente su función como referencia
+documental de la capa de presentación e interacción del SGOF Core.
+
+La documentación disponible resulta coherente con la arquitectura
+general del sistema y proporciona una base adecuada para acompañar
+la evolución de la interfaz durante las siguientes etapas del proyecto.
+
+=======================================================================
+
+=========================================================
+
+3.5 Carpeta 04_Base_de_Datos
+============================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 04_Base_de_Datos reúne la documentación correspondiente a la
+organización, relación y persistencia de la información utilizada por
+el SGOF Core.
+
+Comprende el Modelo de Datos y el Modelo Relacional, proporcionando la
+referencia necesaria para comprender tanto la organización conceptual
+de la información como su representación dentro de la estructura
+relacional persistente del sistema.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación correspondiente a la Base de Datos
+represente de forma coherente la estructura de información del SGOF Core,
+mantenga correspondencia entre el Modelo de Datos y el Modelo Relacional
+y proporcione una referencia adecuada para comprender las entidades,
+relaciones y mecanismos de persistencia utilizados por la plataforma.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar la organización y contenido de la
+documentación correspondiente a la Base de Datos del SGOF Core.
+
+Se constató que el Modelo de Datos proporciona la representación
+conceptual de las principales entidades y relaciones utilizadas por
+la plataforma, mientras que el Modelo Relacional documenta su
+materialización mediante tablas, atributos, claves, relaciones,
+restricciones e integridad referencial.
+
+La revisión del Modelo Relacional fue realizada sobre la estructura
+implementada de la Base de Datos, permitiendo contrastar la documentación
+con la organización persistente utilizada por el sistema.
+
+Se verificó asimismo una adecuada relación entre la documentación de
+datos y los demás componentes que utilizan dicha información,
+particularmente Backend, procesos operativos, GPS y algoritmos.
+
+Observaciones
+-------------
+
+La documentación disponible presenta una separación adecuada entre el
+nivel conceptual correspondiente al Modelo de Datos y el nivel relacional
+correspondiente a su implementación persistente.
+
+No se identificaron inconsistencias documentales que impidan considerar
+consolidada la documentación correspondiente a esta carpeta en el estado
+actual del proyecto.
+
+Recomendaciones
+---------------
+
+Mantener sincronizados el Modelo de Datos y el Modelo Relacional ante
+cualquier modificación futura de la estructura de información del
+SGOF Core.
+
+Toda incorporación, modificación o eliminación de entidades, atributos,
+relaciones o restricciones deberá reflejarse en la documentación
+correspondiente, preservando la trazabilidad entre el diseño conceptual
+y la estructura relacional implementada.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME
+
+Conclusión
+----------
+
+La carpeta 04_Base_de_Datos cumple adecuadamente su función como
+referencia documental de la estructura de información del SGOF Core.
+
+El Modelo de Datos y el Modelo Relacional proporcionan conjuntamente
+una base coherente y suficientemente consolidada para comprender,
+mantener y evolucionar la persistencia de información utilizada por
+la plataforma.
+
+=========================================================
+
+3.6 Carpeta 05_SocketIO
+=======================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 05_SocketIO reúne la documentación correspondiente al
+subsistema de comunicación en tiempo real del SGOF Core.
+
+Documenta el mecanismo mediante el cual el Backend distribuye los
+acontecimientos relevantes de la operación hacia los clientes conectados,
+permitiendo mantener sincronizados los distintos componentes de la
+plataforma mediante una comunicación persistente orientada a eventos.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación correspondiente a Socket.IO represente
+adecuadamente su función dentro del SGOF Core, mantenga coherencia con
+la arquitectura general del sistema y describa correctamente su relación
+con el Backend, el Frontend y los distintos procesos que requieren
+actualización de información en tiempo real.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar la arquitectura y el funcionamiento
+documentado de Socket.IO dentro del SGOF Core.
+
+Se constató su utilización como mecanismo de comunicación en tiempo real
+para distribuir acontecimientos operativos relevantes hacia los clientes
+conectados, complementando la comunicación realizada mediante la API REST.
+
+La documentación identifica los principales eventos utilizados por el
+sistema y describe su participación en la actualización de viajes, taxis,
+Cola Operativa y posiciones GPS.
+
+Se verificó asimismo la integración de Socket.IO con el Backend y el
+Frontend, manteniendo diferenciadas sus responsabilidades respecto de
+la lógica de negocio y de la presentación de información.
+
+Observaciones
+-------------
+
+Durante la revisión fueron identificadas precisiones documentales
+destinadas a mejorar la descripción y delimitación de determinados
+aspectos del funcionamiento de Socket.IO.
+
+Estas precisiones no afectan la coherencia general del componente ni
+impiden considerar aprobada su documentación, quedando registradas para
+ser consideradas en futuras actualizaciones.
+
+Recomendaciones
+---------------
+
+Mantener actualizada la documentación de eventos conforme evolucione
+el sistema, incorporando o modificando únicamente aquellos eventos cuya
+existencia y utilización hayan sido verificadas.
+
+Preservar la diferenciación entre la comunicación mediante API REST y
+la distribución de acontecimientos en tiempo real mediante Socket.IO,
+así como la separación entre el mecanismo de comunicación y la lógica
+de negocio del sistema.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME CON PRECISIONES DOCUMENTALES
+
+Conclusión
+----------
+
+La carpeta 05_SocketIO cumple adecuadamente su función como referencia
+documental del mecanismo de comunicación en tiempo real del SGOF Core.
+
+Las precisiones identificadas durante la revisión se encuentran
+controladas y no constituyen impedimento para considerar consolidada
+la documentación del componente en el estado actual del proyecto.
+
+=========================================================
+
+3.7 Carpeta 06_Algoritmos
+=========================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 06_Algoritmos reúne la documentación correspondiente al
+nivel de decisión del SGOF Core.
+
+Contiene la metodología utilizada para documentar los algoritmos y las
+especificaciones correspondientes a los mecanismos de decisión utilizados
+por el sistema, manteniendo diferenciada la lógica conceptual respecto
+de los detalles particulares de implementación.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación correspondiente a los algoritmos del
+SGOF Core se encuentre organizada de manera coherente, utilice una
+metodología común y describa adecuadamente los criterios de decisión
+aplicados por el sistema.
+
+Asimismo, verificar la correcta separación entre la lógica algorítmica,
+los procesos operativos y los detalles específicos de implementación.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar la existencia de una metodología común
+para la documentación de los algoritmos del SGOF Core y su aplicación
+sobre los algoritmos correspondientes a la versión actual del sistema.
+
+Se constató la documentación del Algoritmo de Asignación Inteligente,
+el Algoritmo de Cola Operativa y el Algoritmo de Calidad GPS, cada uno
+con responsabilidades claramente diferenciadas dentro de la plataforma.
+
+La documentación describe los datos considerados, los criterios de
+evaluación y la lógica utilizada para producir decisiones operativas,
+manteniendo independencia respecto del código fuente y del lenguaje de
+programación utilizado.
+
+Se verificó además la relación existente entre los algoritmos y los
+procesos documentados en otras áreas de la Biblioteca Técnica,
+particularmente la Cola Operativa, la Asignación Inteligente, el Sistema
+GPS y la Gestión de Viajes.
+
+Observaciones
+-------------
+
+La separación entre algoritmos y procesos operativos se encuentra
+correctamente establecida, evitando duplicar en esta carpeta la
+descripción funcional correspondiente al Flujo Operativo.
+
+La carpeta cuenta con documentación metodológica y con un Acta de Cierre
+que formaliza la finalización de su proceso de revisión para la versión
+actual del SGOF Core.
+
+No se identificaron observaciones pendientes que impidan considerar
+cerrada la revisión de este componente.
+
+Recomendaciones
+---------------
+
+Mantener la metodología establecida para documentar futuros algoritmos
+que puedan incorporarse al SGOF Core.
+
+Toda modificación de los criterios de decisión deberá reflejarse en la
+documentación algorítmica correspondiente y conservar coherencia con los
+procesos operativos que utilicen dichos algoritmos.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME Y CERRADO
+
+Conclusión
+----------
+
+La carpeta 06_Algoritmos cumple adecuadamente su función como referencia
+documental de los mecanismos de decisión del SGOF Core.
+
+La metodología y los algoritmos correspondientes a la versión actual
+se encuentran organizados, documentados y revisados, existiendo evidencia
+formal de su cierre documental.
+
+La revisión del componente se considera concluida.
+
+=========================================================
+
+3.8 Carpeta 07_GPS
+==================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 07_GPS reúne la documentación correspondiente al sistema de
+posicionamiento geográfico utilizado por el SGOF Core.
+
+Documenta la obtención, registro, evaluación y utilización de la
+información de ubicación de los recursos operativos, proporcionando la
+base necesaria para su representación geográfica y para los procesos
+que utilizan información espacial dentro de la plataforma.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación correspondiente al Sistema GPS represente
+adecuadamente su función dentro del SGOF Core, mantenga coherencia con
+la arquitectura general del sistema y describa correctamente el flujo
+y utilización de la información de posicionamiento.
+
+Asimismo, verificar su relación con los componentes y procesos que
+utilizan información geográfica dentro de la operación.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar la organización y contenido de la
+documentación correspondiente al Sistema GPS del SGOF Core.
+
+Se constató que la documentación describe el flujo general de la
+información de posicionamiento, el registro de coordenadas y la
+actualización de las posiciones utilizadas por la plataforma.
+
+Se verificó además la integración del Sistema GPS con los componentes
+que requieren información geográfica, particularmente la representación
+de recursos en el mapa operativo y los mecanismos de decisión que
+utilizan datos de ubicación.
+
+La evaluación de la calidad de la información GPS se encuentra
+correctamente diferenciada y documentada dentro del área de Algoritmos,
+evitando duplicaciones de responsabilidad entre ambos componentes.
+
+Observaciones
+-------------
+
+La documentación mantiene una separación adecuada entre la obtención y
+utilización de la información de posicionamiento y los mecanismos
+algorítmicos destinados a evaluar su calidad.
+
+La carpeta cuenta con un Acta de Cierre que formaliza la finalización
+de su proceso de revisión para la versión actual del SGOF Core.
+
+No se identificaron observaciones pendientes que impidan considerar
+cerrada la revisión de este componente.
+
+Recomendaciones
+---------------
+
+Mantener actualizada la documentación del Sistema GPS conforme evolucionen
+los mecanismos de obtención, registro o utilización de la información
+de posicionamiento.
+
+Preservar la separación entre el Sistema GPS y los algoritmos encargados
+de evaluar la calidad de sus datos, manteniendo documentadas las
+relaciones existentes entre ambos componentes.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME Y CERRADO
+
+Conclusión
+----------
+
+La carpeta 07_GPS cumple adecuadamente su función como referencia
+documental del sistema de posicionamiento geográfico del SGOF Core.
+
+La documentación correspondiente a la versión actual se encuentra
+organizada, revisada y relacionada de forma coherente con los demás
+componentes que utilizan información geográfica.
+
+La revisión del componente se considera concluida.
+
+=========================================================
+
+3.9 Carpeta 08_API
+==================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 08_API reúne la documentación correspondiente a la interfaz
+de comunicación REST del SGOF Core.
+
+Documenta el mecanismo estandarizado mediante el cual los distintos
+clientes acceden a las funcionalidades proporcionadas por el Backend,
+manteniendo desacoplada la interfaz de comunicación respecto de la
+lógica de negocio del sistema.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación correspondiente a la API REST represente
+adecuadamente su función dentro del SGOF Core, mantenga coherencia con
+la arquitectura general y describa de forma consistente los mecanismos
+utilizados para la comunicación entre los clientes y el Backend.
+
+Asimismo, verificar la correcta separación entre la interfaz de
+comunicación proporcionada por la API y la lógica de negocio ejecutada
+por el Backend.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar la organización y contenido de la
+documentación correspondiente a la API REST del SGOF Core.
+
+Se constató que la documentación describe adecuadamente la organización
+de la interfaz por recursos, la utilización de métodos HTTP, la
+comunicación sin estado y los criterios generales adoptados para
+proporcionar una interfaz uniforme a los consumidores de la plataforma.
+
+Se verificó asimismo la relación de la API REST con el Backend y el
+Frontend, manteniendo correctamente diferenciadas las responsabilidades
+correspondientes a la comunicación, la lógica de negocio y la
+presentación de información.
+
+La documentación proporciona una referencia coherente para comprender
+el mecanismo mediante el cual los clientes realizan solicitudes y
+reciben las respuestas generadas por el sistema.
+
+Observaciones
+-------------
+
+La documentación mantiene una adecuada separación entre la API REST
+como interfaz de comunicación y el Backend como responsable de ejecutar
+la lógica de negocio.
+
+Asimismo, se encuentra diferenciada la comunicación mediante API REST
+respecto de la distribución de acontecimientos en tiempo real realizada
+mediante Socket.IO.
+
+La carpeta cuenta con un Acta de Cierre que formaliza la finalización
+de su proceso de revisión para la versión actual del SGOF Core.
+
+No se identificaron observaciones pendientes que impidan considerar
+cerrada la revisión de este componente.
+
+Recomendaciones
+---------------
+
+Mantener actualizada la documentación de la API REST conforme se
+incorporen, modifiquen o retiren recursos y operaciones disponibles
+para los clientes del sistema.
+
+Preservar la separación entre la interfaz de comunicación, la lógica
+de negocio y los mecanismos de comunicación en tiempo real durante
+la evolución futura de la plataforma.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME Y CERRADO
+
+Conclusión
+----------
+
+La carpeta 08_API cumple adecuadamente su función como referencia
+documental de la interfaz de comunicación REST del SGOF Core.
+
+La documentación correspondiente a la versión actual se encuentra
+organizada, revisada y relacionada de forma coherente con el Backend,
+el Frontend y los demás mecanismos de comunicación de la plataforma.
+
+La revisión del componente se considera concluida.
+
+=========================================================
+
+3.10 Carpeta 09_Flujo_Operativo
+===============================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 09_Flujo_Operativo reúne la documentación correspondiente
+a los principales procesos que gobiernan la operación del SGOF Core.
+
+Documenta cómo una necesidad registrada ingresa al sistema, cómo se
+organizan los recursos disponibles, cómo se determina el recurso que
+atenderá el servicio y cómo se administra posteriormente su ejecución
+hasta la finalización.
+
+Mantiene diferenciada la descripción de los procesos operativos respecto
+de la lógica de decisión documentada específicamente en la carpeta
+06_Algoritmos.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la documentación correspondiente al Flujo Operativo
+represente de forma coherente los principales procesos del SGOF Core,
+mantenga una adecuada relación entre ellos y preserve la separación
+entre procesos operativos, algoritmos de decisión y demás componentes
+técnicos de la plataforma.
+
+Asimismo, verificar que la documentación permita comprender el recorrido
+general de una solicitud desde su ingreso al sistema hasta la ejecución
+y finalización del servicio correspondiente.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar la organización y contenido de la
+documentación correspondiente a los principales procesos operativos
+del SGOF Core.
+
+Se constató la existencia de documentación específica para la Gestión
+de Pedidos, la Cola Operativa, la Asignación Inteligente y la Gestión
+de Viajes, estableciendo responsabilidades diferenciadas y relaciones
+coherentes entre dichos procesos.
+
+Se verificó especialmente la diferenciación conceptual entre Pedido y
+Viaje, identificando al Pedido como representación de la necesidad
+original registrada en el sistema y al Viaje como representación de
+la ejecución operativa derivada de dicha necesidad.
+
+La documentación mantiene asimismo una adecuada relación con los
+algoritmos de decisión, el Sistema GPS, el Backend, la Base de Datos
+y los mecanismos de comunicación utilizados por la plataforma.
+
+Observaciones
+-------------
+
+La separación entre procesos operativos y algoritmos de decisión se
+encuentra correctamente establecida, evitando duplicaciones de
+responsabilidad entre las carpetas 09_Flujo_Operativo y 06_Algoritmos.
+
+La carpeta cuenta con un Acta de Cierre que formaliza la finalización
+de la auditoría y revisión de los procesos documentados para la versión
+actual del SGOF Core.
+
+No se identificaron observaciones pendientes que impidan considerar
+cerrada la revisión de este componente.
+
+Recomendaciones
+---------------
+
+Mantener actualizada la documentación de los procesos operativos conforme
+evolucione el funcionamiento del SGOF Core.
+
+Toda modificación futura de los estados, transiciones, reglas o relaciones
+entre Pedido, Asignación y Viaje deberá reflejarse en la documentación
+correspondiente, preservando la coherencia con los algoritmos y demás
+componentes relacionados.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME Y CERRADO
+
+Conclusión
+----------
+
+La carpeta 09_Flujo_Operativo cumple adecuadamente su función como
+referencia documental de los principales procesos operativos del
+SGOF Core.
+
+La documentación correspondiente a la versión actual se encuentra
+organizada, revisada y relacionada de forma coherente con los algoritmos
+y componentes técnicos que participan en la operación.
+
+La revisión del componente se considera concluida.
+
+=========================================================
+
+3.11 Carpeta 10_Historial
+=========================
+
+Resumen Ejecutivo
+-----------------
+
+La carpeta 10_Historial está destinada a conservar versiones anteriores,
+documentación sustituida, antecedentes y otros materiales retirados de
+la estructura documental vigente que deban preservarse durante la
+evolución del SGOF Core.
+
+Su finalidad consiste en mantener la trazabilidad histórica del proyecto,
+separando claramente la documentación vigente de aquella que conserva
+únicamente valor histórico o de referencia.
+
+Objetivo de la Revisión
+-----------------------
+
+Verificar que la finalidad asignada a la carpeta 10_Historial resulte
+coherente con la organización general de la Biblioteca Técnica y permita
+preservar antecedentes documentales sin confundirlos con la documentación
+oficial vigente del proyecto.
+
+Resultado de la Revisión
+------------------------
+
+La revisión permitió verificar que la carpeta 10_Historial posee una
+función claramente diferenciada dentro de la Biblioteca Técnica.
+
+Los documentos destinados a conservación histórica pueden mantenerse
+separados de la estructura documental vigente, preservando la trazabilidad
+de la evolución del proyecto sin alterar la identificación de las
+versiones actualmente aplicables.
+
+Esta organización permite conservar antecedentes, versiones sustituidas
+y documentación retirada cuando resulte necesario mantener evidencia
+de la evolución documental del SGOF Core.
+
+Observaciones
+-------------
+
+La condición histórica de los documentos almacenados en esta carpeta
+deberá permanecer claramente identificada.
+
+Los materiales conservados en 10_Historial no constituyen documentación
+técnica vigente y no deberán utilizarse como sustitutos de las versiones
+oficiales registradas en las restantes áreas de la Biblioteca Técnica.
+
+Recomendaciones
+---------------
+
+Mantener la carpeta exclusivamente para documentación histórica,
+sustituida o retirada cuya conservación resulte necesaria para preservar
+la trazabilidad del proyecto.
+
+Evitar incorporar en esta carpeta documentación vigente o material de
+trabajo temporal que no posea valor histórico documental.
+
+DICTAMEN
+--------
+
+Estado: 🟢 CONFORME
+
+Conclusión
+----------
+
+La carpeta 10_Historial cumple adecuadamente la función prevista dentro
+de la estructura de la Biblioteca Técnica del SGOF Core.
+
+Su existencia permite preservar antecedentes documentales manteniendo
+una separación clara entre la documentación histórica y la documentación
+oficial vigente.
+
+La revisión del componente se considera concluida.
+
+=========================================================
+
+4. Resultado Final de la Revisión de Componentes
+=================================================
+
+La Revisión de Componentes del Proyecto SGOF Core permitió examinar
+de forma ordenada las distintas áreas que integran la Biblioteca
+Técnica, siguiendo su estructura documental y aplicando los criterios
+establecidos en la metodología de revisión.
+
+Como resultado del proceso se verificó la finalidad, organización,
+coherencia y relación de los componentes documentados, dejando
+registradas las observaciones y recomendaciones correspondientes
+cuando resultaron necesarias.
+
+Las revisiones realizadas permiten establecer que los componentes
+analizados presentan un grado de consolidación adecuado para el estado
+actual del Proyecto SGOF Core.
+
+Las situaciones que requieren evolución posterior se encuentran
+identificadas mediante sus estados documentales o precisiones
+correspondientes y no constituyen impedimentos para concluir la
+presente Revisión de Componentes.
+
+Los resultados registrados en este documento constituyen evidencia
+documental complementaria de la Revisión General del Proyecto y
+proporcionan fundamento para avanzar hacia la Certificación Documental
+de la Biblioteca Técnica SGOF Core v1.0.
+
+
+DICTAMEN FINAL
+--------------
+
+Estado: 🟢 FAVORABLE
+
+La Revisión de Componentes del Proyecto SGOF Core se considera
+completada satisfactoriamente.
+
+No se identifican impedimentos documentales que requieran prolongar
+esta instancia de revisión antes de avanzar hacia la Certificación
+Documental de la Biblioteca Técnica.
+
+
+Estado de la Revisión de Componentes: 🟢 FINALIZADA
+
+=========================================================
+                 FIN DEL DOCUMENTO
+=========================================================
+=========================================================

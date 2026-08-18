@@ -1,0 +1,8 @@
+004_Modelo_de_Gobierno_del_Proyecto_SGOF_CORE_v1.0.txt
+======================================================
+
+
+Documento reservado para el desarrollo futuro del Modelo de Gobierno
+del Proyecto SGOF Core.
+
+Estado: ⚪ SIN INICIAR

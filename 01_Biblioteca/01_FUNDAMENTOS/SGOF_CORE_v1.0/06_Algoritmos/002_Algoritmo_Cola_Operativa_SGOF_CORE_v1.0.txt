@@ -1,6 +1,34 @@
 002_Algoritmo_Cola_Operativa_SGOF_CORE_v1.0.txt
 ===============================================
 
+# METADATOS DEL DOCUMENTO
+
+Título             : 002_Algoritmo_Cola_Operativa_SGOF_CORE
+Código             : SGOF-ALG-002
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  : 04/08/2026
+Última revisión    : 15/08/2026
+
+
+Documento padre    : 000_Metodologia_Algoritmos_SGOF_CORE_v1.0
+
+Documentos relacionados :
+- 001_Algoritmo_Asignacion_Inteligente_SGOF_CORE_v1.0
+- 003_Algoritmo_Calidad_GPS_SGOF_CORE_v1.0
+- 003_Gestion_de_Viajes_SGOF_CORE_v1.0
+
+Próxima revisión   : Según evolución de la arquitectura
+
+==========================================================================
+
 1. Introducción
 ---------------
 
@@ -34,139 +62,6 @@ objetividad en la administración de la cola;
 consistencia en la evolución del orden establecido.
 
 Estos principios garantizan que la organización de la flota permanezca estable, previsible y trazable durante toda la operación.
-
-
-4. Datos de Entrada
--------------------
-
-Introducción
-------------
-
-El algoritmo de Cola Operativa recibe la información necesaria para mantener actualizado el orden de los recursos que participan en la operación.
-
-La información utilizada proviene de distintos componentes del SGOF Core y representa la situación operativa vigente en el momento de la evaluación.
-
-El algoritmo no genera estos datos, sino que los utiliza para conservar una organización consistente de la flota.
-
-Recursos Operativos
--------------------
-
-El algoritmo recibe la información correspondiente a los recursos registrados en el sistema.
-
-Cada recurso constituye una unidad potencialmente participante de la Cola Operativa y puede incorporarse, mantenerse o retirarse de la organización según su situación operativa.
-
-
-Estado Operativo
-----------------
-
-La posición de un recurso dentro de la Cola Operativa depende de su estado operativo.
-
-Únicamente los recursos habilitados para participar en nuevas asignaciones forman parte del orden activo administrado por el algoritmo.
-
-
-Eventos Operativos
-------------------
-
-El algoritmo recibe los eventos generados durante la operación que pueden modificar el orden de la cola.
-
-Entre ellos se encuentran la incorporación de recursos, la asignación de servicios, la finalización de viajes y cualquier otra situación que requiera reorganizar el orden operativo.
-
-
-Parámetros Operativos
----------------------
-
-La organización de la cola se desarrolla conforme a las reglas permanentes definidas por el SGOF Core.
-
-Estos parámetros garantizan uniformidad en el tratamiento de todos los recursos y mantienen la coherencia del algoritmo.
-
-Observaciones de Arquitectura
-
-La Cola Operativa administra exclusivamente el orden de los recursos.
-
-No interviene en la selección del recurso que atenderá un servicio, responsabilidad que corresponde al algoritmo de Asignación Inteligente.
-
-Esta separación constituye uno de los principios fundamentales de la arquitectura del SGOF Core.
-
-
-Comentario de Auditoría
------------------------
-
-Durante la auditoría funcional se verificó que el algoritmo utiliza únicamente información necesaria para mantener actualizado el orden operativo de los recursos, sin incorporar criterios propios de la decisión de asignación.
-
-Esta diferenciación permite preservar la independencia funcional entre ambos algoritmos.
-
-
-Principio Rector
-----------------
-
-La organización de los recursos constituye el punto de partida de toda decisión operativa.
-
-
-5. Proceso de Evaluación
-------------------------
-
-Introducción
-------------
-
-Una vez recibida la información de entrada, el algoritmo desarrolla el proceso de evaluación destinado a conservar una organización consistente de la Cola Operativa.
-
-Cada etapa responde a una función específica y contribuye a mantener el orden general de los recursos disponibles.
-
-
-Etapa 1 – Identificación de recursos participantes
---------------------------------------------------
-
-El algoritmo determina qué recursos deben integrar la Cola Operativa conforme a su situación operativa actual.
-
-Los recursos que no cumplen las condiciones definidas por el sistema quedan excluidos temporalmente del orden activo.
-
-
-Etapa 2 – Conservación del orden
---------------------------------
-
-El algoritmo verifica la organización existente y mantiene la posición relativa de los recursos siempre que no se produzcan eventos que justifiquen una modificación.
-
-Este principio evita reorganizaciones innecesarias y favorece la estabilidad de la operación.
-
-
-Etapa 3 – Actualización por eventos
------------------------------------
-
-Cuando un evento operativo modifica la situación de un recurso, el algoritmo actualiza la organización de la cola aplicando las reglas establecidas por el sistema.
-
-La reorganización afecta únicamente a los recursos involucrados, preservando el orden del resto de la flota siempre que resulte posible.
-
-
-Etapa 4 – Normalización del orden
----------------------------------
-
-Finalizada la actualización, el algoritmo verifica la consistencia del orden operativo.
-
-La Cola Operativa mantiene una secuencia continua y coherente que permite su utilización inmediata por el algoritmo de Asignación Inteligente.
-
-
-Observaciones de Arquitectura
------------------------------
-
-El algoritmo desarrolla una administración continua del orden operativo.
-
-Su finalidad consiste en garantizar que, en cualquier momento, exista una organización válida de los recursos disponible para los procesos posteriores.
-
-
-Comentario de Auditoría
------------------------
-
-La auditoría permitió comprobar que el algoritmo mantiene la estabilidad de la Cola Operativa mediante actualizaciones puntuales, evitando reorganizaciones completas ante cada evento.
-
-Esta estrategia favorece la eficiencia del sistema y preserva la trazabilidad del orden operativo.
-
-
-Principio Rector
-----------------
-
-Una Cola Operativa eficiente no reorganiza toda la flota; actualiza únicamente aquello que la operación requiere.
-
-======================================================
 
 
 4. Datos de Entrada
@@ -497,12 +392,6 @@ A lo largo del presente documento se describieron sus principios, fuentes de inf
 
 La auditoría permitió comprobar que el algoritmo mantiene una organización consistente de la flota mediante reglas objetivas y trazables, proporcionando una base sólida para el funcionamiento del algoritmo de Asignación Inteligente y del resto de los procesos operativos.
 
-Dictamen Final de Auditoría
-
-Documento: 002_Algoritmo_Cola_Operativa_SGOF_CORE_v1.0.txt
-
-Estado: APROBADO
-
 ========================================================
 
 Resultado del relevamiento
@@ -585,9 +474,10 @@ Una organización estable constituye el fundamento sobre el cual pueden construi
 =======================================================
 
 
+🟢 002_Algoritmo_Cola_Operativa_SGOF_CORE_v1.0 — CERRADO Y APROBADO.
 
 
-
+==================================================================================
 
 
 

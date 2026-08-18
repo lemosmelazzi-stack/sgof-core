@@ -873,4 +873,47 @@ Como resultado del presente relevamiento, se considera que el Proyecto SGOF Core
 
 En consecuencia, el proyecto reúne las condiciones necesarias para iniciar la planificación formal de una etapa Beta, orientada a la validación operativa del sistema en un entorno de utilización real.
 
+
+============================================================
+
+ACTA DE CIERRE DEL DOCUMENTO
+----------------------------
+
+Documento :
+
+001_Estado_Actual_Proyecto_SGOF_CORE_v1.0
+
+Estado :
+
+CERRADO
+-------
+Resultado :
+---------
+El presente documento refleja el estado del Proyecto
+SGOF Core al finalizar la etapa de auditoría técnica
+y consolidación documental.
+
+Las conclusiones expuestas constituyen la referencia
+oficial para la planificación de las próximas etapas
+de evolución del proyecto y servirán como base para
+la elaboración de la Hoja de Ruta hacia la versión
+Beta.
+
+Observaciones :
+-------------
+Toda modificación posterior deberá realizarse
+mediante una nueva versión del documento, preservando
+la trazabilidad histórica del proyecto.
+
+Estado documental :
+-----------------
+APROBADO
+--------
+Equipo responsable :
+
+Equipo SGOF
+-----------
+
+============================================================
+
 =======================================================================

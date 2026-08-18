@@ -1,6 +1,33 @@
 001_API_REST_SGOF_CORE_v1.0.txt
 ===============================
 
+METADATOS DEL DOCUMENTO
+-----------------------
+
+Título             : 001_API_REST_SGOF_CORE
+Código             : SGOF-API-001
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  : 2026-08-02
+Última revisión    : 2026-08-15
+
+Documento padre    : SGOF-ARQ-001_Arquitectura_General
+
+Documentos relacionados :
+- 001_SocketIO_SGOF_CORE_v1.0
+- 001_Sistema_GPS_SGOF_CORE_v1.0
+- 003_Modelo_Relacional_SGOF_CORE_v1.0
+
+Próxima revisión   : Según evolución de la arquitectura
+
+=========================================================================
 
 1. Introducción
 ---------------
@@ -68,7 +95,7 @@ Entre ellos:
 GET para consultas;
 POST para creación de recursos y ejecución de determinadas operaciones;
 PUT para actualizaciones completas o cambios de estado;
-DELETE cuando corresponda a futuras operaciones de eliminación.
+La utilización de otros métodos HTTP podrá incorporarse cuando la evolución funcional del sistema lo requiera.
 
 La utilización consistente de estos métodos mantiene una interfaz uniforme para todos los consumidores de la API.
 
@@ -83,7 +110,7 @@ Este principio favorece la escalabilidad y simplifica el procesamiento de las pe
 
 Separación de responsabilidades
 
-La API REST no implementa reglas de negocio.
+La capa API REST no constituye el núcleo de las reglas de negocio. Su función principal consiste en recibir solicitudes, validar los datos necesarios, coordinar su procesamiento con los componentes correspondientes del Backend y devolver las respuestas generadas por el sistema.
 
 Su función consiste en recibir solicitudes, direccionarlas hacia el Backend y devolver las respuestas generadas por la lógica operativa del sistema.
 
@@ -104,6 +131,8 @@ Desde la perspectiva arquitectónica, la API REST constituye la capa de acceso a
 Mientras el Frontend representa la interfaz para los usuarios y el Backend implementa la lógica de negocio, la API define el lenguaje común mediante el cual ambos componentes intercambian información.
 
 Su correcta definición resulta fundamental para garantizar la estabilidad y evolución de toda la plataforma.
+
+La API REST y Socket.IO cumplen funciones complementarias dentro de la arquitectura del SGOF Core. La API REST administra las solicitudes y respuestas iniciadas por los clientes, mientras que Socket.IO permite distribuir eventos y actualizaciones en tiempo real hacia los clientes conectados. Ambos mecanismos conforman conjuntamente la capa de comunicación de la plataforma.
 
 Comentario de auditoría
 -----------------------
@@ -128,6 +157,8 @@ El documento 001_API_REST_SGOF_CORE_v1.0.txt queda oficialmente aprobado e incor
 
 =========================================================
 
+🟢 001_API_REST_SGOF_CORE_v1.0 — REVISADO, ACTUALIZADO Y APROBADO
+==================================================================
 
 
 

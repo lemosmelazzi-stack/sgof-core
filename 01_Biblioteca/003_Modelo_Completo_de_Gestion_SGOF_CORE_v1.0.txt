@@ -1,0 +1,37 @@
+modelo completo de gestión
+--------------------------
+
+Nivel Estratégico
+Estado Actual
+Principios de Evolución
+Hoja de Ruta
+
+Responde: ¿Hacia dónde vamos?
+=============================
+
+Nivel Táctico
+Plan Maestro Beta
+
+Responde: ¿Cómo vamos a hacerlo?
+===============================
+
+Nivel Operativo
+Plan diario.
+Registro de incidencias.
+Evidencias.
+Actas.
+Informes.
+
+Responde: ¿Qué hacemos hoy?
+
+"El Proyecto SGOF dejó de organizar únicamente el software; comenzó a organizar también la forma en que las personas trabajan para hacerlo evolucionar."
+
+Regla del Horizonte Cercano
+
+
+
+"El Equipo SGOF documentará y desarrollará únicamente la siguiente etapa necesaria para la evolución del proyecto, registrando las ideas futuras sin anticipar su desarrollo hasta que exista una necesidad concreta."
+
+
+🟢 Aprobado
+

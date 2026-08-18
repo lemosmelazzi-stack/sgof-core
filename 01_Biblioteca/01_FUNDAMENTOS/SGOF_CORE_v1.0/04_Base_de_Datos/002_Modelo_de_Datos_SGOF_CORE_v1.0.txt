@@ -3,6 +3,39 @@ SGOF-BD-001
 
 MODELO DE DATOS
 
+METADATOS DEL DOCUMENTO
+======================================================
+
+Título             : 002_MODELO_DE_DATOS
+Código             : SGOF-BD-001
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Biblioteca Técnica
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  : 29/07/2026
+Última revisión    : 14/08/2026
+
+Documento padre    :
+Documentos relacionados : 
+
+003_Modelo_Relacional_SGOF_CORE_v1.0
+004_Base_de_Datos_PostgreSQL_SGOF_CORE_v1.0
+
+Próxima revisión   : Según evolución de la arquitectura
+
+========================================================
+
+
+
+
+
+
+
 ============================================================
 
 
@@ -37,6 +70,10 @@ El modelo ha sido concebido siguiendo criterios de integridad, normalización, t
 
 La presente especificación documenta el modelo de datos implementado en el SGOF Core v1.0 y constituye la referencia oficial para la comprensión y mantenimiento de la estructura de información del sistema.
 
+Capítulo 1 – Introducción
+
+Estado:
+🟢 Conforme
 ===========================================================
 
 2. Objetivo del Modelo de Datos
@@ -50,6 +87,7 @@ Su diseño permite representar de forma estructurada los procesos operativos de 
 
 Asimismo, el Modelo de Datos proporciona una referencia única para la interpretación de la información, asegurando que todos los componentes del SGOF compartan una visión común de las entidades, sus atributos y sus relaciones.
 
+🟢 Conforme.
 =========================================================
 
 3. Principios de Diseño
@@ -59,6 +97,17 @@ El Modelo de Datos del Sistema de Gestión Operativa de Flota (SGOF) ha sido dis
 
 Estos principios constituyen la base conceptual sobre la cual se estructura el almacenamiento de la información y deberán ser preservados durante toda modificación o ampliación futura del modelo de datos.
 
+
+Capítulo 3 – Principios de Diseño
+
+Estado:
+🟢 Conforme
+
+========================================================
+
+🔍 Revisión inicial: estructura general
+
+🟢 Estructura general: Conforme.
 ========================================================
 
 3.1 Integridad de los Datos
@@ -68,6 +117,10 @@ Toda la información almacenada por el SGOF deberá conservar su consistencia du
 
 El modelo de datos establece las relaciones necesarias entre las distintas entidades, procurando evitar registros inconsistentes, referencias inválidas y pérdidas de información que puedan comprometer el funcionamiento del sistema.
 
+
+🔍 3.1 Integridad de los Datos
+
+🟢 Conforme.
 =======================================================
 
 3.2 Normalización
@@ -76,6 +129,10 @@ El modelo de datos establece las relaciones necesarias entre las distintas entid
 La información se organiza procurando minimizar la redundancia y evitar la duplicación innecesaria de datos.
 
 Cada entidad almacena exclusivamente la información correspondiente a su propia responsabilidad, favoreciendo la claridad del modelo, la eficiencia en el mantenimiento y la reducción de inconsistencias derivadas de múltiples copias de un mismo dato.
+
+🔍 3.2 Normalización
+
+🟢 Conforme.
 
 =====================================================
 
@@ -86,6 +143,10 @@ El modelo de datos conserva la información necesaria para reconstruir la evoluc
 
 La trazabilidad constituye un principio fundamental para garantizar la transparencia y la confiabilidad de la información almacenada.
 
+
+🔍 3.3 Trazabilidad
+
+🟢 Conforme.
 ====================================================
 
 3.4 Escalabilidad
@@ -95,6 +156,9 @@ El diseño del modelo permite incorporar nuevas entidades, atributos y relacione
 
 Toda ampliación deberá preservar la compatibilidad con el modelo vigente y mantener la coherencia general de la Base de Datos.
 
+🔍 3.4 Escalabilidad
+
+🟢 Conforme.
 ===================================================
 
 3.5 Independencia del Modelo
@@ -104,6 +168,9 @@ El Modelo de Datos representa la estructura conceptual de la información admini
 
 Las aplicaciones, servicios y componentes que interactúan con la Base de Datos deberán adaptarse al modelo definido, preservando su organización y significado.
 
+🔍 3.5 Independencia del Modelo
+
+🟢 Conforme.
 ===================================================
 
 3.6 Consistencia de la Información
@@ -112,6 +179,25 @@ Las aplicaciones, servicios y componentes que interactúan con la Base de Datos 
 Todas las entidades del sistema deberán mantener definiciones claras, relaciones coherentes y un significado unívoco dentro del Modelo de Datos.
 
 Cada concepto representado en la Base de Datos deberá poseer un único origen de definición, evitando interpretaciones ambiguas y asegurando que todos los componentes del SGOF compartan la misma visión de la información.
+
+🔍 3.6 Consistencia de la Información
+
+🟢 Conforme.
+
+
+===================================================
+Capítulo 3 – Principios de Diseño
+
+3.1 Integridad de los Datos             🟢 Conforme
+3.2 Normalización                       🟢 Conforme
+3.3 Trazabilidad                        🟢 Conforme
+3.4 Escalabilidad                       🟢 Conforme
+3.5 Independencia del Modelo            🟢 Conforme
+3.6 Consistencia de la Información      🟢 Conforme
+
+Estado:
+🟢 Conforme
+
 
 ===================================================
 
@@ -130,6 +216,11 @@ En el caso del SGOF, el Modelo Conceptual refleja una arquitectura orientada a p
 
    "El Modelo Conceptual describe el negocio; el Modelo Relacional describe la implementación."
 
+
+🔍 Capítulo 4 – Modelo Conceptual
+4.1 Propósito del Modelo Conceptual
+
+🟢 Conforme
 =======================================================
 
 4.2 Actores y Entidades Fundamentales
@@ -199,6 +290,48 @@ Estas entidades administran la información financiera asociada a los clientes y
 
 La agrupación de las entidades en categorías funcionales responde a una decisión de diseño orientada a separar responsabilidades y mantener un modelo conceptual organizado. Esta clasificación no implica una división física de la base de datos, sino una forma de representar los distintos dominios funcionales que integran el SGOF.
 
+🔍 4.2 Actores y Entidades Fundamentales
+
+🟢 Conforme, con una observación conceptual menor que conviene dejar presente para la auditoría integral.
+
+SGOF
+│
+├── Organización
+│   ├── Empresa
+│   ├── Usuario
+│   ├── Operadora
+│   └── Configuración
+│
+├── Recursos Operativos
+│   ├── Chofer
+│   ├── Taxi
+│   └── Tablet
+│
+├── Operación
+│   ├── Cliente
+│   ├── Pedido
+│   ├── Viaje
+│   ├── Asignación
+│   ├── GPS
+│   └── Evento
+│
+└── Administración Comercial
+    ├── Pago
+    ├── Cliente Crédito
+    └── Movimiento de Crédito
+
+
+4.2 Actores y Entidades Fundamentales
+
+Estado:
+🟢 Conforme
+
+Observación:
+La clasificación presentada corresponde a dominios conceptuales
+y no implica correspondencia directa entre cada entidad y una
+tabla física de la Base de Datos.
+
+====================================================
 
 
 4.3 Organización Conceptual del Sistema
@@ -241,6 +374,41 @@ Configuración              │            │          Movimientos Crédito
 
 La organización conceptual presentada constituye una representación lógica del funcionamiento del SGOF. Su objetivo es facilitar la comprensión de las responsabilidades de cada grupo de entidades y de las relaciones funcionales existentes entre ellas, sin reflejar necesariamente la estructura física de la base de datos ni el orden de implementación de los componentes del sistema.
 
+⚠️ Figura 4.1
+--------------
+
+Figura 4.1 – Organización Conceptual del SGOF
+
+EMPRESA
+│
+├── Organización
+│   ├── Usuarios
+│   ├── Operadoras
+│   └── Configuración
+│
+├── Recursos Operativos
+│   ├── Choferes
+│   ├── Taxis
+│   └── Dispositivos asociados
+│
+├── Operación
+│   ├── Clientes
+│   ├── Pedidos
+│   ├── Viajes
+│   ├── Asignaciones
+│   ├── GPS Logs
+│   └── Eventos
+│
+└── Administración Comercial
+    ├── Pagos
+    ├── Clientes Crédito
+    └── Movimientos Crédito
+
+4.3 Organización Conceptual del Sistema
+
+Estado:
+🟢 Conforme
+
 ==============================================================================
 
 
@@ -252,55 +420,95 @@ Las entidades que integran el Modelo Conceptual del SGOF no constituyen elemento
 Desde la perspectiva conceptual, cada relación responde a una necesidad del negocio y no a una decisión de implementación técnica. En consecuencia, este apartado describe cómo interactúan las entidades dentro del proceso operativo, sin hacer referencia a claves primarias, claves foráneas, cardinalidades o restricciones propias del Modelo Relacional.
 
 Relaciones principales
+----------------------
 Empresa
-
+-------
 La Empresa constituye la unidad organizativa del sistema y proporciona el contexto sobre el cual se desarrollan todas las actividades administrativas, operativas y comerciales.
 
 Cliente → Pedido
+----------------
 
 Un Cliente solicita un servicio mediante la generación de un Pedido.
 
 El Pedido representa la intención inicial de contratar un traslado y constituye el punto de partida del proceso operativo.
+🟢 Muy bien
 
+	
 Pedido → Viaje
+--------------
 
 Una vez aceptada la solicitud, el Pedido da origen a un Viaje.
 
 El Viaje representa la ejecución efectiva del servicio solicitado.
 
+	•	Conceptualmente se entiende, pero “aceptada” puede confundirse con el estado/acción operativa aceptarViaje, que pertenece a otro momento del ciclo.
+
+ • expresión más neutral:
+
+Pedido → Viaje
+--------------
+Cuando la solicitud ingresa al proceso operativo, el Pedido da origen
+a un Viaje.
+
+El Viaje representa la ejecución efectiva del servicio solicitado.
+
+🟢 Muy bien
+
+
+
 Viaje → Asignación
+------------------
 
 Para que un Viaje pueda ejecutarse, el sistema realiza una o más Asignaciones de recursos operativos.
 
 Estas asignaciones vinculan temporalmente el servicio con los recursos disponibles.
 
-Asignación → Recursos Operativos
+🟢 Muy bien
 
+Asignación → Recursos Operativos
+--------------------------------
 La Asignación relaciona al Chofer y al Taxi que ejecutarán el servicio.
 
 Esta relación es dinámica y responde a las necesidades operativas del momento, evitando asociaciones permanentes entre personas y vehículos.
+	🟢 Muy bien
 
 Viaje → GPS
+-----------
+La información GPS permite conocer la ubicación y el desplazamiento
+de los recursos operativos y, cuando corresponde, relacionar dicha
+información con el seguimiento de un Viaje.
 
-Durante la ejecución del servicio, los registros GPS permiten documentar la ubicación y el desplazamiento de los recursos operativos.
+Estos registros constituyen el soporte para el seguimiento en tiempo
+real y el análisis histórico de la operación.
 
-Estos registros constituyen el soporte para el seguimiento en tiempo real y el análisis histórico de la operación.
+	🟢 Muy bien
 
 Viaje → Eventos
 
 A lo largo de su ciclo de vida, un Viaje genera Eventos que documentan los cambios de estado y las acciones relevantes ocurridas durante la operación.
 
 Estos eventos conforman la trazabilidad operativa del sistema.
+	🟢 Muy bien
 
 Viaje → Pagos
 
 Finalizada la prestación del servicio, el Viaje puede originar operaciones comerciales vinculadas al cobro y a la gestión financiera correspondiente.
+
+🟢 Correcto.
 
 Cierre del apartado
 
 Las relaciones conceptuales descritas representan la secuencia lógica mediante la cual el SGOF administra la prestación de un servicio de transporte. Esta organización permite mantener separadas las responsabilidades de cada entidad, facilitando la evolución del sistema y preservando la coherencia del modelo de datos.
 
 	Del análisis del Modelo Conceptual surge la existencia de dos ejes complementarios que estructuran el funcionamiento del SGOF. El primero corresponde al eje organizacional, representado por la entidad Empresa, que establece el contexto administrativo y operativo del sistema. El segundo corresponde al eje operativo, representado por la entidad Viaje, alrededor de la cual se articulan los procesos de asignación, ejecución, seguimiento y registro de los servicios. La interacción entre ambos ejes proporciona al modelo una estructura coherente, escalable y orientada a los procesos de negocio.
+
+🟢 Correcto a nivel conceptual.
+
+ 
+4.4 Relaciones Conceptuales
+---------------------------
+Estado:
+🟢 Conforme
 
 =====================================================
 
@@ -323,7 +531,10 @@ Las personas (choferes, usuarios, clientes) y los recursos físicos (taxis, tabl
 
 4. Modelo Orientado a Procesos
 
-El sistema se estructura alrededor del proceso de prestación del servicio, representado conceptualmente por el ciclo Pedido → Viaje → Finalización.
+El sistema se estructura alrededor del proceso de prestación del
+servicio, desde la generación del Pedido, pasando por la Asignación
+de los recursos necesarios, hasta la ejecución y finalización del
+Viaje.
 
 5. Relaciones Basadas en la Operación
 
@@ -340,6 +551,12 @@ Toda información relevante para la gestión y trazabilidad de la operación se 
 8. Separación entre Concepto e Implementación
 
 El Modelo Conceptual representa el negocio; la implementación técnica corresponde al Modelo Relacional y a los componentes físicos del sistema.
+
+
+🔍 4.5 – Principios del Modelo Conceptual
+
+🟢 Conforme.
+
 
 =====================================================
 
@@ -358,12 +575,15 @@ Autor              : Proyecto SGOF
 Revisión Técnica   : Auditoría Técnica SGOF
 
 Fecha de creación  :
-Última revisión    :
+Última revisión    : : 09/08/2026
 
 Documento padre    :
-Documentos relacionados :
+Documentos relacionados : 
+
+003_Modelo_Relacional_SGOF_CORE_v1.0
+004_Base_de_Datos_PostgreSQL_SGOF_CORE_v1.0
 
 Próxima revisión   : Según evolución de la arquitectura
 
-
-
+🟢 Conforme
+002_Modelo_de_Datos_SGOF_CORE_v1.0 : AUDITADO🟢 

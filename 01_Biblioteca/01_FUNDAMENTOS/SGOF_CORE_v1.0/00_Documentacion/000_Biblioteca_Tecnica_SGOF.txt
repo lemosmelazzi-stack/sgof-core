@@ -1,11 +1,69 @@
-=====================================================
+
 
 SGOF-DOC-000
 BIBLIOTECA TÉCNICA DEL SGOF
 
+🟢 APROBADO.
+
 Normas Generales de Documentación
 
 =====================================================
+==============================================
+METADATOS DEL DOCUMENTO
+==============================================
+
+Título           : Biblioteca Técnica del SGOF
+Subtítulo        : Normas Generales de Documentación
+
+Código           : SGOF-DOC-000
+Versión          : 1.0
+Estado           : APROBADO
+
+Clasificación    : Documento Rector
+Proyecto         : SGOF Core
+
+Autor            : Equipo de Desarrollo SGOF
+Revisión Técnica : Auditoría Técnica SGOF
+
+Fecha de creación: ‎29 ‎de ‎julio ‎de ‎2026, ‏‎8:04:07
+Última revisión :  16 de Agosto del 2026 
+
+Ámbito de aplicación :
+Toda la Biblioteca Técnica del SGOF Core
+
+Documentos relacionados :
+Todos los documentos de la Biblioteca Técnica
+
+Próxima revisión :
+Cuando se modifique la metodología de documentación.
+
+=======================================================================
+• 000_Biblioteca_Tecnica_SGOF.txt
+
+Resumen Ejecutivo
+-----------------
+
+Documento rector de la Biblioteca Técnica del SGOF Core.
+
+Establece las normas generales que regulan la organización, estructura,
+codificación, mantenimiento y evolución de la documentación oficial
+del proyecto.
+
+Define los principios normativos de la Biblioteca, la organización
+documental, los estados oficiales de los documentos, el control de
+versiones y la metodología aplicable a su elaboración, revisión,
+aprobación y conservación.
+
+Establece además que la documentación debe representar el estado real
+del sistema, manteniendo las funcionalidades futuras expresamente
+identificadas y separadas de la especificación vigente.
+
+Constituye la referencia normativa principal para todos los documentos
+que integran la Biblioteca Técnica del SGOF Core.
+
+Estado: 🟢 APROBADO
+
+
 
 1. Objetivo
 ===========
@@ -17,14 +75,14 @@ del Sistema de Gestión Operativa de Flota (SGOF).
 =====================================================
 
 2. Principios Generales
------------------------
+=======================
 
 La Biblioteca Técnica constituye el repositorio oficial del conocimiento de ingeniería del Sistema de Gestión Operativa de Flota (SGOF).
 
 =====================================================
 
 3. Principios Normativos
-------------------------
+========================
 
 Ningún documento podrá describir funcionalidades que no hayan sido implementadas,  verificadas y consolidadas.
 Las funcionalidades futuras deberán identificarse expresamente como propuestas y mantenerse separadas de la especificación vigente.
@@ -32,7 +90,7 @@ Las funcionalidades futuras deberán identificarse expresamente como propuestas 
 =====================================================
 
 4. Biblioteca Técnica
----------------------
+=====================
 
 La Biblioteca Técnica SGOF constituye la documentación oficial del proyecto y representa el repositorio central del conocimiento de ingeniería desarrollado durante el diseño, implementación y evolución del Sistema de Gestión Operativa de Flota (SGOF).
 
@@ -45,7 +103,7 @@ La Biblioteca Técnica constituye la principal fuente de consulta para el manten
 ===================================================
 
 5. Codificación Documental
---------------------------
+==========================
 
 La Biblioteca Técnica del SGOF Core utiliza un sistema uniforme de codificación destinado a identificar de manera única cada documento y facilitar su localización dentro de la estructura general.
 
@@ -58,7 +116,7 @@ Todos los documentos deberán respetar este sistema de identificación durante t
 ======================================================
 
 6. Organización de la Biblioteca
---------------------------------
+================================
 
 La Biblioteca Técnica se organiza mediante una estructura jerárquica de carpetas y documentos, agrupados por áreas temáticas de la plataforma.
 
@@ -77,32 +135,39 @@ Este criterio permite mantener una Biblioteca clara, consistente y fácilmente m
 ====================================================
 
 7. Estados de los Documentos
-----------------------------
+============================
 
-Durante su elaboración, cada documento podrá encontrarse en uno de los siguientes estados:
+Durante su ciclo de vida, cada documento de la Biblioteca Técnica del
+SGOF Core deberá identificar claramente su estado documental.
 
-Borrador
+Los estados documentales oficiales son:
 
-Documento en proceso de elaboración o revisión.
+⚪ SIN INICIAR
+🔴 PENDIENTE
+🟠 EN PREPARACIÓN
+🟡 EN DESARROLLO
+🔵 EN REVISIÓN
+🟢 APROBADO
+⚫ ARCHIVADO
 
-En revisión
+Cada estado representa una condición específica dentro del proceso de
+elaboración, revisión, aprobación y conservación de la documentación.
 
-Documento cuyo contenido está siendo auditado y validado técnicamente.
+La definición, alcance y representación gráfica de cada estado se
+encuentran establecidos en:
 
-Aprobado
+000_Normas_Graficas_y_Simbolos_SGOF_CORE_v1.0.txt
 
-Documento revisado, validado e incorporado oficialmente a la Biblioteca Técnica.
+Los Estados del Proyecto, Estados de Trabajo y símbolos auxiliares no
+deberán utilizarse como sustitutos de los Estados Documentales.
 
-Obsoleto
-
-Documento reemplazado por una versión posterior o retirado de la documentación vigente.
-
-El estado deberá indicarse claramente en la versión oficial del documento cuando corresponda.
+El estado indicado en cada documento deberá corresponder a su situación
+real y actualizarse cuando se produzca un cambio en su ciclo documental. 
 
 ======================================================
 
 8. Control de Versiones
------------------------
+=======================
 
 Cada documento de la Biblioteca Técnica deberá mantener un control de versiones que permita identificar su evolución a lo largo del tiempo.
 
@@ -144,75 +209,94 @@ La Biblioteca Técnica evoluciona junto con el sistema, preservando el conocimie
 =======================================================
 
 10. Relación con la Biblioteca Técnica
-==================================
+=====================================
 
-El presente documento constituye la referencia arquitectónica principal del Sistema de Gestión Operativa de Flota (SGOF). Los documentos técnicos específicos desarrollan en detalle cada uno de los componentes aquí descritos,
-manteniendo la coherencia con los principios, la arquitectura y el flujo operativo establecidos en el presente documento.
+El presente documento constituye la referencia normativa principal para
+la organización, estructura, codificación, mantenimiento y evolución
+documental de la Biblioteca Técnica del SGOF Core.
+
+Los documentos que integran la Biblioteca Técnica deberán mantener
+coherencia con los principios generales, criterios de organización,
+metodología documental y normas de versionado establecidos en el
+presente documento.
+
+Las disposiciones específicas de carácter arquitectónico, funcional,
+técnico u operativo serán desarrolladas en los documentos
+correspondientes a cada área del Proyecto SGOF Core.
 
 ========================================================
 
 ANEXO A
--------
+=======
 
 Índice Maestro de la Biblioteca Técnica
 =======================================
 
-El presente índice constituye el registro oficial de los documentos que integran la Biblioteca Técnica del Sistema de Gestión Operativa de Flota (SGOF).
+El presente índice identifica las principales áreas documentales que
+integran la Biblioteca Técnica del Sistema de Gestión Operativa de Flota
+(SGOF) y sus documentos técnicos de referencia.
 
-Su actualización deberá realizarse cada vez que se incorpore un nuevo documento, se modifique el estado de uno existente o se apruebe una nueva versión documental.
+Su finalidad es proporcionar una visión general de la organización
+documental del proyecto.
 
-------------------------------------------------------------
-Código            Documento                         Estado
-------------------------------------------------------------
+El detalle completo de carpetas, documentos, versiones y estados vigentes
+se mantiene en:
 
-SGOF-DOC-000      Biblioteca Técnica               ✔ Consolidado
+001_Inventario_General_Biblioteca_Tecnica_SGOF_CORE.txt
 
-SGOF-ARQ-001      Arquitectura General             ✔ Consolidado
+La descripción funcional y documental de cada componente se mantiene en:
 
-SGOF-BD-001       Base de Datos                    Pendiente
+002_Indice_Descriptivo_Biblioteca_SGOF_CORE_v1.0.txt
 
-SGOF-BE-001       Backend                          Pendiente
 
-SGOF-FE-001       Frontend                         Pendiente
+===========================================================================
+Código          Área / Documento de Referencia                 Estado
+===========================================================================
 
-SGOF-SIO-001      Socket.IO                        Pendiente
+SGOF-DOC-000    Biblioteca Técnica / Normas Generales          🟢 APROBADO
 
-SGOF-GPS-001      GPS                              Pendiente
+SGOF-ARQ-001    Arquitectura General                           🟢 APROBADO
 
-SGOF-ALG-001      Algoritmos                       Pendiente
+SGOF-BE-001     Backend                                        🟢 APROBADO
 
-SGOF-API-001      API                              Pendiente
+SGOF-FE-001     Frontend                                       🟢 APROBADO
 
-SGOF-OPS-001      Flujo Operativo                  Pendiente
+SGOF-BD-002     Modelo de Datos                                🟢 APROBADO
 
-==========================================================
+SGOF-BD-003     Modelo Relacional                              🟢 APROBADO
 
-==============================================
-METADATOS DEL DOCUMENTO
-==============================================
+SGOF-SIO-001    Socket.IO                                      🟢 APROBADO
 
-Título           : Biblioteca Técnica del SGOF
-Subtítulo        : Normas Generales de Documentación
+SGOF-ALG-000    Metodología de Algoritmos                      🟢 APROBADO
 
-Código           : SGOF-DOC-000
-Versión          : 1.0
-Estado           : APROBADO
+SGOF-ALG-001    Asignación Inteligente                         🟢 APROBADO
 
-Clasificación    : Documento Rector
-Proyecto         : SGOF Core
+SGOF-ALG-002    Cola Operativa                                 🟢 APROBADO
 
-Autor            : Equipo de Desarrollo SGOF
-Revisión Técnica : Auditoría Técnica SGOF
+SGOF-ALG-003    Calidad GPS                                    🟢 APROBADO
 
-Fecha de creación:
-Última revisión :
+SGOF-GPS-001    Sistema GPS                                    🟢 APROBADO
 
-Ámbito de aplicación :
-Toda la Biblioteca Técnica del SGOF Core
+SGOF-API-001    API REST                                       🟢 APROBADO
 
-Documentos relacionados :
-Todos los documentos de la Biblioteca Técnica
+SGOF-OPS-001    Cola Inteligente                               🟢 APROBADO
 
-Próxima revisión :
-Cuando se modifique la metodología de documentación.
+SGOF-OPS-002    Asignación Inteligente                         🟢 APROBADO
 
+SGOF-OPS-003    Gestión de Viajes                              🟢 APROBADO
+
+SGOF-OPS-004    Gestión de Pedidos                             🟢 APROBADO
+
+===========================================================================
+
+  Estado final: 🟢 APROBADO.===========================================================================
+Nota:
+----
+El presente Índice Maestro proporciona una referencia general y no
+sustituye al Inventario General ni al Índice Descriptivo de la Biblioteca
+Técnica.
+
+Los estados indicados deberán mantenerse sincronizados con la
+documentación vigente.
+
+===========================================================================

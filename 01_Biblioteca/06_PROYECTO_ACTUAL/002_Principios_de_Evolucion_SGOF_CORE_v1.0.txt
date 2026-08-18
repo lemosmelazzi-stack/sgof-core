@@ -1,0 +1,58 @@
+002_Principios_de_Evolucion_SGOF_CORE_v1.0
+------------------------------------------
+
+1. Introducción
+---------------
+El Proyecto SGOF Core se desarrolla mediante un proceso evolutivo basado en planificación, implementación, validación y mejora continua.
+
+Con el propósito de preservar la coherencia técnica, metodológica y documental del proyecto, se establecen los presentes Principios de Evolución, que servirán como guía para las decisiones adoptadas durante las distintas etapas de desarrollo.
+
+Los principios aquí definidos constituyen el marco conceptual del proyecto y podrán ampliarse o perfeccionarse a medida que el SGOF evolucione y se consolide mediante la experiencia obtenida durante su utilización.
+
+2. Objetivo
+-----------
+
+Establecer un conjunto de principios generales que orienten la evolución del Proyecto SGOF Core, promoviendo una metodología de trabajo basada en la planificación, la evidencia, la documentación y la mejora continua.
+
+3. Alcance
+----------
+
+Los presentes principios serán aplicables a todas las etapas del Proyecto SGOF Core y servirán como referencia para la planificación, implementación, validación y evolución de la plataforma.
+
+Su finalidad es proporcionar criterios comunes para la toma de decisiones, sin sustituir la planificación específica de cada etapa del proyecto.
+
+
+4. Principios Rectores
+----------------------
+
+4.1 La necesidad precede al desarrollo.
+
+4.2 El análisis precede al diseño.
+
+4.3 El diseño precede a la implementación.
+
+4.4 La implementación precede a la validación.
+
+4.5 La validación precede a la certificación.
+
+4.6 La certificación precede a la evolución.
+
+4.7 La documentación acompaña todo el proceso.
+
+4.8 La arquitectura prevalece sobre las soluciones particulares.
+
+4.9 La evidencia fundamenta las decisiones.
+
+4.10 La mejora continua constituye un proceso permanente.
+
+5. Consideraciones Finales
+--------------------------
+
+Los presentes principios constituyen una guía metodológica para el desarrollo del Proyecto SGOF Core.
+
+Su aplicación práctica permitirá consolidar una forma de trabajo basada en la evidencia, la trazabilidad y la mejora continua.
+
+A medida que el proyecto evolucione y se incorporen nuevas experiencias derivadas de la operación del sistema, estos principios podrán ser revisados, ampliados o complementados, manteniendo siempre su finalidad de orientar el crecimiento ordenado y sostenible del Proyecto SGOF Core.
+
+
+

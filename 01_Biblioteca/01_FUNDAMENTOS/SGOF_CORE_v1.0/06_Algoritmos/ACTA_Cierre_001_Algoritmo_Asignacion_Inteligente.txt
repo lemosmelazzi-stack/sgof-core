@@ -2,6 +2,28 @@
            ACTA DE CIERRE DE DOCUMENTO
 ==============================================================
 
+# METADATOS DEL DOCUMENTO
+
+Título             : ACTA_Cierre_001_Algoritmo_Asignacion_Inteligente
+Código             : No aplica
+Versión            : 1.0
+Estado             : APROBADO
+
+Clasificación      : Acta de Cierre
+Proyecto           : SGOF Core
+
+Autor              : Proyecto SGOF
+Revisión Técnica   : Auditoría Técnica SGOF
+
+Fecha de creación  : 03/08/2026
+Última revisión    : 15/08/2026
+
+Documento asociado :
+- 001_Algoritmo_Asignacion_Inteligente_SGOF_CORE_v1.0
+
+Próxima revisión   : No aplica
+
+===========================================================================
 Documento :
 
 001_Algoritmo_Asignacion_Inteligente_SGOF_CORE_v1.0
@@ -47,3 +69,8 @@ de la Asignación Inteligente de recursos operativos.
 ==============================================================
                  DOCUMENTO CERRADO
 ==============================================================
+
+🟢 ACTA DE CIERRE 001 — CONFORME
+🟢 Sin observaciones pendientes.
+
+===============================================================

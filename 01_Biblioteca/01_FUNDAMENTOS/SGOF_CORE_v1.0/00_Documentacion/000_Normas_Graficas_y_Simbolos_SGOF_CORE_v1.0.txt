@@ -1,0 +1,482 @@
+
+000_Normas_Graficas_y_Simbolos_SGOF_CORE_v1.0.txt
+
+Estado: 🟢 APROBADO
+=============================================================
+
+Resumen Ejecutivo
+=================
+
+• 000_Normas_Graficas_y_Simbolos_SGOF_CORE_v1.0.txt
+
+Resumen Ejecutivo
+-----------------
+
+Establece las normas gráficas y la simbología oficial utilizada en la
+Biblioteca Técnica del SGOF Core, definiendo criterios uniformes para
+representar visualmente estados, categorías, observaciones y niveles
+de avance.
+
+Define los Estados Documentales, Estados del Proyecto, símbolos de
+identificación documental, Estados de Trabajo y símbolos de evaluación
+y observación.
+
+Establece además el control previo requerido para otorgar a un documento
+el estado de aprobado y los criterios para la incorporación futura de
+nuevas convenciones gráficas.
+
+Constituye la referencia normativa vigente para mantener una representación
+visual uniforme y coherente en toda la Biblioteca Técnica.
+
+Estado: 🟢 APROBADO
+
+===================================================================
+1. Objetivo
+===========
+
+Establecer y normalizar las convenciones gráficas, símbolos e indicadores
+visuales utilizados en la Biblioteca Técnica del Proyecto SGOF Core.
+
+Estas normas tienen como finalidad facilitar la identificación inmediata
+del estado, naturaleza o condición de los distintos elementos documentales
+y operativos representados dentro de la Biblioteca.
+
+La utilización uniforme de estas convenciones permitirá preservar la
+coherencia visual de la documentación y evitar interpretaciones diferentes
+de un mismo símbolo o estado.
+
+
+2. Principios de Utilización
+============================
+
+La simbología definida en el presente documento deberá utilizarse de
+forma uniforme en toda la Biblioteca Técnica del SGOF Core.
+
+Cada símbolo tendrá un significado específico dentro de la categoría
+a la que pertenece y deberá utilizarse únicamente para representar
+la condición definida en estas normas.
+
+Los colores, iconos y símbolos constituyen elementos auxiliares de
+identificación visual y no sustituyen la denominación escrita del
+estado cuando esta resulte necesaria para evitar ambigüedades.
+
+La utilización de símbolos deberá respetar los siguientes principios:
+
+• uniformidad de significado;
+• claridad de interpretación;
+• utilización consistente entre documentos;
+• ausencia de símbolos diferentes para una misma condición;
+• separación entre estados documentales, estados del proyecto,
+  indicadores de trabajo y símbolos informativos.
+
+Cuando resulte necesario incorporar una nueva convención gráfica,
+esta deberá ser definida previamente en el presente documento antes
+de utilizarse como norma general dentro de la Biblioteca Técnica.
+
+3. Estados Documentales
+=======================
+
+Los estados documentales permiten identificar visualmente la situación
+de cada documento dentro de su ciclo de elaboración, revisión, aprobación
+y conservación.
+
+Las convenciones oficiales son las siguientes:
+
+
+⚪ SIN INICIAR
+
+Documento previsto o reservado cuya elaboración aún no ha comenzado.
+
+
+🔴 PENDIENTE
+
+Documento cuya elaboración, revisión o actualización se encuentra
+pendiente de ejecución.
+
+
+🟠 EN PREPARACIÓN
+
+Documento para el cual se están reuniendo antecedentes, definiendo su
+estructura o preparando las condiciones necesarias para su desarrollo.
+
+
+🟡 EN DESARROLLO
+
+Documento cuyo contenido se encuentra actualmente en proceso de
+elaboración o ampliación.
+
+
+🔵 EN REVISIÓN
+
+Documento cuyo contenido está siendo revisado, auditado o validado antes
+de determinar su estado definitivo.
+
+
+🟢 APROBADO
+
+Documento revisado y validado que forma parte de la documentación oficial
+vigente de la Biblioteca Técnica.
+
+
+⚫ ARCHIVADO
+
+Documento retirado de la documentación vigente que se conserva por
+razones históricas, de trazabilidad o como antecedente del proyecto.
+
+
+4. Estados del Proyecto
+=======================
+
+Los Estados del Proyecto permiten representar visualmente la situación
+general del Proyecto SGOF Core o de aquellos componentes cuya condición
+operativa deba ser identificada.
+
+Estos estados no representan la situación documental de un archivo,
+sino la condición funcional, operativa o evolutiva del elemento al que
+se aplican.
+
+Las convenciones oficiales son las siguientes:
+
+
+⚪ PLANIFICADO
+
+Componente, etapa o funcionalidad prevista cuya ejecución o puesta en
+funcionamiento aún no ha comenzado.
+
+
+🟠 EN PRUEBAS
+
+Componente o funcionalidad que se encuentra sometido a pruebas,
+verificaciones o validaciones antes de su utilización operativa.
+
+
+🔵 EN CERTIFICACIÓN
+
+Componente, etapa o conjunto documental que se encuentra sometido a un
+proceso formal de verificación previo a su aprobación o habilitación.
+
+
+🟢 OPERATIVO
+
+Componente o sistema que se encuentra funcionando conforme a las
+condiciones previstas para su etapa actual.
+
+
+🟡 OPERATIVO CON OBSERVACIONES
+
+Componente o sistema que se encuentra operativo, pero presenta
+observaciones conocidas que requieren seguimiento, corrección o
+evaluación posterior.
+
+
+🔴 FUERA DE SERVICIO
+
+Componente o sistema que no se encuentra disponible para su utilización
+operativa.
+
+
+
+5. Símbolos de Identificación Documental
+========================================
+
+Los símbolos de identificación documental permiten reconocer visualmente
+la naturaleza del elemento representado dentro de la Biblioteca Técnica
+del SGOF Core.
+
+Estos símbolos no indican estados de avance, aprobación o funcionamiento.
+Su finalidad consiste exclusivamente en identificar el tipo de elemento
+documental al que acompañan.
+
+Las convenciones oficiales son las siguientes:
+
+
+📄 DOCUMENTO
+
+Identifica un documento técnico, funcional, metodológico o institucional
+perteneciente a la Biblioteca Técnica.
+
+
+📝 BORRADOR
+
+Identifica material preliminar de trabajo que todavía no constituye una
+versión documental oficial.
+
+
+📚 BIBLIOTECA
+
+Identifica la Biblioteca Técnica o una referencia general al conjunto
+documental del Proyecto SGOF Core.
+
+
+📦 REPOSITORIO
+
+Identifica un repositorio destinado al almacenamiento organizado de
+documentación, código, evidencias u otros recursos del proyecto.
+
+
+📁 CARPETA
+
+Identifica una carpeta o agrupación estructural dentro de la organización
+documental del proyecto.
+
+
+📌 OBSERVACIÓN
+
+Identifica una observación, aclaración o consideración que requiere ser
+destacada dentro de un documento o proceso de revisión.
+
+
+📎 EVIDENCIA
+
+Identifica material utilizado como respaldo o evidencia de una
+verificación, revisión, auditoría o decisión.
+
+
+📷 CAPTURA
+
+Identifica una imagen o captura utilizada como evidencia visual.
+
+
+📊 INFORME
+
+Identifica un documento destinado a presentar resultados, evaluaciones,
+mediciones o conclusiones derivadas de un proceso determinado.
+
+
+📋 ACTA
+
+Identifica un documento formal destinado a dejar constancia de una
+decisión, aprobación, cierre, consolidación o acontecimiento relevante.
+
+
+6. Estados de Trabajo
+=====================
+
+Los Estados de Trabajo constituyen indicadores visuales auxiliares
+utilizados para identificar actividades, situaciones o etapas específicas
+durante el desarrollo, revisión y evolución del Proyecto SGOF Core.
+
+Estos indicadores no sustituyen los Estados Documentales ni los Estados
+del Proyecto definidos en los capítulos anteriores.
+
+Su utilización tiene carácter informativo y permite reconocer rápidamente
+la naturaleza de una actividad o situación de trabajo.
+
+
+🚧 EN CONSTRUCCIÓN
+
+Indica que un documento, componente o estructura se encuentra siendo
+construido o completado.
+
+
+🛠️ EN DESARROLLO
+
+Indica la realización activa de tareas de desarrollo, modificación o
+implementación.
+
+
+🔍 EN ANÁLISIS
+
+Indica que un elemento, problema o propuesta se encuentra bajo estudio,
+inspección o evaluación.
+
+
+🧪 EN PRUEBAS
+
+Indica la realización de pruebas destinadas a verificar comportamiento,
+funcionamiento o resultados.
+
+
+🎯 OBJETIVO
+
+Identifica una meta, propósito o resultado que se pretende alcanzar.
+
+
+🏁 FINALIZADO
+
+Indica que una tarea, actividad o etapa de trabajo ha sido completada.
+
+
+🚀 PRODUCCIÓN
+
+Identifica una instancia, componente o versión destinada al entorno
+operativo de producción.
+
+
+💡 IDEA
+
+Identifica una propuesta, posibilidad o concepto sujeto a evaluación
+antes de su eventual incorporación al proyecto.
+
+
+⭐ RECOMENDACIÓN
+
+Identifica una recomendación surgida de una revisión, análisis, auditoría
+o proceso de mejora.
+
+7. Símbolos de Evaluación y Observación
+=======================================
+
+Los símbolos de evaluación y observación permiten destacar resultados,
+advertencias o información relevante durante los procesos de revisión,
+auditoría, documentación y seguimiento del Proyecto SGOF Core.
+
+Estos símbolos tienen carácter complementario y no sustituyen los
+Estados Documentales, los Estados del Proyecto ni los Estados de Trabajo.
+
+
+✅ APROBADO / CORRECTO
+
+Indica que un elemento, verificación o condición ha sido evaluado
+satisfactoriamente o considerado correcto dentro del contexto en el
+que se utiliza.
+
+
+❌ RECHAZADO / INCORRECTO
+
+Indica que un elemento, propuesta, verificación o condición no ha sido
+aceptado o presenta un resultado incorrecto.
+
+
+⚠️ ATENCIÓN
+
+Identifica una situación que requiere especial consideración,
+seguimiento, revisión o eventual corrección.
+
+
+ℹ️ INFORMACIÓN
+
+Identifica información complementaria, aclaratoria o de referencia
+destinada a facilitar la comprensión de un contenido.
+
+
+8. Control Previo a la Aprobación
+=================================
+
+Antes de otorgar a un documento el estado 🟢 APROBADO, deberá realizarse
+una verificación básica destinada a comprobar que el contenido reúne las
+condiciones necesarias para formar parte de la documentación oficial
+vigente de la Biblioteca Técnica.
+
+El control comprenderá las siguientes preguntas:
+
+
+1. Integridad del contenido
+
+¿El contenido previsto para la versión evaluada se encuentra completo?
+
+☐ Sí
+☐ No
+
+
+2. Coherencia documental
+
+¿El documento mantiene coherencia con el resto de la Biblioteca Técnica
+y con los documentos relacionados?
+
+☐ Sí
+☐ No
+
+
+3. Uniformidad estructural
+
+¿El documento mantiene una estructura y presentación compatibles con
+las normas documentales vigentes?
+
+☐ Sí
+☐ No
+
+
+4. Ausencia de duplicaciones
+
+¿Se verificó que el documento no reproduzca innecesariamente contenidos
+cuya responsabilidad corresponde a otro documento de la Biblioteca?
+
+☐ Sí
+☐ No
+
+
+5. Vigencia
+
+¿El contenido representa la versión documental vigente y refleja
+correctamente el estado conocido del elemento documentado?
+
+☐ Sí
+☐ No
+
+
+Criterio de Aprobación
+----------------------
+
+Un documento podrá recibir el estado:
+
+🟢 APROBADO
+
+cuando las verificaciones anteriores hayan sido respondidas
+satisfactoriamente y no existan observaciones pendientes que impidan
+su incorporación como documentación oficial vigente.
+
+Cuando alguna condición no se encuentre cumplida, el documento deberá
+mantener el estado que corresponda a su situación real hasta completar
+las correcciones o verificaciones necesarias.
+
+
+9. Incorporación de Nuevos Símbolos
+===================================
+
+Las normas gráficas y la simbología definidas en el presente documento
+podrán ampliarse cuando la evolución del Proyecto SGOF Core requiera
+representar nuevas condiciones, estados, categorías o situaciones que
+no se encuentren contempladas en las convenciones vigentes.
+
+La incorporación de un nuevo símbolo deberá responder a una necesidad
+concreta y evitar la creación de convenciones innecesarias o duplicadas.
+
+Antes de incorporar una nueva convención gráfica deberá verificarse:
+
+• que no exista un símbolo vigente con el mismo significado;
+• que su interpretación resulte clara y suficientemente diferenciada;
+• que corresponda a una categoría definida dentro de estas normas;
+• que su utilización pueda mantenerse de forma uniforme en la Biblioteca;
+• que no genere contradicciones con otras convenciones existentes.
+
+Una vez incorporado un nuevo símbolo como convención general, deberá
+actualizarse el presente documento para mantener vigente la referencia
+normativa de simbología de la Biblioteca Técnica.
+
+Las ampliaciones deberán procurar preservar la coherencia visual y la
+simplicidad del sistema gráfico, evitando que la cantidad de símbolos
+dificulte su interpretación.
+
+10. Vigencia de las Normas
+==========================
+
+El presente documento constituye la referencia normativa vigente para
+la utilización de símbolos, colores, indicadores visuales y convenciones
+gráficas dentro de la Biblioteca Técnica del Proyecto SGOF Core.
+
+Las convenciones aquí definidas deberán aplicarse de forma uniforme en
+los documentos de la Biblioteca cuando resulte necesaria la representación
+visual de estados, categorías, actividades, evaluaciones u observaciones.
+
+En caso de existir diferencias entre convenciones gráficas utilizadas en
+documentos anteriores y las establecidas en el presente documento,
+prevalecerán las definiciones contenidas en esta versión vigente.
+
+Los documentos históricos conservarán la simbología correspondiente a
+su momento de elaboración cuando su modificación no resulte necesaria,
+preservando de esta forma la trazabilidad documental del proyecto.
+
+Toda modificación futura de las presentes normas deberá realizarse
+mediante una revisión controlada del documento, manteniendo registro de
+la versión correspondiente y evitando alterar innecesariamente las
+convenciones ya consolidadas.
+
+La vigencia del presente documento se mantendrá hasta su sustitución por
+una versión posterior formalmente revisada y aprobada.
+
+
+==========================================================
+
+Estado: 🟢 APROBADO
+==========================================================

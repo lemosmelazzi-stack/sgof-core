@@ -1,7 +1,19 @@
-04_Base_de_Datos
+
+==============================================================
+04_BASE_DE_DATOS
+==============================================================
+
+002_Modelo_de_Datos_SGOF_CORE_v1.0.txt
+Código : SGOF-BD-001
+Estado : 🟢 APROBADO
+
+003_Modelo_Relacional_SGOF_CORE_v1.0.txt
+Código : SGOF-BD-003
+Estado : 🟢 APROBADO
+
 
 003_Modelo_Relacional_SGOF_CORE_v1.0
-
+====================================
 disciplina:
 	Auditar.
 	Comprender.
