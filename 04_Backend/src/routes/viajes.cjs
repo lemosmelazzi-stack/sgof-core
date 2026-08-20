@@ -602,10 +602,7 @@ router.post('/:id/iniciar', async (req, res) => {
   });
 }
 
-if (
-  viaje.estado !== 'en_origen' &&
-  viaje.estado !== 'en_camino_origen'
-) {
+if (viaje.estado !== 'en_origen') {
   return res.status(400).json({
     ok: false,
     mensaje: `No se puede iniciar un viaje en estado ${viaje.estado}`
