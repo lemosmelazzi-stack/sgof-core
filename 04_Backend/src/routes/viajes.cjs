@@ -947,8 +947,15 @@ router.post('/:id/aceptar', async (req, res) => {
 router.post('/asignar', async (req, res) => {
 
   try {
-
+    
     const { viaje_id, taxi_id } = req.body;
+
+    if (!viaje_id || !taxi_id) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'viaje_id y taxi_id son obligatorios'
+      });
+    }
 
 const taxiExiste = await pool.query(`
   SELECT id, codigo_movil, estado, activo
