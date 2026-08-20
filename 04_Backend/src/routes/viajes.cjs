@@ -504,7 +504,11 @@ router.post('/:id/rechazar', async (req, res) => {
           fecha_actualizacion = NOW()
       WHERE id = $1
     `, [taxiActualId]);
-
+await colaTaxis.moverTaxiAlFinal(
+  pool,
+  taxiActualId,
+  'Taxi rechazó viaje'
+);
     const siguienteTaxi = await pool.query(`
   SELECT id, codigo_movil
   FROM taxis
