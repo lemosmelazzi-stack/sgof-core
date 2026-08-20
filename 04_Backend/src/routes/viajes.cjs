@@ -964,6 +964,16 @@ if (taxiExiste.rows.length === 0) {
   });
 }
 
+if (
+  taxiExiste.rows[0].activo !== true ||
+  taxiExiste.rows[0].estado !== 'disponible'
+) {
+  return res.status(400).json({
+    ok: false,
+    mensaje: `El taxi ${taxiExiste.rows[0].codigo_movil} no está disponible para asignación`
+  });
+}
+
 const taxiConViajeActivo = await pool.query(`
   SELECT id, codigo, estado
   FROM viajes
