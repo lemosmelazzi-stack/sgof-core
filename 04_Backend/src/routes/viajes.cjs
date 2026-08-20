@@ -426,50 +426,6 @@ router.post('/:id/despachar', async (req, res) => {
   });
 });
 
-
-// 🔴 NUEVO: rechazar taxi
-router.post('/:id/rechazar-taxi', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const viaje = await pool.query(`
-      SELECT taxi_id
-      FROM viajes
-      WHERE id = $1
-      LIMIT 1
-    `, [id]);
-
-    if (viaje.rows.length === 0 || !viaje.rows[0].taxi_id) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: 'El viaje no tiene taxi asignado'
-      });
-    }
-
-    const taxi_id = viaje.rows[0].taxi_id;
-
-    await pool.query(`
-      UPDATE viajes
-      SET taxi_id = NULL,
-          estado = 'pendiente',
-          fecha_actualizacion = NOW()
-      WHERE id = $1
-    `, [id]);
-
-    res.json({
-      ok: true,
-      mensaje: 'Taxi rechazado correctamente'
-    });
-
-  } catch (error) {
-    console.error('Error en rechazar taxi:', error);
-    res.status(500).json({
-      ok: false,
-      mensaje: 'Error al rechazar taxi'
-    });
-  }
-});
-
 router.post('/:id/rechazar', async (req, res) => {
   try {
     const { id } = req.params;
