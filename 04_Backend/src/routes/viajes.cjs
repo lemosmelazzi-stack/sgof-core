@@ -945,9 +945,9 @@ router.post('/:id/aceptar', async (req, res) => {
 });
 
 router.post('/asignar', async (req, res) => {
+  const client = await pool.connect();
 
   try {
-    
     const { viaje_id, taxi_id } = req.body;
 
     if (!viaje_id || !taxi_id) {
@@ -957,100 +957,110 @@ router.post('/asignar', async (req, res) => {
       });
     }
 
-const taxiExiste = await pool.query(`
-  SELECT id, codigo_movil, estado, activo
-  FROM taxis
-  WHERE id = $1
-  LIMIT 1
-`, [taxi_id]);
+    await client.query('BEGIN');
 
-if (taxiExiste.rows.length === 0) {
-  return res.status(404).json({
-    ok: false,
-    mensaje: 'Taxi no encontrado'
-  });
-}
+    const taxiExiste = await client.query(`
+      SELECT id, codigo_movil, estado, activo
+      FROM taxis
+      WHERE id = $1
+      LIMIT 1
+    `, [taxi_id]);
 
-if (
-  taxiExiste.rows[0].activo !== true ||
-  taxiExiste.rows[0].estado !== 'disponible'
-) {
-  return res.status(400).json({
-    ok: false,
-    mensaje: `El taxi ${taxiExiste.rows[0].codigo_movil} no está disponible para asignación`
-  });
-}
+    if (taxiExiste.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Taxi no encontrado'
+      });
+    }
 
-const taxiConViajeActivo = await pool.query(`
-  SELECT id, codigo, estado
-  FROM viajes
-  WHERE taxi_id = $1
-    AND estado IN ('asignado', 'en_camino_origen', 'en_origen', 'en_curso')
-    AND id <> $2
-  LIMIT 1
-`, [taxi_id, viaje_id]);
+    if (
+      taxiExiste.rows[0].activo !== true ||
+      taxiExiste.rows[0].estado !== 'disponible'
+    ) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        mensaje: `El taxi ${taxiExiste.rows[0].codigo_movil} no está disponible para asignación`
+      });
+    }
 
-if (taxiConViajeActivo.rows.length > 0) {
-  return res.status(400).json({
-    ok: false,
-    mensaje: `El taxi ${taxiExiste.rows[0].codigo_movil} ya tiene un viaje activo`
-  });
-}
-    const result = await pool.query(
-      `
+    const taxiConViajeActivo = await client.query(`
+      SELECT id, codigo, estado
+      FROM viajes
+      WHERE taxi_id = $1
+        AND estado IN ('asignado', 'en_camino_origen', 'en_origen', 'en_curso')
+        AND id <> $2
+      LIMIT 1
+    `, [taxi_id, viaje_id]);
+
+    if (taxiConViajeActivo.rows.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        mensaje: `El taxi ${taxiExiste.rows[0].codigo_movil} ya tiene un viaje activo`
+      });
+    }
+
+    const result = await client.query(`
       UPDATE viajes
-    SET
-       taxi_id = $1,
-       estado = 'asignado',
-       fecha_hora_asignacion = NOW(),
-       fecha_actualizacion = NOW()
-     WHERE id = $2
-     AND estado = 'pendiente'
-     RETURNING *
-      `,
-      [taxi_id, viaje_id]
-    );
-     if (result.rows.length === 0) {
-    return res.status(400).json({
-    ok: false,
-    mensaje: 'El viaje no existe o no está pendiente'
-  });
-}
-    const taxiUpdate = await pool.query(
-      `
+      SET
+        taxi_id = $1,
+        estado = 'asignado',
+        fecha_hora_asignacion = NOW(),
+        fecha_actualizacion = NOW()
+      WHERE id = $2
+        AND estado = 'pendiente'
+      RETURNING *
+    `, [taxi_id, viaje_id]);
+
+    if (result.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El viaje no existe o no está pendiente'
+      });
+    }
+
+    const taxiUpdate = await client.query(`
       UPDATE taxis
       SET
         estado = 'ocupado',
         fecha_actualizacion = NOW()
       WHERE id = $1
       RETURNING *
-      `,
-      [taxi_id]
-    );
+    `, [taxi_id]);
 
-  const io = req.app.get('io');
+    await client.query('COMMIT');
 
-   if (io) {
-  io.emit('taxi-actualizado', taxiUpdate.rows[0]);
-  io.emit('viaje-actualizado', result.rows[0]);
-  io.emit('cola-operativa-actualizada');
-}
-    
+    const io = req.app.get('io');
+
+    if (io) {
+      io.emit('taxi-actualizado', taxiUpdate.rows[0]);
+      io.emit('viaje-actualizado', result.rows[0]);
+      io.emit('cola-operativa-actualizada');
+    }
+
     res.json({
       ok: true,
       mensaje: 'Taxi asignado correctamente',
       viaje: result.rows[0],
       taxi: taxiUpdate.rows[0]
     });
-   
- } catch (error) {
-  console.error('ERROR /viajes/asignar:', error);
 
-  res.status(500).json({
-    ok: false,
-    error: error.message
-  });
-}
+  } catch (error) {
+    await client.query('ROLLBACK');
+
+    console.error('ERROR /viajes/asignar:', error);
+
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+
+  } finally {
+    client.release();
+  }
 });
 
 function calcularScoreOperativo({
