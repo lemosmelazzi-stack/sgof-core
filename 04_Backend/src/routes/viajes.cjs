@@ -1098,6 +1098,7 @@ router.post('/asignar', async (req, res) => {
     SET
        taxi_id = $1,
        estado = 'asignado',
+       fecha_hora_asignacion = NOW(),
        fecha_actualizacion = NOW()
      WHERE id = $2
      RETURNING *
@@ -1741,6 +1742,7 @@ router.put('/:id/en-origen', async (req, res) => {
       UPDATE viajes
       SET
         estado = 'en_origen',
+        fecha_hora_llegada_origen = NOW(),
         fecha_actualizacion = NOW()
       WHERE id = $1
       RETURNING *
