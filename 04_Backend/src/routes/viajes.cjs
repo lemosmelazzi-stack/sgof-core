@@ -1441,7 +1441,7 @@ async function diagnosticarAsignacionInteligente(pool, viajeId) {
   const diferenciaKm =
     taxiBase.distancia_origen_km - taxiMasCercano.distancia_origen_km;
 
-  const UMBRAL_KM_ROMPER_COLA = 0.8;
+  const UMBRAL_KM_ROMPER_COLA = 1.5;
 
   const decisionActual = diferenciaKm >= UMBRAL_KM_ROMPER_COLA
     ? taxiMasCercano
