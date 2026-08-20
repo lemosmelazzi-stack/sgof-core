@@ -1101,11 +1101,17 @@ router.post('/asignar', async (req, res) => {
        fecha_hora_asignacion = NOW(),
        fecha_actualizacion = NOW()
      WHERE id = $2
+     AND estado = 'pendiente'
      RETURNING *
       `,
       [taxi_id, viaje_id]
     );
-
+     if (result.rows.length === 0) {
+    return res.status(400).json({
+    ok: false,
+    mensaje: 'El viaje no existe o no está pendiente'
+  });
+}
     const taxiUpdate = await pool.query(
       `
       UPDATE taxis
@@ -1736,7 +1742,37 @@ router.post('/:id/asignar-automatico', async (req, res) => {
 router.put('/:id/en-origen', async (req, res) => {
   try {
     const { id } = req.params;
-    
+ 
+    const viajeActual = await pool.query(`
+      SELECT id, estado, taxi_id
+      FROM viajes
+      WHERE id = $1
+      LIMIT 1
+    `, [id]);
+
+    if (viajeActual.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Viaje no encontrado'
+      });
+    }
+
+    const viaje = viajeActual.rows[0];
+
+    if (!viaje.taxi_id) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El viaje no tiene taxi asignado'
+      });
+    }
+
+    if (viaje.estado !== 'en_camino_origen') {
+      return res.status(400).json({
+        ok: false,
+        mensaje: `No se puede marcar en origen un viaje en estado ${viaje.estado}`
+      });
+    }
+
     const result = await pool.query(
       `
       UPDATE viajes
