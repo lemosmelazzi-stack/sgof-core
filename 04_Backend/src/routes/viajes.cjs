@@ -1051,6 +1051,35 @@ router.post('/asignar', async (req, res) => {
 
     const { viaje_id, taxi_id } = req.body;
 
+const taxiExiste = await pool.query(`
+  SELECT id, codigo_movil, estado, activo
+  FROM taxis
+  WHERE id = $1
+  LIMIT 1
+`, [taxi_id]);
+
+if (taxiExiste.rows.length === 0) {
+  return res.status(404).json({
+    ok: false,
+    mensaje: 'Taxi no encontrado'
+  });
+}
+
+const taxiConViajeActivo = await pool.query(`
+  SELECT id, codigo, estado
+  FROM viajes
+  WHERE taxi_id = $1
+    AND estado IN ('asignado', 'en_camino_origen', 'en_origen', 'en_curso')
+    AND id <> $2
+  LIMIT 1
+`, [taxi_id, viaje_id]);
+
+if (taxiConViajeActivo.rows.length > 0) {
+  return res.status(400).json({
+    ok: false,
+    mensaje: `El taxi ${taxiExiste.rows[0].codigo_movil} ya tiene un viaje activo`
+  });
+}
     const result = await pool.query(
       `
       UPDATE viajes
