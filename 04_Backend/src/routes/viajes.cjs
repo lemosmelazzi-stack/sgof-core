@@ -489,9 +489,15 @@ router.post('/:id/rechazar', async (req, res) => {
     }
 
     const viaje = viajeActual.rows[0];
-    const taxiActualId = viaje.taxi_id;
 
-    if (!taxiActualId) {
+if (viaje.estado !== 'asignado') {
+  return res.status(400).json({
+    ok: false,
+    mensaje: `No se puede rechazar un viaje en estado ${viaje.estado}`
+  });
+}
+const taxiActualId = viaje.taxi_id;
+if (!taxiActualId) {
       return res.status(400).json({
         ok: false,
         mensaje: 'El viaje no tiene taxi asignado para rechazar'
