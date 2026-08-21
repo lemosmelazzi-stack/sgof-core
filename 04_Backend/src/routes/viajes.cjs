@@ -908,8 +908,16 @@ router.post('/:id/aceptar', async (req, res) => {
       SET estado = 'en_camino_origen',
           fecha_actualizacion = NOW()
       WHERE id = $1
+        AND estado = 'asignado'
       RETURNING *
     `, [id]);
+
+    if (viajeUpdate.rows.length === 0) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El viaje ya no está disponible para aceptar'
+      });
+    }
 
     const taxiUpdate = await pool.query(`
       UPDATE taxis
@@ -974,7 +982,7 @@ router.post('/asignar', async (req, res) => {
         mensaje: 'Taxi no encontrado'
       });
     }
-    
+
     if (
       taxiExiste.rows[0].activo !== true ||
       taxiExiste.rows[0].estado !== 'disponible'
