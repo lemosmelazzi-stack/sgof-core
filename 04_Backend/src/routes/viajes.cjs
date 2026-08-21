@@ -964,6 +964,7 @@ router.post('/asignar', async (req, res) => {
       FROM taxis
       WHERE id = $1
       LIMIT 1
+      FOR UPDATE
     `, [taxi_id]);
 
     if (taxiExiste.rows.length === 0) {
@@ -973,7 +974,7 @@ router.post('/asignar', async (req, res) => {
         mensaje: 'Taxi no encontrado'
       });
     }
-
+    
     if (
       taxiExiste.rows[0].activo !== true ||
       taxiExiste.rows[0].estado !== 'disponible'
