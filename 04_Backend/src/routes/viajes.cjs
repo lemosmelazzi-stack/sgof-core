@@ -1603,15 +1603,16 @@ router.put('/:id/en-origen', async (req, res) => {
         fecha_hora_llegada_origen = NOW(),
         fecha_actualizacion = NOW()
       WHERE id = $1
+        AND estado = 'en_camino_origen'
       RETURNING *
       `,
       [id]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({
+      return res.status(400).json({
         ok: false,
-        mensaje: 'Viaje no encontrado'
+        mensaje: 'El viaje ya no está disponible para marcar en origen'
       });
     }
 
