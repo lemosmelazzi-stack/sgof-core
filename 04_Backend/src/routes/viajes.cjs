@@ -584,6 +584,7 @@ if (viaje.estado !== 'en_origen') {
       fecha_hora_inicio = NOW(),
       fecha_actualizacion = NOW()
   WHERE id = $1
+    AND estado = 'en_origen'
   RETURNING
     id,
     codigo,
@@ -596,6 +597,13 @@ if (viaje.estado !== 'en_origen') {
     destino_longitud,
     destino_direccion
 `, [id]);
+
+if (resultViaje.rows.length === 0) {
+  return res.status(400).json({
+    ok: false,
+    mensaje: 'El viaje ya no está disponible para iniciar'
+  });
+}
 
    const resultTaxi = await pool.query(`
   UPDATE taxis
