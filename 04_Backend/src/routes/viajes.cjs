@@ -650,6 +650,7 @@ router.post('/:id/finalizar', async (req, res) => {
       FROM viajes
       WHERE id = $1
       LIMIT 1
+      FOR UPDATE
     `, [id]);
 
     if (viajeResult.rows.length === 0) {
