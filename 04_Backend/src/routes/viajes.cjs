@@ -427,17 +427,32 @@ router.post('/:id/despachar', async (req, res) => {
 });
 
 router.post('/:id/rechazar', async (req, res) => {
-  try {
-    const { id } = req.params;
+  const { id } = req.params;
+  const { taxi_id } = req.body || {};
 
-    const viajeActual = await pool.query(`
+  if (!taxi_id) {
+    return res.status(400).json({
+      ok: false,
+      mensaje: 'taxi_id es obligatorio para rechazar el viaje'
+    });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const viajeActual = await client.query(`
       SELECT id, codigo, estado, taxi_id
       FROM viajes
       WHERE id = $1
       LIMIT 1
+      FOR UPDATE
     `, [id]);
 
     if (viajeActual.rows.length === 0) {
+      await client.query('ROLLBACK');
+
       return res.status(404).json({
         ok: false,
         mensaje: 'Viaje no encontrado'
@@ -446,51 +461,82 @@ router.post('/:id/rechazar', async (req, res) => {
 
     const viaje = viajeActual.rows[0];
 
-if (viaje.estado !== 'asignado') {
-  return res.status(400).json({
-    ok: false,
-    mensaje: `No se puede rechazar un viaje en estado ${viaje.estado}`
-  });
-}
-const taxiActualId = viaje.taxi_id;
-if (!taxiActualId) {
+    if (viaje.estado !== 'asignado') {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        mensaje: `No se puede rechazar un viaje en estado ${viaje.estado}`
+      });
+    }
+
+    if (!viaje.taxi_id) {
+      await client.query('ROLLBACK');
+
       return res.status(400).json({
         ok: false,
         mensaje: 'El viaje no tiene taxi asignado para rechazar'
       });
     }
 
-    await pool.query(`
+    if (viaje.taxi_id !== taxi_id) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El taxi indicado ya no corresponde a la asignación actual del viaje'
+      });
+    }
+
+    const taxiActualId = viaje.taxi_id;
+
+    await client.query(`
       UPDATE taxis
       SET estado = 'disponible',
           fecha_actualizacion = NOW()
       WHERE id = $1
     `, [taxiActualId]);
-await colaTaxis.moverTaxiAlFinal(
-  pool,
-  taxiActualId,
-  'Taxi rechazó viaje'
-);
-    const siguienteTaxi = await pool.query(`
-  SELECT id, codigo_movil
-  FROM taxis
-  WHERE estado = 'disponible'
-    AND activo = true
-    AND orden_cola IS NOT NULL
-    AND id <> $1
-  ORDER BY orden_cola ASC
-  LIMIT 1
-`, [taxiActualId]);
+
+    await colaTaxis.moverTaxiAlFinal(
+      client,
+      taxiActualId,
+      'Taxi rechazó viaje'
+    );
+
+    const siguienteTaxi = await client.query(`
+      SELECT id, codigo_movil
+      FROM taxis
+      WHERE estado = 'disponible'
+        AND activo = true
+        AND orden_cola IS NOT NULL
+        AND id <> $1
+      ORDER BY orden_cola ASC
+      LIMIT 1
+      FOR UPDATE SKIP LOCKED
+    `, [taxiActualId]);
 
     if (siguienteTaxi.rows.length === 0) {
-      const viajePendiente = await pool.query(`
+      const viajePendiente = await client.query(`
         UPDATE viajes
         SET taxi_id = NULL,
             estado = 'pendiente',
             fecha_actualizacion = NOW()
         WHERE id = $1
+          AND estado = 'asignado'
+          AND taxi_id = $2
         RETURNING id, codigo, estado, taxi_id
-      `, [id]);
+      `, [id, taxiActualId]);
+
+      if (viajePendiente.rows.length === 0) {
+        await client.query('ROLLBACK');
+
+        return res.status(400).json({
+          ok: false,
+          mensaje: 'El viaje ya no está disponible para rechazar'
+        });
+      }
+
+      await client.query('COMMIT');
 
       return res.json({
         ok: true,
@@ -502,24 +548,37 @@ await colaTaxis.moverTaxiAlFinal(
 
     const nuevoTaxi = siguienteTaxi.rows[0];
 
-    const viajeReasignado = await pool.query(`
+    const viajeReasignado = await client.query(`
       UPDATE viajes
       SET taxi_id = $1,
           estado = 'asignado',
           fecha_hora_asignacion = NOW(),
           fecha_actualizacion = NOW()
       WHERE id = $2
+        AND estado = 'asignado'
+        AND taxi_id = $3
       RETURNING id, codigo, estado, taxi_id
-    `, [nuevoTaxi.id, id]);
+    `, [nuevoTaxi.id, id, taxiActualId]);
 
-    await pool.query(`
+    if (viajeReasignado.rows.length === 0) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El viaje ya no está disponible para rechazar'
+      });
+    }
+
+    await client.query(`
       UPDATE taxis
       SET estado = 'ocupado',
           fecha_actualizacion = NOW()
       WHERE id = $1
     `, [nuevoTaxi.id]);
 
-    res.json({
+    await client.query('COMMIT');
+
+    return res.json({
       ok: true,
       mensaje: `Taxi rechazado. Viaje reasignado a ${nuevoTaxi.codigo_movil}`,
       viaje: viajeReasignado.rows[0],
@@ -527,13 +586,18 @@ await colaTaxis.moverTaxiAlFinal(
     });
 
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.error('Error en POST /viajes/:id/rechazar:', error);
 
-    res.status(500).json({
+    return res.status(500).json({
       ok: false,
       mensaje: 'Error al rechazar y reasignar viaje',
       error: error.message
     });
+
+  } finally {
+    client.release();
   }
 });
 

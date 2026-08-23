@@ -704,10 +704,23 @@ async function rechazarViaje() {
   }
 
   try {
+    const taxiIdActual = window.viajeSeleccionado?.taxi_id;
+
+    if (!taxiIdActual) {
+      alert('El viaje no tiene taxi asignado para rechazar');
+      return;
+    }
+
     const res = await fetch(
       `/viajes/${window.viajeSeleccionadoId}/rechazar`,
       {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          taxi_id: taxiIdActual
+        })
       }
     );
 
