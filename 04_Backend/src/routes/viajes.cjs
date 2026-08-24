@@ -1222,6 +1222,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 
   return R * c;
 }
+const UMBRAL_KM_ROMPER_COLA = 1.5;
 
 async function diagnosticarAsignacionInteligente(pool, viajeId) {
   const viajeResult = await pool.query(`
@@ -1341,8 +1342,6 @@ async function diagnosticarAsignacionInteligente(pool, viajeId) {
 
   const diferenciaKm =
     taxiBase.distancia_origen_km - taxiMasCercano.distancia_origen_km;
-
-  const UMBRAL_KM_ROMPER_COLA = 1.5;
 
   const decisionActual = diferenciaKm >= UMBRAL_KM_ROMPER_COLA
     ? taxiMasCercano
@@ -1526,7 +1525,7 @@ async function seleccionarTaxiInteligente(viajeId) {
 
     if (
       masCercano.taxi_id !== primeroColaValido.taxi_id &&
-      diferenciaKm >= 1.5
+      diferenciaKm >= UMBRAL_KM_ROMPER_COLA
     ) {
       recomendado = masCercano;
       motivo = `Se rompe cola: ${masCercano.codigo_movil} está ${diferenciaKm.toFixed(2)} km más cerca que ${primeroColaValido.codigo_movil}.`;
