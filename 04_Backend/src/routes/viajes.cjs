@@ -1564,6 +1564,8 @@ async function seleccionarTaxiInteligente(viajeId) {
 router.post('/:id/asignar-automatico', async (req, res) => {
   const { id } = req.params;
 
+  const client = await pool.connect();
+
   try {
     const decision = await seleccionarTaxiInteligente(id);
 
@@ -1571,7 +1573,58 @@ router.post('/:id/asignar-automatico', async (req, res) => {
       return res.status(400).json(decision);
     }
 
-    const result = await pool.query(`
+    await client.query('BEGIN');
+
+    const taxiBloqueado = await client.query(`
+      SELECT id, codigo_movil, estado, activo
+      FROM taxis
+      WHERE id = $1
+      LIMIT 1
+      FOR UPDATE
+    `, [decision.taxi_id]);
+
+    if (taxiBloqueado.rows.length === 0) {
+      await client.query('ROLLBACK');
+
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Taxi recomendado no encontrado'
+      });
+    }
+
+    const taxi = taxiBloqueado.rows[0];
+
+    if (
+      taxi.activo !== true ||
+      taxi.estado !== 'disponible'
+    ) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        mensaje: `El taxi ${taxi.codigo_movil} ya no está disponible para asignación automática`
+      });
+    }
+
+    const viajeOperativoTaxi = await client.query(`
+      SELECT id, codigo, estado
+      FROM viajes
+      WHERE taxi_id = $1
+        AND estado IN ('asignado', 'en_camino_origen', 'en_origen', 'en_curso')
+        AND id <> $2
+      LIMIT 1
+    `, [decision.taxi_id, id]);
+
+    if (viajeOperativoTaxi.rows.length > 0) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        mensaje: `El taxi ${taxi.codigo_movil} ya posee un viaje operativo`
+      });
+    }
+
+    const result = await client.query(`
       UPDATE viajes
       SET
         taxi_id = $1,
@@ -1584,15 +1637,15 @@ router.post('/:id/asignar-automatico', async (req, res) => {
     `, [decision.taxi_id, id]);
 
     if (result.rows.length === 0) {
+      await client.query('ROLLBACK');
+
       return res.status(400).json({
         ok: false,
         mensaje: 'No se pudo asignar el viaje'
       });
     }
 
- 
-
-    await pool.query(`
+    await client.query(`
       UPDATE taxis
       SET
         estado = 'ocupado',
@@ -1600,12 +1653,15 @@ router.post('/:id/asignar-automatico', async (req, res) => {
       WHERE id = $1
     `, [decision.taxi_id]);
 
+    await client.query('COMMIT');
+
     req.io?.emit('viaje-actualizado', result.rows[0]);
 
     req.io?.emit('taxi-actualizado', {
       taxi_id: decision.taxi_id,
       estado: 'ocupado'
     });
+
     req.io?.emit('cola-operativa-actualizada');
 
     return res.json({
@@ -1624,6 +1680,8 @@ router.post('/:id/asignar-automatico', async (req, res) => {
     });
 
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.error('Error en asignación automática inteligente:', error);
 
     return res.status(500).json({
@@ -1631,6 +1689,9 @@ router.post('/:id/asignar-automatico', async (req, res) => {
       mensaje: 'Error interno en asignación automática inteligente',
       error: error.message
     });
+
+  } finally {
+    client.release();
   }
 });
 
