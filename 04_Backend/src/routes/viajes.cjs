@@ -5,6 +5,14 @@ const pool = require('../../config/db');
 const colaTaxis = require('../services/colaTaxis.cjs');
 const ESTADOS_VIAJE_VALIDOS = Object.values(ESTADOS.VIAJE);
 
+function fechaValida(valor) {
+  if (!valor) return true;
+
+  const fecha = new Date(valor);
+
+  return !Number.isNaN(fecha.getTime());
+}
+
 // ✅ CREAR PEDIDO + VIAJE TEST
 router.post('/', async (req, res) => {
   const client = await pool.connect();
@@ -137,6 +145,13 @@ router.get('/resumen', async (req, res) => {
         mensaje: 'Estado de viaje inválido'
       });
     }
+    if (!fechaValida(desde) || !fechaValida(hasta)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'desde y hasta deben contener fechas válidas'
+      });
+    }
+
     // 🔹 Construir filtros dinámicos
     let filtros = [];
     let valores = [];
@@ -238,10 +253,18 @@ router.get('/resumen', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
    const { empresa_id, estado, desde, hasta, limit, offset, sort, order } = req.query;
+
    if (estado && !ESTADOS_VIAJE_VALIDOS.includes(estado)) {
      return res.status(400).json({
        ok: false,
        mensaje: 'Estado de viaje inválido'
+     });
+   }
+
+   if (!fechaValida(desde) || !fechaValida(hasta)) {
+     return res.status(400).json({
+       ok: false,
+       mensaje: 'desde y hasta deben contener fechas válidas'
      });
    }
 
