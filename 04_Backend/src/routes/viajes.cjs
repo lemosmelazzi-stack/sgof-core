@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../config/db');
 const colaTaxis = require('../services/colaTaxis.cjs');
+const ESTADOS_VIAJE_VALIDOS = Object.values(ESTADOS.VIAJE);
 
 // ✅ CREAR PEDIDO + VIAJE TEST
 router.post('/', async (req, res) => {
@@ -130,6 +131,12 @@ router.get('/resumen', async (req, res) => {
   try {
     const { desde, hasta, estado } = req.query;
 
+    if (estado && !ESTADOS_VIAJE_VALIDOS.includes(estado)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'Estado de viaje inválido'
+      });
+    }
     // 🔹 Construir filtros dinámicos
     let filtros = [];
     let valores = [];
@@ -231,6 +238,12 @@ router.get('/resumen', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
    const { empresa_id, estado, desde, hasta, limit, offset, sort, order } = req.query;
+   if (estado && !ESTADOS_VIAJE_VALIDOS.includes(estado)) {
+     return res.status(400).json({
+       ok: false,
+       mensaje: 'Estado de viaje inválido'
+     });
+   }
 
    let query = `
   SELECT
