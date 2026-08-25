@@ -13,6 +13,12 @@ function fechaValida(valor) {
   return !Number.isNaN(fecha.getTime());
 }
 
+function uuidValido(valor) {
+  if (!valor) return true;
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(valor);
+}
+
 // ✅ CREAR PEDIDO + VIAJE TEST
 router.post('/', async (req, res) => {
   const client = await pool.connect();
@@ -260,6 +266,13 @@ router.get('/resumen', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
    const { empresa_id, estado, desde, hasta, limit, offset, sort, order } = req.query;
+
+   if (!uuidValido(empresa_id)) {
+     return res.status(400).json({
+       ok: false,
+       mensaje: 'empresa_id debe ser un UUID válido'
+     });
+   }
 
    if (estado && !ESTADOS_VIAJE_VALIDOS.includes(estado)) {
      return res.status(400).json({
