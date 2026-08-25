@@ -355,8 +355,8 @@ router.get('/', async (req, res) => {
 const conditions = [];
 const values = [];
 
-const parsedLimit = limit ? parseInt(limit, 10) : null;
-const parsedOffset = offset ? parseInt(offset, 10) : 0;
+const parsedLimit = limit ? Number(limit) : null;
+const parsedOffset = offset ? Number(offset) : 0;
 if (
   parsedLimit !== null &&
   (!Number.isInteger(parsedLimit) || parsedLimit <= 0)
