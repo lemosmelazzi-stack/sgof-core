@@ -367,6 +367,13 @@ if (
   });
 }
 
+if (parsedLimit !== null && parsedLimit > 1000) {
+  return res.status(400).json({
+    ok: false,
+    mensaje: 'limit no puede ser mayor que 1000'
+  });
+}
+
 if (
   !Number.isInteger(parsedOffset) ||
   parsedOffset < 0
