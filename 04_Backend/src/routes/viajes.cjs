@@ -282,6 +282,25 @@ const values = [];
 
 const parsedLimit = limit ? parseInt(limit, 10) : null;
 const parsedOffset = offset ? parseInt(offset, 10) : 0;
+if (
+  parsedLimit !== null &&
+  (!Number.isInteger(parsedLimit) || parsedLimit <= 0)
+) {
+  return res.status(400).json({
+    ok: false,
+    mensaje: 'limit debe ser un entero mayor que 0'
+  });
+}
+
+if (
+  !Number.isInteger(parsedOffset) ||
+  parsedOffset < 0
+) {
+  return res.status(400).json({
+    ok: false,
+    mensaje: 'offset debe ser un entero mayor o igual a 0'
+  });
+}
 const allowedSortFields = [
   'fecha_creacion',
   'fecha_actualizacion',
