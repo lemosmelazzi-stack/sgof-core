@@ -10,6 +10,7 @@ module.exports = {
 
   VIAJE: {
     PENDIENTE: 'pendiente',
+    ASIGNADO: 'asignado',
     EN_CAMINO_ORIGEN: 'en_camino_origen',
     EN_ORIGEN: 'en_origen',
     EN_CURSO: 'en_curso',
