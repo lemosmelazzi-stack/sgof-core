@@ -152,7 +152,14 @@ router.get('/resumen', async (req, res) => {
       });
     }
 
-    // 🔹 Construir filtros dinámicos
+    if (desde && hasta && new Date(desde) > new Date(hasta)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'desde no puede ser posterior a hasta'
+      });
+    }
+
+   // 🔹 Construir filtros dinámicos
     let filtros = [];
     let valores = [];
 
@@ -265,6 +272,13 @@ router.get('/', async (req, res) => {
      return res.status(400).json({
        ok: false,
        mensaje: 'desde y hasta deben contener fechas válidas'
+     });
+   }
+
+   if (desde && hasta && new Date(desde) > new Date(hasta)) {
+     return res.status(400).json({
+       ok: false,
+       mensaje: 'desde no puede ser posterior a hasta'
      });
    }
 
