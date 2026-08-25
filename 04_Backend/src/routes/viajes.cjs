@@ -8,9 +8,21 @@ const ESTADOS_VIAJE_VALIDOS = Object.values(ESTADOS.VIAJE);
 function fechaValida(valor) {
   if (!valor) return true;
 
-  const fecha = new Date(valor);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(valor);
 
-  return !Number.isNaN(fecha.getTime());
+  if (!match) return false;
+
+  const anio = Number(match[1]);
+  const mes = Number(match[2]);
+  const dia = Number(match[3]);
+
+  const fecha = new Date(Date.UTC(anio, mes - 1, dia));
+
+  return (
+    fecha.getUTCFullYear() === anio &&
+    fecha.getUTCMonth() === mes - 1 &&
+    fecha.getUTCDate() === dia
+  );
 }
 
 function uuidValido(valor) {
