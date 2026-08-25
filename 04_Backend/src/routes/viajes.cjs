@@ -393,6 +393,13 @@ const allowedSortFields = [
   'importe_final'
 ];
 
+if (Array.isArray(order)) {
+  return res.status(400).json({
+    ok: false,
+    mensaje: 'order debe contener un único valor'
+  });
+}
+
 const sortField = allowedSortFields.includes(sort) ? sort : 'fecha_creacion';
 const sortOrder = order && order.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 if (empresa_id) {
