@@ -304,6 +304,16 @@ if (estado) {
   conditions.push(`v.estado = $${values.length}`);
 }
 
+if (desde) {
+  values.push(desde);
+  conditions.push(`v.fecha_creacion >= $${values.length}`);
+}
+
+if (hasta) {
+  values.push(hasta);
+  conditions.push(`v.fecha_creacion <= $${values.length}`);
+}
+
 let countQuery = `
   SELECT COUNT(*) AS total
   FROM viajes v
