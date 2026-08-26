@@ -2,6 +2,12 @@ const express = require('express');
 const router = express.Router();
 const colaTaxis = require('../services/colaTaxis.cjs');
 
+function uuidValido(valor) {
+  if (!valor) return true;
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(valor);
+}
+
 async function queryConReintento(pool, sql, params = [], intentos = 2) {
   try {
     return await pool.query(sql, params);
@@ -127,6 +133,13 @@ ORDER BY g.taxi_id, g.fecha_hora_gps DESC
   router.get('/:id', async (req, res) => {
 
     const { id } = req.params;
+
+    if (!id || !uuidValido(id)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'id debe ser un UUID válido'
+      });
+    }
 
     try {
 
