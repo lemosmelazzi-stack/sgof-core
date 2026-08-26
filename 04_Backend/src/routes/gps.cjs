@@ -2,6 +2,13 @@ const express = require('express');
 const crypto = require('crypto');
 
 const router = express.Router();
+
+function uuidValido(valor) {
+  if (!valor) return true;
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(valor);
+}
+
 router.get('/ping', (req, res) => {
   res.json({ ok: true, mensaje: 'GPS router vivo' });
 });
@@ -159,6 +166,14 @@ const pool = require('../../config/db');
 router.get('/historial/:taxiId', async (req, res) => {
   try {
     const { taxiId } = req.params;
+
+    if (!taxiId || !uuidValido(taxiId)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'taxiId debe ser un UUID válido'
+      });
+    }
+
     const { desde, hasta } = req.query;
 
     let query = `
@@ -219,6 +234,13 @@ router.get('/historial/:taxiId', async (req, res) => {
 router.get('/resumen-hoy/:taxiId', async (req, res) => {
   try {
     const { taxiId } = req.params;
+
+    if (!taxiId || !uuidValido(taxiId)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'taxiId debe ser un UUID válido'
+      });
+    }
 
     const result = await pool.query(`
       SELECT
