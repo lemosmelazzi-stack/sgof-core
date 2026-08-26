@@ -38,6 +38,13 @@ router.post('/posicion', async (req, res) => {
       });
     }
 
+    if (!uuidValido(taxi_id)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'taxi_id debe ser un UUID válido'
+      });
+    }
+
     const empresaId = '4b593c63-8fdd-4c9d-bd48-54cb6ae89623';
 
     const result = await req.app.get('pool').query(
@@ -292,6 +299,18 @@ async function insertarGps(req, res, fuenteDefault, mensajeOk) {
       return res.status(400).json({
         ok: false,
         mensaje: 'Faltan empresa_id, taxi_id, latitud o longitud'
+      });
+    }
+
+    if (
+      !uuidValido(empresa_id) ||
+      !uuidValido(taxi_id) ||
+      (viaje_id && !uuidValido(viaje_id)) ||
+      (chofer_id && !uuidValido(chofer_id))
+    ) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'empresa_id, taxi_id, viaje_id y chofer_id deben ser UUID válidos'
       });
     }
 
