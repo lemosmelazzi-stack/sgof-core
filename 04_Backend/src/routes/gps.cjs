@@ -385,6 +385,13 @@ async function insertarGps(req, res, fuenteDefault, mensajeOk) {
       });
     }
 
+    if (!FUENTES_GPS_VALIDAS.includes(fuente)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'fuente GPS inválida'
+      });
+    }
+
     const result = await pool.query(`
       INSERT INTO gps_logs (
         id,
