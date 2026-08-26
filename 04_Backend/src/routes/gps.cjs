@@ -9,6 +9,52 @@ function uuidValido(valor) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(valor);
 }
 
+function fechaHoraValida(valor) {
+  if (!valor) return true;
+
+  const match = /^(\d{4}-\d{2}-\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2}))?)?$/.exec(valor);
+
+  if (!match) return false;
+
+  if (!fechaValida(match[1])) {
+    return false;
+  }
+
+  if (match[2] === undefined) {
+    return true;
+  }
+
+  const hora = Number(match[2]);
+  const minuto = Number(match[3]);
+  const segundo = match[4] === undefined ? 0 : Number(match[4]);
+
+  return (
+    hora >= 0 && hora <= 23 &&
+    minuto >= 0 && minuto <= 59 &&
+    segundo >= 0 && segundo <= 59
+  );
+}
+
+function fechaValida(valor) {
+  if (!valor) return true;
+
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(valor);
+
+  if (!match) return false;
+
+  const anio = Number(match[1]);
+  const mes = Number(match[2]);
+  const dia = Number(match[3]);
+
+  const fecha = new Date(Date.UTC(anio, mes - 1, dia));
+
+  return (
+    fecha.getUTCFullYear() === anio &&
+    fecha.getUTCMonth() === mes - 1 &&
+    fecha.getUTCDate() === dia
+  );
+}
+
 router.get('/ping', (req, res) => {
   res.json({ ok: true, mensaje: 'GPS router vivo' });
 });
@@ -183,6 +229,13 @@ router.get('/historial/:taxiId', async (req, res) => {
 
     const { desde, hasta } = req.query;
 
+    if (!fechaHoraValida(desde) || !fechaHoraValida(hasta)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'desde y hasta deben ser fechas válidas'
+      });
+    }
+
     let query = `
       SELECT
         id,
@@ -249,6 +302,15 @@ router.get('/resumen-hoy/:taxiId', async (req, res) => {
       });
     }
 
+    const { fecha } = req.query;
+
+    if (!fechaValida(fecha)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'fecha debe ser una fecha válida'
+      });
+    }
+
     const result = await pool.query(`
       SELECT
         COUNT(*)::int AS puntos_hoy,
@@ -260,8 +322,8 @@ router.get('/resumen-hoy/:taxiId', async (req, res) => {
        AND fecha_hora_gps >= COALESCE($2::date, CURRENT_DATE)
        AND fecha_hora_gps < COALESCE($2::date, CURRENT_DATE) + INTERVAL '1 day'
 
-    `, [taxiId, req.query.fecha || null]);
-    
+    `, [taxiId, fecha || null]);
+
     res.json({
       ok: true,
       taxi_id: taxiId,
