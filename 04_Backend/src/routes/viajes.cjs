@@ -485,6 +485,13 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!id || !uuidValido(id)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'id debe ser un UUID válido'
+      });
+    }
+
     const result = await pool.query(
       `
       SELECT
@@ -546,6 +553,14 @@ router.post('/:id/despachar', async (req, res) => {
 
 router.post('/:id/rechazar', async (req, res) => {
   const { id } = req.params;
+
+  if (!id || !uuidValido(id)) {
+    return res.status(400).json({
+      ok: false,
+      mensaje: 'id debe ser un UUID válido'
+    });
+  }
+
   const { taxi_id } = req.body || {};
 
   if (!taxi_id) {
@@ -723,6 +738,13 @@ router.post('/:id/iniciar', async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!id || !uuidValido(id)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'id debe ser un UUID válido'
+      });
+    }
+
     const viajeResult = await pool.query(`
       SELECT id, estado, taxi_id
       FROM viajes
@@ -824,6 +846,13 @@ router.post('/:id/finalizar', async (req, res) => {
 
   try {
     const { id } = req.params;
+
+    if (!id || !uuidValido(id)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'id debe ser un UUID válido'
+      });
+    }
 
     await client.query('BEGIN');
 
@@ -1058,12 +1087,18 @@ router.post('/test/limpiar-abiertos', async (req, res) => {
   }
 });
 
-  
+
 
 router.post('/:id/aceptar', async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!id || !uuidValido(id)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'id debe ser un UUID válido'
+      });
+    }
     const viajeResult = await pool.query(`
       SELECT id, taxi_id, estado
       FROM viajes
@@ -1681,6 +1716,13 @@ async function seleccionarTaxiInteligente(viajeId) {
 router.post('/:id/asignar-automatico', async (req, res) => {
   const { id } = req.params;
 
+  if (!id || !uuidValido(id)) {
+    return res.status(400).json({
+      ok: false,
+      mensaje: 'id debe ser un UUID válido'
+    });
+  }
+
   const client = await pool.connect();
 
   try {
@@ -1815,7 +1857,14 @@ router.post('/:id/asignar-automatico', async (req, res) => {
 router.put('/:id/en-origen', async (req, res) => {
   try {
     const { id } = req.params;
- 
+
+    if (!id || !uuidValido(id)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'id debe ser un UUID válido'
+      });
+    }
+
     const viajeActual = await pool.query(`
       SELECT id, estado, taxi_id
       FROM viajes
