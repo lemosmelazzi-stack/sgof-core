@@ -366,6 +366,8 @@ async function insertarGps(req, res, fuenteDefault, mensajeOk) {
       estado = 'activo'
     } = req.body;
 
+    const estadoFinal = estado == null ? 'activo' : estado;
+
     if (!empresa_id || !taxi_id || latitud == null || longitud == null) {
       return res.status(400).json({
         ok: false,
@@ -448,7 +450,7 @@ async function insertarGps(req, res, fuenteDefault, mensajeOk) {
       rumbo,
       fuente,
       estado_senal,
-      estado
+      estadoFinal
     ]);
 
     const gps = result.rows[0];
