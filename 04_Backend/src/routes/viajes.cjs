@@ -1191,6 +1191,13 @@ router.post('/asignar', async (req, res) => {
       });
     }
 
+    if (!uuidValido(viaje_id) || !uuidValido(taxi_id)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'viaje_id y taxi_id deben ser UUID válidos'
+      });
+    }
+
     await client.query('BEGIN');
 
     const taxiExiste = await client.query(`
