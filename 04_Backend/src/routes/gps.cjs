@@ -55,6 +55,8 @@ function fechaValida(valor) {
   );
 }
 
+const FUENTES_GPS_VALIDAS = ['tablet', 'gps', 'api', 'manual', 'backend'];
+
 router.get('/ping', (req, res) => {
   res.json({ ok: true, mensaje: 'GPS router vivo' });
 });
@@ -88,6 +90,13 @@ router.post('/posicion', async (req, res) => {
       return res.status(400).json({
         ok: false,
         mensaje: 'taxi_id debe ser un UUID válido'
+      });
+    }
+
+    if (!FUENTES_GPS_VALIDAS.includes(fuente)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'fuente GPS inválida'
       });
     }
 
