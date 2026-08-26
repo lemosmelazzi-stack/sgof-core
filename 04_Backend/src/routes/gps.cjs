@@ -392,6 +392,25 @@ async function insertarGps(req, res, fuenteDefault, mensajeOk) {
       });
     }
 
+    const lat = Number(latitud);
+    const lng = Number(longitud);
+    const velocidad = velocidad_kmh == null ? null : Number(velocidad_kmh);
+    const rumbo = rumbo_grados == null ? null : Number(rumbo_grados);
+
+    if (
+      !Number.isFinite(lat) ||
+      !Number.isFinite(lng) ||
+      lat < -90 || lat > 90 ||
+      lng < -180 || lng > 180 ||
+      (velocidad !== null && (!Number.isFinite(velocidad) || velocidad < 0)) ||
+      (rumbo !== null && (!Number.isFinite(rumbo) || rumbo < 0 || rumbo > 360))
+    ) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'Valores GPS fuera de rango'
+      });
+    }
+
     const result = await pool.query(`
       INSERT INTO gps_logs (
         id,
@@ -423,10 +442,10 @@ async function insertarGps(req, res, fuenteDefault, mensajeOk) {
       taxi_id,
       viaje_id,
       chofer_id,
-      latitud,
-      longitud,
-      velocidad_kmh,
-      rumbo_grados,
+      lat,
+      lng,
+      velocidad,
+      rumbo,
       fuente,
       estado_senal,
       estado
