@@ -413,6 +413,50 @@ async function insertarGps(req, res, fuenteDefault, mensajeOk) {
       });
     }
 
+    const referencias = await pool.query(`
+      SELECT
+        EXISTS (SELECT 1 FROM empresas WHERE id = $1) AS empresa_existe,
+        EXISTS (SELECT 1 FROM taxis WHERE id = $2) AS taxi_existe,
+        CASE
+          WHEN $3::uuid IS NULL THEN true
+          ELSE EXISTS (SELECT 1 FROM viajes WHERE id = $3)
+        END AS viaje_existe,
+        CASE
+          WHEN $4::uuid IS NULL THEN true
+          ELSE EXISTS (SELECT 1 FROM choferes WHERE id = $4)
+        END AS chofer_existe
+    `, [empresa_id, taxi_id, viaje_id, chofer_id]);
+
+    const refs = referencias.rows[0];
+
+    if (!refs.empresa_existe) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Empresa no encontrada'
+      });
+    }
+
+    if (!refs.taxi_existe) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Taxi no encontrado'
+      });
+    }
+
+    if (!refs.viaje_existe) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Viaje no encontrado'
+      });
+    }
+
+    if (!refs.chofer_existe) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Chofer no encontrado'
+      });
+    }
+
     const result = await pool.query(`
       INSERT INTO gps_logs (
         id,
