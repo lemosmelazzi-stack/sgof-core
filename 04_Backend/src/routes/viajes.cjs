@@ -570,6 +570,13 @@ router.post('/:id/rechazar', async (req, res) => {
     });
   }
 
+  if (!uuidValido(taxi_id)) {
+    return res.status(400).json({
+      ok: false,
+      mensaje: 'taxi_id debe ser un UUID válido'
+    });
+  }
+
   const client = await pool.connect();
 
   try {
