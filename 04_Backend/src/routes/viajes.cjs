@@ -1097,6 +1097,7 @@ router.post('/test/limpiar-abiertos', async (req, res) => {
 
 
 router.post('/:id/aceptar', async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
 
@@ -1106,7 +1107,10 @@ router.post('/:id/aceptar', async (req, res) => {
         mensaje: 'id debe ser un UUID válido'
       });
     }
-    const viajeResult = await pool.query(`
+
+    await client.query('BEGIN');
+
+    const viajeResult = await client.query(`
       SELECT id, taxi_id, estado
       FROM viajes
       WHERE id = $1
@@ -1114,6 +1118,7 @@ router.post('/:id/aceptar', async (req, res) => {
     `, [id]);
 
     if (viajeResult.rows.length === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).json({
         ok: false,
         mensaje: 'Viaje no encontrado'
@@ -1123,6 +1128,7 @@ router.post('/:id/aceptar', async (req, res) => {
     const viaje = viajeResult.rows[0];
 
     if (!viaje.taxi_id) {
+      await client.query('ROLLBACK');
       return res.status(400).json({
         ok: false,
         mensaje: 'El viaje no tiene taxi asignado'
@@ -1130,13 +1136,14 @@ router.post('/:id/aceptar', async (req, res) => {
     }
 
     if (viaje.estado !== 'asignado') {
+      await client.query('ROLLBACK');
       return res.status(400).json({
         ok: false,
         mensaje: `No se puede aceptar un viaje en estado ${viaje.estado}`
       });
     }
 
-    const viajeUpdate = await pool.query(`
+    const viajeUpdate = await client.query(`
       UPDATE viajes
       SET estado = 'en_camino_origen',
           fecha_actualizacion = NOW()
@@ -1146,19 +1153,22 @@ router.post('/:id/aceptar', async (req, res) => {
     `, [id]);
 
     if (viajeUpdate.rows.length === 0) {
+      await client.query('ROLLBACK');
       return res.status(400).json({
         ok: false,
         mensaje: 'El viaje ya no está disponible para aceptar'
       });
     }
 
-    const taxiUpdate = await pool.query(`
+    const taxiUpdate = await client.query(`
       UPDATE taxis
       SET estado = 'ocupado',
           fecha_actualizacion = NOW()
       WHERE id = $1
       RETURNING id, codigo_movil, estado
     `, [viaje.taxi_id]);
+
+    await client.query('COMMIT');
 
     const io = req.app.get('io');
 
@@ -1175,6 +1185,8 @@ router.post('/:id/aceptar', async (req, res) => {
     });
 
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.error('Error aceptar viaje:', error);
 
     res.status(500).json({
@@ -1182,6 +1194,9 @@ router.post('/:id/aceptar', async (req, res) => {
       mensaje: 'Error al aceptar viaje',
       error: error.message
     });
+
+  } finally {
+    client.release();
   }
 });
 
