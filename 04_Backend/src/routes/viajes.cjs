@@ -742,6 +742,7 @@ router.post('/:id/rechazar', async (req, res) => {
 });
 
 router.post('/:id/iniciar', async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
 
@@ -752,7 +753,8 @@ router.post('/:id/iniciar', async (req, res) => {
       });
     }
 
-    const viajeResult = await pool.query(`
+    await client.query('BEGIN');
+    const viajeResult = await client.query(`
       SELECT id, estado, taxi_id
       FROM viajes
       WHERE id = $1
@@ -760,6 +762,7 @@ router.post('/:id/iniciar', async (req, res) => {
     `, [id]);
 
     if (viajeResult.rows.length === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).json({
         ok: false,
         mensaje: 'Viaje no encontrado'
@@ -767,78 +770,86 @@ router.post('/:id/iniciar', async (req, res) => {
     }
 
     const viaje = viajeResult.rows[0];
-   if (viaje.estado === 'en_curso') {
-  return res.json({
-    ok: true,
-    mensaje: 'Viaje ya iniciado',
-    viaje
-  });
-}
+    if (viaje.estado === 'en_curso') {
+      await client.query('ROLLBACK');
+      return res.json({
+        ok: true,
+        mensaje: 'Viaje ya iniciado',
+        viaje
+      });
+    }
 
-if (viaje.estado !== 'en_origen') {
-  return res.status(400).json({
-    ok: false,
-    mensaje: `No se puede iniciar un viaje en estado ${viaje.estado}`
-  });
-}
+    if (viaje.estado !== 'en_origen') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        mensaje: `No se puede iniciar un viaje en estado ${viaje.estado}`
+      });
+    }
 
     if (!viaje.taxi_id) {
+      await client.query('ROLLBACK');
       return res.status(400).json({
         ok: false,
         mensaje: 'El viaje no tiene taxi asignado'
       });
     }
 
-   const resultViaje = await pool.query(`
-  UPDATE viajes
-  SET estado = 'en_curso',
-      fecha_hora_inicio = NOW(),
-      fecha_actualizacion = NOW()
-  WHERE id = $1
-    AND estado = 'en_origen'
-  RETURNING
-    id,
-    codigo,
-    estado,
-    taxi_id,
-    origen_latitud,
-    origen_longitud,
-    origen_direccion,
-    destino_latitud,
-    destino_longitud,
-    destino_direccion
-`, [id]);
+    const resultViaje = await client.query(`
+      UPDATE viajes
+      SET estado = 'en_curso',
+          fecha_hora_inicio = NOW(),
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+        AND estado = 'en_origen'
+      RETURNING
+        id,
+        codigo,
+        estado,
+        taxi_id,
+        origen_latitud,
+        origen_longitud,
+        origen_direccion,
+        destino_latitud,
+        destino_longitud,
+        destino_direccion
+    `, [id]);
 
-if (resultViaje.rows.length === 0) {
-  return res.status(400).json({
-    ok: false,
-    mensaje: 'El viaje ya no está disponible para iniciar'
-  });
-}
+    if (resultViaje.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El viaje ya no está disponible para iniciar'
+      });
+    }
 
-   const resultTaxi = await pool.query(`
-  UPDATE taxis
-  SET estado = 'ocupado',
-      fecha_actualizacion = NOW()
-  WHERE id = $1
-  RETURNING id, codigo_movil, estado
-`, [viaje.taxi_id]);
+    const resultTaxi = await client.query(`
+      UPDATE taxis
+      SET estado = 'ocupado',
+          fecha_actualizacion = NOW()
+      WHERE id = $1
+      RETURNING id, codigo_movil, estado
+    `, [viaje.taxi_id]);
 
-   const io = req.app.get('io');
+    await client.query('COMMIT');
 
-if (io) {
-  io.emit('viaje-actualizado', resultViaje.rows[0]);
-  io.emit('taxi-actualizado', resultTaxi.rows[0]);
-}
-  
+    const io = req.app.get('io');
+
+    if (io) {
+      io.emit('viaje-actualizado', resultViaje.rows[0]);
+      io.emit('taxi-actualizado', resultTaxi.rows[0]);
+    }
+
     res.json({
-  ok: true,
-  mensaje: 'Viaje iniciado correctamente',
-  viaje: resultViaje.rows[0],
-  taxi: resultTaxi.rows[0]
-});
+      ok: true,
+      mensaje: 'Viaje iniciado correctamente',
+      viaje: resultViaje.rows[0],
+      taxi: resultTaxi.rows[0]
+    });
 
   } catch (error) {
+    await client.query('ROLLBACK');
+
     console.error('Error en POST /viajes/:id/iniciar:', error);
 
     res.status(500).json({
@@ -846,8 +857,12 @@ if (io) {
       mensaje: 'Error interno al iniciar viaje',
       error: error.message
     });
+
+  } finally {
+    client.release();
   }
 });
+
 router.post('/:id/finalizar', async (req, res) => {
   const client = await pool.connect();
 
