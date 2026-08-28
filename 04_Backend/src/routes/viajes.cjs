@@ -1247,7 +1247,7 @@ router.post('/asignar', async (req, res) => {
     await client.query('BEGIN');
 
     const taxiExiste = await client.query(`
-      SELECT id, codigo_movil, estado, activo
+      SELECT id, codigo_movil, estado, activo, empresa_id
       FROM taxis
       WHERE id = $1
       LIMIT 1
@@ -1270,6 +1270,29 @@ router.post('/asignar', async (req, res) => {
       return res.status(400).json({
         ok: false,
         mensaje: `El taxi ${taxiExiste.rows[0].codigo_movil} no está disponible para asignación`
+      });
+    }
+    const viajeExiste = await client.query(`
+      SELECT id, empresa_id, estado
+      FROM viajes
+      WHERE id = $1
+      LIMIT 1
+      FOR UPDATE
+    `, [viaje_id]);
+
+    if (viajeExiste.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({
+        ok: false,
+        mensaje: 'Viaje no encontrado'
+      });
+    }
+
+    if (viajeExiste.rows[0].empresa_id !== taxiExiste.rows[0].empresa_id) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        ok: false,
+        mensaje: 'El viaje y el taxi pertenecen a empresas diferentes'
       });
     }
 
