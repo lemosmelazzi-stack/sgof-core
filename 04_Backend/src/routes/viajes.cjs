@@ -1061,12 +1061,21 @@ router.post('/test/limpiar-abiertos', async (req, res) => {
       RETURNING id, codigo, estado, taxi_id
     `);
 
-    const taxisLiberados = await client.query(`
-      UPDATE taxis
-      SET estado = 'disponible',
-          fecha_actualizacion = NOW()
-      RETURNING id, codigo_movil, estado
-    `);
+    const taxiIds = viajesCerrados.rows
+      .map(viaje => viaje.taxi_id)
+      .filter(Boolean);
+
+    let taxisLiberados = { rows: [] };
+
+    if (taxiIds.length > 0) {
+      taxisLiberados = await client.query(`
+        UPDATE taxis
+        SET estado = 'disponible',
+            fecha_actualizacion = NOW()
+        WHERE id = ANY($1::uuid[])
+        RETURNING id, codigo_movil, estado
+      `, [taxiIds]);
+    }
 
     await client.query(`
       WITH cola_ordenada AS (
