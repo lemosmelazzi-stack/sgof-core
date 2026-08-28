@@ -970,9 +970,9 @@ router.post('/:id/finalizar', async (req, res) => {
 });
 
 router.post('/test', async (req, res) => {
-  
   try {
-   const empresaId = '4b593c63-8fdd-4c9d-bd48-54cb6ae89623'; 
+    const empresaId = '4b593c63-8fdd-4c9d-bd48-54cb6ae89623';
+
     const result = await pool.query(`
       WITH nuevo_pedido AS (
         INSERT INTO pedidos (
@@ -1022,26 +1022,27 @@ router.post('/test', async (req, res) => {
       RETURNING *;
     `, [empresaId]);
 
-   const io = req.app.get('io');
+    const io = req.app.get('io');
 
-if (io) {
-  
-  io.emit('viaje-creado', result.rows[0]);
-}
+    if (io) {
+      io.emit('viaje-creado', result.rows[0]);
+    }
 
-res.json({ ok: true, data: result.rows[0] });
-
+    res.json({
+      ok: true,
+      data: result.rows[0]
+    });
 
   } catch (error) {
-  console.error('ERROR REAL CREANDO TEST:', error);
+    console.error('ERROR REAL CREANDO TEST:', error);
 
-  res.status(500).json({
-    ok: false,
-    mensaje: 'Error creando test',
-    error: error.message,
-    detalle: error.detail || null
-  });
-}
+    res.status(500).json({
+      ok: false,
+      mensaje: 'Error creando test',
+      error: error.message,
+      detalle: error.detail || null
+    });
+  }
 });
 
 router.post('/test/limpiar-abiertos', async (req, res) => {
