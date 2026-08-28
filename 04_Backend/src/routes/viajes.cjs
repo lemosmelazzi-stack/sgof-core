@@ -1665,7 +1665,7 @@ async function diagnosticarAsignacionInteligente(pool, viajeId) {
 
 async function seleccionarTaxiInteligente(viajeId) {
   const viajeResult = await pool.query(`
-    SELECT id, estado, origen_latitud, origen_longitud
+    SELECT id, empresa_id, estado, origen_latitud, origen_longitud
     FROM viajes
     WHERE id = $1
     LIMIT 1
@@ -1694,11 +1694,12 @@ async function seleccionarTaxiInteligente(viajeId) {
       g.fecha_hora_gps
     FROM taxis t
     LEFT JOIN gps_logs g ON g.taxi_id = t.id
-    WHERE t.estado = 'disponible'
+    WHERE t.empresa_id = $1
+      AND t.estado = 'disponible'
       AND t.activo = true
       AND t.orden_cola IS NOT NULL
     ORDER BY t.id, g.fecha_hora_gps DESC NULLS LAST
-  `);
+  `, [viaje.empresa_id]);
 
   const ahora = new Date();
 
