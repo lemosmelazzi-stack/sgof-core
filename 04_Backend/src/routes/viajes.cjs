@@ -937,21 +937,20 @@ router.post('/:id/finalizar', async (req, res) => {
 
     await client.query('COMMIT');
 
+    const io = req.app.get('io');
 
-const io = req.app.get('io');
+    if (io) {
+      io.emit('viaje-actualizado', viajeFinalizado.rows[0]);
+      io.emit('taxi-actualizado', taxiResult.rows[0]);
+      io.emit('cola-operativa-actualizada');
+    }
 
-if (io) {
-  io.emit('viaje-actualizado', viajeFinalizado.rows[0]);
-  io.emit('taxi-actualizado', taxiResult.rows[0]);
-  io.emit('cola-operativa-actualizada');
-}
-
-res.json({
-  ok: true,
-  mensaje: 'Viaje finalizado correctamente',
-  viaje: viajeFinalizado.rows[0],
-  taxi: taxiResult.rows[0]
-});
+    res.json({
+      ok: true,
+      mensaje: 'Viaje finalizado correctamente',
+      viaje: viajeFinalizado.rows[0],
+      taxi: taxiResult.rows[0]
+    });
 
 
   } catch (error) {
