@@ -1925,14 +1925,18 @@ router.post('/:id/asignar-automatico', async (req, res) => {
 
     await client.query('COMMIT');
 
-    req.io?.emit('viaje-actualizado', result.rows[0]);
+    const io = req.app.get('io');
 
-    req.io?.emit('taxi-actualizado', {
-      taxi_id: decision.taxi_id,
-      estado: 'ocupado'
-    });
+    if (io) {
+      io.emit('viaje-actualizado', result.rows[0]);
 
-    req.io?.emit('cola-operativa-actualizada');
+      io.emit('taxi-actualizado', {
+        taxi_id: decision.taxi_id,
+        estado: 'ocupado'
+      });
+
+      io.emit('cola-operativa-actualizada');
+    }
 
     return res.json({
       ok: true,
