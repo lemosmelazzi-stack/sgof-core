@@ -1705,6 +1705,16 @@ async function seleccionarTaxiInteligente(viajeId) {
     return { ok: false, mensaje: 'El viaje no está pendiente' };
   }
 
+  if (
+    viaje.origen_latitud === null ||
+    viaje.origen_longitud === null
+  ) {
+    return {
+      ok: false,
+      mensaje: 'El viaje no tiene coordenadas de origen'
+    };
+  }
+
   const origenLat = Number(viaje.origen_latitud);
   const origenLng = Number(viaje.origen_longitud);
 
