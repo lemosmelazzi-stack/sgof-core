@@ -1500,11 +1500,12 @@ async function diagnosticarAsignacionInteligente(pool, viajeId) {
       ORDER BY fecha_hora_gps DESC
       LIMIT 1
     ) gl ON true
-    WHERE t.estado = 'disponible'
+    WHERE t.empresa_id = $1
+      AND t.estado = 'disponible'
       AND t.activo = true
       AND t.orden_cola IS NOT NULL
     ORDER BY t.orden_cola ASC
-  `);
+  `, [viaje.empresa_id]);
 
   const taxisConDistancia = taxisResult.rows.map((taxi) => {
     const distanciaKm = calcularDistancia(
