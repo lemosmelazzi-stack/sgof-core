@@ -1451,12 +1451,13 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 
   return R * c;
 }
-const UMBRAL_KM_ROMPER_COLA = 1.5;
+
 
 async function diagnosticarAsignacionInteligente(pool, viajeId) {
   const viajeResult = await pool.query(`
     SELECT
       id,
+      empresa_id,
       estado,
       origen_latitud,
       origen_longitud
@@ -1471,6 +1472,17 @@ async function diagnosticarAsignacionInteligente(pool, viajeId) {
   }
 
   const viaje = viajeResult.rows[0];
+
+  const configuracionResult = await pool.query(`
+    SELECT umbral_km_romper_cola
+    FROM configuracion_empresa
+    WHERE empresa_id = $1
+    LIMIT 1
+  `, [viaje.empresa_id]);
+
+  const umbralKmRomperCola = configuracionResult.rows.length > 0
+    ? Number(configuracionResult.rows[0].umbral_km_romper_cola)
+    : 1.0;
 
   const taxisResult = await pool.query(`
     SELECT 
@@ -1572,7 +1584,7 @@ async function diagnosticarAsignacionInteligente(pool, viajeId) {
   const diferenciaKm =
     taxiBase.distancia_origen_km - taxiMasCercano.distancia_origen_km;
 
-  const decisionActual = diferenciaKm >= UMBRAL_KM_ROMPER_COLA
+  const decisionActual = diferenciaKm >= umbralKmRomperCola
     ? taxiMasCercano
     : taxiBase;
 
@@ -1611,7 +1623,7 @@ async function diagnosticarAsignacionInteligente(pool, viajeId) {
 
   console.log(
     'Decisión sugerida:',
-    diferenciaKm >= UMBRAL_KM_ROMPER_COLA
+    diferenciaKm >= umbralKmRomperCola
       ? 'ROMPER COLA por proximidad'
       : 'RESPETAR COLA'
   );
@@ -1676,6 +1688,17 @@ async function seleccionarTaxiInteligente(viajeId) {
   }
 
   const viaje = viajeResult.rows[0];
+
+  const configuracionResult = await pool.query(`
+    SELECT umbral_km_romper_cola
+    FROM configuracion_empresa
+    WHERE empresa_id = $1
+    LIMIT 1
+  `, [viaje.empresa_id]);
+
+  const umbralKmRomperCola = configuracionResult.rows.length > 0
+    ? Number(configuracionResult.rows[0].umbral_km_romper_cola)
+    : 1.0;
 
   if (viaje.estado !== 'pendiente') {
     return { ok: false, mensaje: 'El viaje no está pendiente' };
@@ -1755,7 +1778,7 @@ async function seleccionarTaxiInteligente(viajeId) {
 
     if (
       masCercano.taxi_id !== primeroColaValido.taxi_id &&
-      diferenciaKm >= UMBRAL_KM_ROMPER_COLA
+      diferenciaKm >= umbralKmRomperCola
     ) {
       recomendado = masCercano;
       motivo = `Se rompe cola: ${masCercano.codigo_movil} está ${diferenciaKm.toFixed(2)} km más cerca que ${primeroColaValido.codigo_movil}.`;
