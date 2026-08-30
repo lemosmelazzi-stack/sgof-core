@@ -1473,6 +1473,14 @@ async function diagnosticarAsignacionInteligente(pool, viajeId) {
 
   const viaje = viajeResult.rows[0];
 
+  if (
+    viaje.origen_latitud === null ||
+    viaje.origen_longitud === null
+  ) {
+    console.log('DIAG INTELIGENTE: viaje sin coordenadas de origen');
+    return;
+  }
+
   const configuracionResult = await pool.query(`
     SELECT umbral_km_romper_cola
     FROM configuracion_empresa
